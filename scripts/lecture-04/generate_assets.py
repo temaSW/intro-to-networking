@@ -97,62 +97,118 @@ def constellation(name: str, side: int, noise: float = 0) -> None:
     write(filenames[name], body, name)
 
 
+def fft(values: list[complex]) -> list[complex]:
+    """In-place radix-2 FFT, sufficient for reproducible Welch spectra."""
+    size = len(values)
+    j = 0
+    for i in range(1, size):
+        bit = size >> 1
+        while j & bit:
+            j ^= bit
+            bit >>= 1
+        j ^= bit
+        if i < j:
+            values[i], values[j] = values[j], values[i]
+    length = 2
+    while length <= size:
+        root = complex(math.cos(-2 * math.pi / length), math.sin(-2 * math.pi / length))
+        for start in range(0, size, length):
+            phase = 1 + 0j
+            for offset in range(length // 2):
+                even = values[start + offset]
+                odd = phase * values[start + offset + length // 2]
+                values[start + offset] = even + odd
+                values[start + offset + length // 2] = even - odd
+                phase *= root
+        length *= 2
+    return values
+
+
+def keying_signal(mode: str, bits: list[int], samples_per_bit: int) -> list[float]:
+    signal = []
+    phase = 0.0
+    for index in range(len(bits) * samples_per_bit):
+        bit = bits[index // samples_per_bit]
+        local = index % samples_per_bit
+        if mode == "ask":
+            value = bit * math.cos(2 * math.pi * 4 * local / samples_per_bit)
+        elif mode == "fsk":
+            phase += 2 * math.pi * (3 if bit == 0 else 5) / samples_per_bit
+            value = math.cos(phase)
+        else:
+            value = math.cos(2 * math.pi * 4 * local / samples_per_bit + math.pi * bit)
+        signal.append(value)
+    return signal
+
+
+def welch_db(signal: list[float], size: int) -> list[float]:
+    """Hann-windowed, 50%-overlap periodogram average on a long bit stream."""
+    window = [0.5 - 0.5 * math.cos(2 * math.pi * i / (size - 1)) for i in range(size)]
+    power = [0.0] * (size // 2 + 1)
+    windows = 0
+    for start in range(0, len(signal) - size + 1, size // 2):
+        spectrum = fft([complex(signal[start + i] * window[i]) for i in range(size)])
+        for i in range(len(power)):
+            power[i] += abs(spectrum[i]) ** 2
+        windows += 1
+    return [10 * math.log10(max(value / windows, 1e-20)) for value in power]
+
+
 def keying_figures() -> None:
-    """Finite 01011010 example, rectangular symbols; spectra are DFT magnitudes."""
-    bits = [0, 1, 0, 1, 1, 0, 1, 0]
-    samples_per_bit = 128
-    count = len(bits) * samples_per_bit
-    modes = {
-        "ask": ("ASK: меняется амплитуда", "Амплитуда"),
-        "fsk": ("FSK: меняется частота", "Частота"),
-        "psk": ("PSK: меняется фаза", "Фаза"),
-    }
-    for mode, (title, changing) in modes.items():
-        signal = []
-        phase = 0.0
-        for i in range(count):
-            bit = bits[i // samples_per_bit]
-            local = (i % samples_per_bit) / samples_per_bit
-            if mode == "ask":
-                value = bit * math.cos(2 * math.pi * 4 * local)
-            elif mode == "fsk":
-                frequency = 3 if bit == 0 else 5
-                phase += 2 * math.pi * frequency / samples_per_bit
-                value = math.cos(phase)
-            else:
-                value = math.cos(2 * math.pi * 4 * local + math.pi * bit)
-            signal.append(value)
+    """One figure: short oscillograms and Welch spectra from 4096 random bits."""
+    shown_bits = [0, 1, 0, 1, 1, 0, 1, 0]
+    samples_per_bit = 32
+    rng = random.Random(42)
+    long_bits = [rng.randrange(2) for _ in range(4096)]
+    modes = [("ask", "ASK · амплитуда"), ("fsk", "FSK · частота"), ("psk", "PSK · фаза")]
+    width, height = 1200, 860
+    body = '<text x="35" y="42" class="title">Три способа различать биты</text><text x="300" y="88" text-anchor="middle" class="label">Сигнал во времени · 01011010</text><text x="900" y="88" text-anchor="middle" class="label">Усреднённая спектральная плотность, дБ</text>'
+    for row, (mode, label) in enumerate(modes):
+        top = 112 + row * 243
+        baseline = top + 112
+        x0, x1 = 120, 570
+        sx0, sx1 = 680, 1160
+        body += f'<text x="35" y="{top+24}" class="title">{label}</text>'
+        for j, bit in enumerate(shown_bits):
+            x = x0 + j * (x1-x0) / len(shown_bits)
+            body += f'<rect x="{x:.1f}" y="{top+39}" width="{(x1-x0)/len(shown_bits):.1f}" height="153" fill="{"#e9f1f0" if j%2 == 0 else BG}"/><line x1="{x:.1f}" y1="{top+39}" x2="{x:.1f}" y2="{top+192}" class="grid"/><text x="{x+(x1-x0)/16:.1f}" y="{top+59}" text-anchor="middle" class="muted">{bit}</text>'
+        signal = keying_signal(mode, shown_bits, samples_per_bit)
+        points = " ".join(f"{x0+i/(len(signal)-1)*(x1-x0):.1f},{baseline-65*v:.1f}" for i, v in enumerate(signal))
+        body += f'<line x1="{x0}" y1="{baseline}" x2="{x1}" y2="{baseline}" class="axis"/><polyline points="{points}" fill="none" stroke="{ACCENT}" stroke-width="2"/>'
 
-        # Oscillogram: one displayed period is one bit interval.
-        body = f'<text x="64" y="35" class="title">{esc(title)}</text><text x="64" y="66" class="muted">01011010 · меняется: {esc(changing.lower())}</text>'
-        x0, x1, baseline, amplitude = 70, 860, 285, 105
-        for j, bit in enumerate(bits):
-            x = x0 + j * (x1 - x0) / len(bits)
-            body += f'<rect x="{x:.1f}" y="120" width="{(x1-x0)/len(bits):.1f}" height="330" fill="{BG if j % 2 else "#e9f1f0"}"/><line x1="{x:.1f}" y1="120" x2="{x:.1f}" y2="450" class="grid"/><text x="{x+(x1-x0)/16:.1f}" y="160" text-anchor="middle" class="title">{bit}</text>'
-        points = " ".join(f"{x0+i/(count-1)*(x1-x0):.1f},{baseline-amplitude*v:.1f}" for i, v in enumerate(signal))
-        body += f'<line x1="{x0}" y1="{baseline}" x2="{x1}" y2="{baseline}" class="axis"/><polyline points="{points}" fill="none" stroke="{ACCENT}" stroke-width="2.4"/><text x="465" y="482" text-anchor="middle" class="label">время →</text>'
-        write(f"{mode}-time.svg", body, f"Осциллограмма {mode.upper()}")
+        db = welch_db(keying_signal(mode, long_bits, samples_per_bit), 4096)
+        peak = max(db)
+        chart_top, chart_bottom = top + 39, top + 192
+        for frequency in (0, 2, 4, 6, 8):
+            x = sx0 + frequency/8 * (sx1-sx0)
+            body += f'<line x1="{x:.1f}" y1="{chart_top}" x2="{x:.1f}" y2="{chart_bottom}" class="grid"/><text x="{x:.1f}" y="{chart_bottom+23}" text-anchor="middle" class="muted">{frequency}</text>'
+        for level in (0, -20, -40, -60):
+            y = chart_top - level/60 * (chart_bottom-chart_top)
+            body += f'<line x1="{sx0}" y1="{y:.1f}" x2="{sx1}" y2="{y:.1f}" class="grid"/><text x="{sx0-9}" y="{y+5:.1f}" text-anchor="end" class="muted">{level}</text>'
+        # 0..8 cycles per bit: 1025 of the 2049 one-sided FFT bins.
+        spectrum = " ".join(f"{sx0+i/1024*(sx1-sx0):.1f},{chart_top+min(60,max(0,peak-db[i]))/60*(chart_bottom-chart_top):.1f}" for i in range(1025))
+        body += f'<polyline points="{spectrum}" fill="none" stroke="{ORANGE}" stroke-width="2"/><line x1="{sx0}" y1="{chart_bottom}" x2="{sx1}" y2="{chart_bottom}" class="axis"/>'
+    body += '<text x="920" y="846" text-anchor="middle" class="label">Частота, циклов на битовый интервал</text>'
+    (OUT / "keying-comparison.svg").write_text(svg(body, "Амплитудная, частотная и фазовая манипуляция").replace('viewBox="0 0 900 500"', f'viewBox="0 0 {width} {height}"'), encoding="utf-8")
 
-        # Amplitude of the finite 8-bit sequence, normalized to its own peak.
-        max_frequency = 8.0  # cycles per bit interval
-        bins = [int(f * len(bits)) for f in [j / 8 for j in range(8 * 8 + 1)]]
-        magnitudes = []
-        for k in bins:
-            real = sum(v * math.cos(2 * math.pi * k * i / count) for i, v in enumerate(signal))
-            imag = -sum(v * math.sin(2 * math.pi * k * i / count) for i, v in enumerate(signal))
-            magnitudes.append(math.hypot(real, imag))
-        peak = max(magnitudes)
-        body = f'<text x="64" y="35" class="title">{mode.upper()}: амплитудный спектр фрагмента 01011010</text><text x="64" y="66" class="muted">Прямоугольные символы; спектр конечного фрагмента, не спектральная плотность мощности</text>'
-        left, right, top, bottom = 75, 850, 100, 425
-        for frequency in range(0, 9):
-            x = left + frequency / max_frequency * (right - left)
-            body += f'<line x1="{x:.1f}" y1="{top}" x2="{x:.1f}" y2="{bottom}" class="grid"/><text x="{x:.1f}" y="451" text-anchor="middle" class="muted">{frequency}</text>'
-        for fraction in (0, .25, .5, .75, 1):
-            y = bottom - fraction * (bottom - top)
-            body += f'<line x1="{left}" y1="{y:.1f}" x2="{right}" y2="{y:.1f}" class="grid"/><text x="63" y="{y+5:.1f}" text-anchor="end" class="muted">{fraction:g}</text>'
-        points = " ".join(f"{left+j/(len(bins)-1)*(right-left):.1f},{bottom-(m/peak)*(bottom-top):.1f}" for j, m in enumerate(magnitudes))
-        body += f'<polyline points="{points}" fill="none" stroke="{ACCENT}" stroke-width="3"/><line x1="{left}" y1="{bottom}" x2="{right}" y2="{bottom}" class="axis"/><text x="465" y="485" text-anchor="middle" class="label">частота, циклов на битовый интервал</text>'
-        write(f"{mode}-spectrum.svg", body, f"Амплитудный спектр {mode.upper()}")
+
+def qpsk_modulator() -> None:
+    body = '''<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#075b6a"/></marker></defs>
+<text x="35" y="36" class="title">Квадратурный модулятор QPSK</text>
+<rect x="30" y="210" width="105" height="62" rx="8" fill="#dcecef" stroke="#075b6a"/><text x="82" y="246" text-anchor="middle" class="label">Биты</text>
+<rect x="175" y="195" width="130" height="92" rx="8" fill="#dcecef" stroke="#075b6a"/><text x="240" y="229" text-anchor="middle" class="label">По парам</text><text x="240" y="257" text-anchor="middle" class="muted">b₀, b₁</text>
+<rect x="350" y="75" width="105" height="60" rx="8" fill="#dcecef" stroke="#075b6a"/><text x="402" y="111" text-anchor="middle" class="label">I = ±1</text>
+<rect x="350" y="350" width="105" height="60" rx="8" fill="#dcecef" stroke="#075b6a"/><text x="402" y="386" text-anchor="middle" class="label">Q = ±1</text>
+<circle cx="590" cy="105" r="31" fill="#f7f8f6" stroke="#075b6a" stroke-width="2"/><text x="590" y="114" text-anchor="middle" class="title">×</text>
+<circle cx="590" cy="380" r="31" fill="#f7f8f6" stroke="#075b6a" stroke-width="2"/><text x="590" y="389" text-anchor="middle" class="title">×</text>
+<rect x="365" y="216" width="145" height="56" rx="8" fill="#fae2bc" stroke="#b05515"/><text x="437" y="250" text-anchor="middle" class="label">Генератор</text>
+<rect x="505" y="282" width="88" height="48" rx="8" fill="#fae2bc" stroke="#b05515"/><text x="549" y="312" text-anchor="middle" class="label">90°</text>
+<circle cx="745" cy="242" r="32" fill="#f7f8f6" stroke="#075b6a" stroke-width="2"/><text x="745" y="251" text-anchor="middle" class="title">+</text>
+<path d="M135 241 H175 M305 218 H325 V105 H350 M305 264 H325 V380 H350 M455 105 H559 M455 380 H559 M621 105 H690 V225 H714 M621 380 H690 V259 H714 M777 242 H862" fill="none" stroke="#075b6a" stroke-width="2.5" marker-end="url(#arrow)"/>
+<path d="M437 216 V158 H590 V136 M510 244 H549 V282 M549 330 V349" fill="none" stroke="#b05515" stroke-width="2.5" marker-end="url(#arrow)"/>
+<text x="478" y="169" class="muted">cos(ωt)</text><text x="600" y="312" class="muted">−sin(ωt)</text><text x="787" y="222" class="label">s(t)</text>
+<text x="450" y="467" text-anchor="middle" class="muted">Две ветви с несущими, сдвинутыми на 90°</text>'''
+    write("qpsk-modulator.svg", body, "Схема квадратурного модулятора QPSK")
 
 
 def main() -> None:
@@ -162,6 +218,7 @@ def main() -> None:
     constellation("64-QAM", 8)
     constellation("64-QAM + AWGN", 8, noise=.09)
     keying_figures()
+    qpsk_modulator()
 
 
 if __name__ == "__main__":

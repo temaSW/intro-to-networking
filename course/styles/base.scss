@@ -88,6 +88,13 @@ main img:not(.no-lightbox) { cursor: zoom-in; }
 .lightbox-close { position: fixed; top: .6rem; right: 1rem; border: 1px solid #fff; border-radius: .5rem; color: #fff; background: #263b46; font-size: 2rem; line-height: 1; padding: .2rem .65rem; }
 
 .lecture-interactive { background: var(--surface-alt); border: 1px solid var(--line); border-radius: .6rem; padding: 1.2rem; margin: 1.4rem 0; }
+.bottleneck-widget .bottleneck-summary { background: var(--surface); border: 1px solid var(--line); padding: .8rem 1rem; margin: .8rem 0; font-weight: 600; }
+.bottleneck-widget .bottleneck-segments { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .7rem; }
+.bottleneck-widget .bottleneck-segment { display: grid; gap: .35rem; background: var(--surface); border: 1px solid var(--line); padding: .8rem; }
+.bottleneck-widget .bottleneck-segment.is-limiting { border: 2px solid var(--focus); }
+.bottleneck-widget .bottleneck-segment span { color: var(--muted); font-size: .9rem; }
+.bottleneck-widget progress { width: 100%; accent-color: var(--accent); }
+.bottleneck-widget .is-limiting progress { accent-color: var(--focus); }
 .interactive-controls { display: flex; flex-wrap: wrap; align-items: end; gap: 1rem; margin-bottom: 1rem; }
 .interactive-controls label { display: grid; gap: .3rem; min-width: min(100%, 9rem); flex: 1 1 9rem; font-weight: 600; }
 .interactive-controls select, .interactive-controls input { width: 100%; max-width: 100%; }
@@ -106,6 +113,10 @@ main img:not(.no-lightbox) { cursor: zoom-in; }
 .metric-row > div { display: grid; gap: .2rem; }
 .metric-row strong { font-size: 1.25rem; }
 .metric-row span { color: var(--muted); font-size: .85rem; }
+.ber-controls { display: flex; flex-wrap: wrap; gap: .5rem 1rem; margin-bottom: .7rem; }
+.ber-controls label { display: inline-flex; align-items: center; gap: .35rem; cursor: pointer; }
+.ber-controls input { margin: 0; }
+.ber-plot svg { display: block; width: 100%; height: auto; max-width: 60rem; border: 1px solid var(--line); }
 
 /* The six signal figures are more legible stacked on a narrow display. */
 @media (max-width: 850px) {
@@ -114,6 +125,7 @@ main img:not(.no-lightbox) { cursor: zoom-in; }
 }
 
 @media (max-width: 760px) {
+  .bottleneck-widget .bottleneck-segments { grid-template-columns: 1fr; }
   .style-choice-grid { grid-template-columns: 1fr; }
   .resource-diagram { flex-wrap: wrap; justify-content: center; }
   .flow-arrow { transform: rotate(90deg); }

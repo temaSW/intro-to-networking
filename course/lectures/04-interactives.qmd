@@ -13,8 +13,8 @@ subtitle: "Модуляция, общий ресурс, кодирование"
 
 <div class="lecture-interactive" data-lecture-interactive="grid"></div>
 
-## Модуляция и кодирование
+## Вероятность ошибки бита после декодирования
 
-<div class="lecture-interactive" data-lecture-interactive="coding"></div>
+<div class="lecture-interactive" data-lecture-interactive="ber"></div>
 
 <script type="module" src="../interactives/lecture-04-ui.js"></script>

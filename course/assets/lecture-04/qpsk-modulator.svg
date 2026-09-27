@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500" role="img" aria-labelledby="title desc">
+  <title id="title">Схема квадратурного модулятора QPSK</title><desc id="desc">Generated reproducibly by scripts/lecture-04/generate_assets.py.</desc>
+  <rect width="100%" height="100%" fill="#f7f8f6"/>
+  <style>text{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;fill:#172b32}.muted{fill:#4d6268;font-size:15px}.axis{stroke:#172b32;stroke-width:2}.grid{stroke:#b8c9ca;stroke-width:1}.label{font-size:16px}.title{font-size:20px;font-weight:700}</style><defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#075b6a"/></marker></defs>
+<text x="35" y="36" class="title">Квадратурный модулятор QPSK</text>
+<rect x="30" y="210" width="105" height="62" rx="8" fill="#dcecef" stroke="#075b6a"/><text x="82" y="246" text-anchor="middle" class="label">Биты</text>
+<rect x="175" y="195" width="130" height="92" rx="8" fill="#dcecef" stroke="#075b6a"/><text x="240" y="229" text-anchor="middle" class="label">По парам</text><text x="240" y="257" text-anchor="middle" class="muted">b₀, b₁</text>
+<rect x="350" y="75" width="105" height="60" rx="8" fill="#dcecef" stroke="#075b6a"/><text x="402" y="111" text-anchor="middle" class="label">I = ±1</text>
+<rect x="350" y="350" width="105" height="60" rx="8" fill="#dcecef" stroke="#075b6a"/><text x="402" y="386" text-anchor="middle" class="label">Q = ±1</text>
+<circle cx="590" cy="105" r="31" fill="#f7f8f6" stroke="#075b6a" stroke-width="2"/><text x="590" y="114" text-anchor="middle" class="title">×</text>
+<circle cx="590" cy="380" r="31" fill="#f7f8f6" stroke="#075b6a" stroke-width="2"/><text x="590" y="389" text-anchor="middle" class="title">×</text>
+<rect x="365" y="216" width="145" height="56" rx="8" fill="#fae2bc" stroke="#b05515"/><text x="437" y="250" text-anchor="middle" class="label">Генератор</text>
+<rect x="505" y="282" width="88" height="48" rx="8" fill="#fae2bc" stroke="#b05515"/><text x="549" y="312" text-anchor="middle" class="label">90°</text>
+<circle cx="745" cy="242" r="32" fill="#f7f8f6" stroke="#075b6a" stroke-width="2"/><text x="745" y="251" text-anchor="middle" class="title">+</text>
+<path d="M135 241 H175 M305 218 H325 V105 H350 M305 264 H325 V380 H350 M455 105 H559 M455 380 H559 M621 105 H690 V225 H714 M621 380 H690 V259 H714 M777 242 H862" fill="none" stroke="#075b6a" stroke-width="2.5" marker-end="url(#arrow)"/>
+<path d="M437 216 V158 H590 V136 M510 244 H549 V282 M549 330 V349" fill="none" stroke="#b05515" stroke-width="2.5" marker-end="url(#arrow)"/>
+<text x="478" y="169" class="muted">cos(ωt)</text><text x="600" y="312" class="muted">−sin(ωt)</text><text x="787" y="222" class="label">s(t)</text>
+<text x="450" y="467" text-anchor="middle" class="muted">Две ветви с несущими, сдвинутыми на 90°</text></svg>
