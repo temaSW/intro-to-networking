@@ -1,32 +1,20 @@
 ---
-title: "Интерактивы лекции 04"
-subtitle: "Карточки будущих переиспользуемых компонентов"
+title: "Модели лекции 04"
+subtitle: "Модуляция, общий ресурс, кодирование"
 ---
 
-Эти компоненты пока не исполняются на сайте. Карточки фиксируют предметные параметры и наблюдения, чтобы будущая реализация на Python + marimo могла использоваться также на практике или в лабораторной работе.
+Три модели можно использовать отдельно от [лекции 04](04-physical-resource.qmd).
 
-## Constellation + AWGN {#constellation-awgn}
+## Модуляция и шум
 
-**Управление:** QPSK / 16-QAM / 64-QAM (позже 256-QAM), SNR и число символов.
+<div class="lecture-interactive" data-lecture-interactive="constellation"></div>
 
-**Наблюдение:** идеальные и принятые точки, решение ближайшей точки, symbol error rate и, при явном bit mapping, bit error rate.
+## Общий ресурс
 
-**Вопрос до запуска:** что будет, если оставить SNR и изменить QPSK на 64-QAM?
+<div class="lecture-interactive" data-lecture-interactive="grid"></div>
 
-## Time–frequency resource grid {#resource-grid}
+## Модуляция и кодирование
 
-**Управление:** пользователи и их backlog, static/dynamic allocation, размер сетки time × frequency; впоследствии — ручное назначение клеток.
+<div class="lecture-interactive" data-lecture-interactive="coding"></div>
 
-**Наблюдение:** занятые, свободные и неиспользованные клетки, обслуженный и оставшийся backlog.
-
-**Вопрос до запуска:** почему статическая доля Dave не помогает Alice, если у Dave нет данных?
-
-## Modulation + coding + channel {#modulation-coding}
-
-**Управление:** SNR, порядок модуляции, code rate и число блоков/seed.
-
-**Наблюдение:** information bits, transmitted coded bits, номинальная эффективность $Q_mR_c$ и явно модельный индикатор ошибок.
-
-**Вопрос до запуска:** что изменится при $R_c=5/6\rightarrow1/2$?
-
-Во всех трёх компонентах предметная модель должна быть отделена от UI. Они не будут кодировать универсальное соответствие MCS↔SNR.
+<script type="module" src="../interactives/lecture-04-ui.js"></script>

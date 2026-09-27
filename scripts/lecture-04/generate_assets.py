@@ -38,7 +38,7 @@ def shannon() -> None:
     left, right, top, bottom = 90, 850, 45, 430
     x = lambda db: left + (db + 10) / 45 * (right - left)
     y = lambda eta: bottom - eta / 12 * (bottom - top)
-    body = '<text x="90" y="28" class="title">Предел Шеннона: ориентир, а не MCS-таблица</text>'
+    body = '<text x="90" y="28" class="title">Предельная спектральная эффективность</text>'
     for db in range(-10, 36, 5):
         body += f'<line x1="{x(db):.1f}" y1="{top}" x2="{x(db):.1f}" y2="{bottom}" class="grid"/><text x="{x(db):.1f}" y="455" text-anchor="middle" class="muted">{db}</text>'
     for eta in range(0, 13, 2):
@@ -48,7 +48,7 @@ def shannon() -> None:
     for db in (0, 10, 20, 30):
         eta = math.log2(1 + 10 ** (db / 10))
         body += f'<circle cx="{x(db):.1f}" cy="{y(eta):.1f}" r="5" fill="{ORANGE}"/><text x="{x(db)+9:.1f}" y="{y(eta)-10:.1f}" class="muted">{db} dB → {eta:.2f}</text>'
-    body += '<text x="470" y="490" text-anchor="middle" class="label">SNR, dB</text><text x="22" y="240" transform="rotate(-90 22 240)" text-anchor="middle" class="label">η = C/B, bit/s/Hz</text>'
+    body += '<text x="470" y="490" text-anchor="middle" class="label">отношение сигнал/шум, дБ</text><text x="22" y="240" transform="rotate(-90 22 240)" text-anchor="middle" class="label">η = C/B, бит/с/Гц</text>'
     write("shannon-se.svg", body, "Спектральная эффективность по формуле Шеннона")
 
 
@@ -61,7 +61,7 @@ def mcs() -> None:
     colors = {"2": "#dcecef", "4": "#c8e1c8", "6": "#fae2bc", "8": "#e4d4ee", "10": "#ffd3cf"}
     names = {"2": "QPSK", "4": "16-QAM", "6": "64-QAM", "8": "256-QAM", "10": "1024-QAM"}
     groups = [("2", 0, 2), ("4", 3, 5), ("6", 6, 14), ("8", 15, 22), ("10", 23, 26)]
-    body = '<text x="80" y="28" class="title">Реальная MCS-лестница 5G NR: Table 5.1.3.1-4</text>'
+    body = '<text x="80" y="28" class="title">Режимы MCS 5G NR: таблица 5.1.3.1-4</text>'
     for qm, start, end in groups:
         a, b = x(start) - 12, x(end) + 12
         body += f'<rect x="{a:.1f}" y="{top}" width="{b-a:.1f}" height="{bottom-top}" fill="{colors[qm]}"/><text x="{(a+b)/2:.1f}" y="{top+22}" text-anchor="middle" class="muted">{names[qm]}</text>'
@@ -73,7 +73,7 @@ def mcs() -> None:
         body += f'<circle cx="{x(r["mcs_index"]):.1f}" cy="{y(r["spectral_efficiency"]):.1f}" r="4" fill="{ACCENT}"/>'
     body += f'<line x1="{left}" y1="{bottom}" x2="{right}" y2="{bottom}" class="axis"/><line x1="{left}" y1="{top}" x2="{left}" y2="{bottom}" class="axis"/>'
     for index in range(0, 27, 2): body += f'<text x="{x(index):.1f}" y="455" text-anchor="middle" class="muted">{index}</text>'
-    body += '<text x="470" y="490" text-anchor="middle" class="label">Iₘcₛ</text><text x="22" y="240" transform="rotate(-90 22 240)" text-anchor="middle" class="label">η ≈ QₘR, bit/s/Hz</text>'
+    body += '<text x="470" y="490" text-anchor="middle" class="label">индекс MCS</text><text x="22" y="240" transform="rotate(-90 22 240)" text-anchor="middle" class="label">η ≈ QₘR, бит/с/Гц</text>'
     write("nr-mcs-se.svg", body, "Спектральная эффективность MCS таблицы 5G NR")
 
 
@@ -97,12 +97,71 @@ def constellation(name: str, side: int, noise: float = 0) -> None:
     write(filenames[name], body, name)
 
 
+def keying_figures() -> None:
+    """Finite 01011010 example, rectangular symbols; spectra are DFT magnitudes."""
+    bits = [0, 1, 0, 1, 1, 0, 1, 0]
+    samples_per_bit = 128
+    count = len(bits) * samples_per_bit
+    modes = {
+        "ask": ("ASK: меняется амплитуда", "Амплитуда"),
+        "fsk": ("FSK: меняется частота", "Частота"),
+        "psk": ("PSK: меняется фаза", "Фаза"),
+    }
+    for mode, (title, changing) in modes.items():
+        signal = []
+        phase = 0.0
+        for i in range(count):
+            bit = bits[i // samples_per_bit]
+            local = (i % samples_per_bit) / samples_per_bit
+            if mode == "ask":
+                value = bit * math.cos(2 * math.pi * 4 * local)
+            elif mode == "fsk":
+                frequency = 3 if bit == 0 else 5
+                phase += 2 * math.pi * frequency / samples_per_bit
+                value = math.cos(phase)
+            else:
+                value = math.cos(2 * math.pi * 4 * local + math.pi * bit)
+            signal.append(value)
+
+        # Oscillogram: one displayed period is one bit interval.
+        body = f'<text x="64" y="35" class="title">{esc(title)}</text><text x="64" y="66" class="muted">01011010 · меняется: {esc(changing.lower())}</text>'
+        x0, x1, baseline, amplitude = 70, 860, 285, 105
+        for j, bit in enumerate(bits):
+            x = x0 + j * (x1 - x0) / len(bits)
+            body += f'<rect x="{x:.1f}" y="120" width="{(x1-x0)/len(bits):.1f}" height="330" fill="{BG if j % 2 else "#e9f1f0"}"/><line x1="{x:.1f}" y1="120" x2="{x:.1f}" y2="450" class="grid"/><text x="{x+(x1-x0)/16:.1f}" y="160" text-anchor="middle" class="title">{bit}</text>'
+        points = " ".join(f"{x0+i/(count-1)*(x1-x0):.1f},{baseline-amplitude*v:.1f}" for i, v in enumerate(signal))
+        body += f'<line x1="{x0}" y1="{baseline}" x2="{x1}" y2="{baseline}" class="axis"/><polyline points="{points}" fill="none" stroke="{ACCENT}" stroke-width="2.4"/><text x="465" y="482" text-anchor="middle" class="label">время →</text>'
+        write(f"{mode}-time.svg", body, f"Осциллограмма {mode.upper()}")
+
+        # Amplitude of the finite 8-bit sequence, normalized to its own peak.
+        max_frequency = 8.0  # cycles per bit interval
+        bins = [int(f * len(bits)) for f in [j / 8 for j in range(8 * 8 + 1)]]
+        magnitudes = []
+        for k in bins:
+            real = sum(v * math.cos(2 * math.pi * k * i / count) for i, v in enumerate(signal))
+            imag = -sum(v * math.sin(2 * math.pi * k * i / count) for i, v in enumerate(signal))
+            magnitudes.append(math.hypot(real, imag))
+        peak = max(magnitudes)
+        body = f'<text x="64" y="35" class="title">{mode.upper()}: амплитудный спектр фрагмента 01011010</text><text x="64" y="66" class="muted">Прямоугольные символы; спектр конечного фрагмента, не спектральная плотность мощности</text>'
+        left, right, top, bottom = 75, 850, 100, 425
+        for frequency in range(0, 9):
+            x = left + frequency / max_frequency * (right - left)
+            body += f'<line x1="{x:.1f}" y1="{top}" x2="{x:.1f}" y2="{bottom}" class="grid"/><text x="{x:.1f}" y="451" text-anchor="middle" class="muted">{frequency}</text>'
+        for fraction in (0, .25, .5, .75, 1):
+            y = bottom - fraction * (bottom - top)
+            body += f'<line x1="{left}" y1="{y:.1f}" x2="{right}" y2="{y:.1f}" class="grid"/><text x="63" y="{y+5:.1f}" text-anchor="end" class="muted">{fraction:g}</text>'
+        points = " ".join(f"{left+j/(len(bins)-1)*(right-left):.1f},{bottom-(m/peak)*(bottom-top):.1f}" for j, m in enumerate(magnitudes))
+        body += f'<polyline points="{points}" fill="none" stroke="{ACCENT}" stroke-width="3"/><line x1="{left}" y1="{bottom}" x2="{right}" y2="{bottom}" class="axis"/><text x="465" y="485" text-anchor="middle" class="label">частота, циклов на битовый интервал</text>'
+        write(f"{mode}-spectrum.svg", body, f"Амплитудный спектр {mode.upper()}")
+
+
 def main() -> None:
     shannon(); mcs()
     constellation("QPSK", 2)
     constellation("16-QAM", 4)
     constellation("64-QAM", 8)
     constellation("64-QAM + AWGN", 8, noise=.09)
+    keying_figures()
 
 
 if __name__ == "__main__":

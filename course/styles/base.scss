@@ -75,10 +75,49 @@ table td, table th { border-color: var(--line); overflow-wrap: anywhere; }
 .quarto-dark .tf-grid .bob, .quarto-dark .grid-legend .bob { background: #7d571e; }
 .quarto-dark .tf-grid .carol, .quarto-dark .grid-legend .carol { background: #526d31; }
 
+/* Lecture 04: diagrams expand via the native dialog element. */
+main img:not(.no-lightbox) { cursor: zoom-in; }
+.lecture-lightbox {
+  position: fixed; inset: 0; width: 100vw; height: 100dvh; max-width: none; max-height: none;
+  margin: 0; padding: 3.5rem 1rem 1rem; border: 0; background: #0d171eea; color: #fff;
+  text-align: center; overflow: auto;
+}
+.lecture-lightbox::backdrop { background: #0d171eea; }
+.lecture-lightbox img { width: auto; height: auto; max-width: 96vw; max-height: calc(100dvh - 7rem); object-fit: contain; cursor: default !important; }
+.lecture-lightbox p { color: #fff; margin: .5rem auto; max-width: 70rem; }
+.lightbox-close { position: fixed; top: .6rem; right: 1rem; border: 1px solid #fff; border-radius: .5rem; color: #fff; background: #263b46; font-size: 2rem; line-height: 1; padding: .2rem .65rem; }
+
+.lecture-interactive { background: var(--surface-alt); border: 1px solid var(--line); border-radius: .6rem; padding: 1.2rem; margin: 1.4rem 0; }
+.interactive-controls { display: flex; flex-wrap: wrap; align-items: end; gap: 1rem; margin-bottom: 1rem; }
+.interactive-controls label { display: grid; gap: .3rem; min-width: min(100%, 9rem); flex: 1 1 9rem; font-weight: 600; }
+.interactive-controls select, .interactive-controls input { width: 100%; max-width: 100%; }
+.interactive-controls output { font-weight: 400; color: var(--muted); }
+.interactive-controls button { padding: .4rem .7rem; border: 1px solid var(--accent); border-radius: .3rem; background: var(--surface); color: var(--ink); }
+.interactive-output { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(13rem, .8fr); align-items: start; gap: 1rem; }
+.interactive-plot svg { display: block; width: 100%; max-width: 31rem; height: auto; border: 1px solid var(--line); }
+.interactive-metrics { background: var(--surface); border: 1px solid var(--line); padding: .8rem 1rem; }
+.interactive-metrics p { margin: .25rem 0 .65rem; }
+.interactive-note { color: var(--muted); font-size: .9rem; }
+.interactive-grid { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: .2rem; width: 100%; max-width: 32rem; aspect-ratio: 4 / 3; }
+.grid-cell { display: grid; place-items: center; min-width: 0; background: var(--cell-color, var(--surface)); border: 1px solid var(--line); color: #fff; font-weight: 700; }
+.grid-cell:not([style]) { color: var(--muted); }
+.user-swatch { display: inline-block; width: .75rem; height: .75rem; margin-right: .45rem; border-radius: .2rem; }
+.metric-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .6rem; }
+.metric-row > div { display: grid; gap: .2rem; }
+.metric-row strong { font-size: 1.25rem; }
+.metric-row span { color: var(--muted); font-size: .85rem; }
+
+/* The six signal figures are more legible stacked on a narrow display. */
+@media (max-width: 850px) {
+  .interactive-output { grid-template-columns: 1fr; }
+  .metric-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
 @media (max-width: 760px) {
   .style-choice-grid { grid-template-columns: 1fr; }
   .resource-diagram { flex-wrap: wrap; justify-content: center; }
   .flow-arrow { transform: rotate(90deg); }
   .states-diagram { grid-template-columns: 1fr; }
   .tf-grid { margin-left: 1.8rem; }
+  .lecture-interactive { padding: .8rem; }
 }
