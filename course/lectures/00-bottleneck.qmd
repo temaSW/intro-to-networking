@@ -1,0 +1,12 @@
+---
+title: "Где узкое место?"
+subtitle: "Самостоятельная модель к лекции 00"
+---
+
+[Вернуться к лекции 00](00-introduction.qmd).
+
+Сначала предположите, какой общий сегмент ограничит передачу при росте числа пользователей, затем измените параметры и сравните результат.
+
+<div class="lecture-interactive" data-bottleneck-interactive></div>
+
+<script type="module" src="../interactives/bottleneck-ui.js"></script>
