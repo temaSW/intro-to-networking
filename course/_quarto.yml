@@ -14,6 +14,8 @@ website:
     left:
       - text: "О курсе"
         href: index.qmd
+      - text: "Конспект"
+        href: notes/index.qmd
       - text: "Лекции"
         href: lectures/index.qmd
       - text: "Практика"
