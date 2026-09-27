@@ -116,6 +116,8 @@ main img:not(.no-lightbox) { cursor: zoom-in; }
 .ber-controls { display: flex; flex-wrap: wrap; gap: .5rem 1rem; margin-bottom: .7rem; }
 .ber-controls label { display: inline-flex; align-items: center; gap: .35rem; cursor: pointer; }
 .ber-controls input { margin: 0; }
+.ber-swatch { display: inline-block; flex: 0 0 1.2rem; border-top: 3px solid var(--curve-color); }
+.ber-swatch-uncoded { border-top-style: dashed; }
 .ber-plot svg { display: block; width: 100%; height: auto; max-width: 60rem; border: 1px solid var(--line); }
 
 /* The six signal figures are more legible stacked on a narrow display. */

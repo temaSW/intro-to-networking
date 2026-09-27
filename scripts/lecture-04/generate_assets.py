@@ -205,8 +205,8 @@ def qpsk_modulator() -> None:
 <rect x="505" y="282" width="88" height="48" rx="8" fill="#fae2bc" stroke="#b05515"/><text x="549" y="312" text-anchor="middle" class="label">90°</text>
 <circle cx="745" cy="242" r="32" fill="#f7f8f6" stroke="#075b6a" stroke-width="2"/><text x="745" y="251" text-anchor="middle" class="title">+</text>
 <path d="M135 241 H175 M305 218 H325 V105 H350 M305 264 H325 V380 H350 M455 105 H559 M455 380 H559 M621 105 H690 V225 H714 M621 380 H690 V259 H714 M777 242 H862" fill="none" stroke="#075b6a" stroke-width="2.5" marker-end="url(#arrow)"/>
-<path d="M437 216 V158 H590 V136 M510 244 H549 V282 M549 330 V349" fill="none" stroke="#b05515" stroke-width="2.5" marker-end="url(#arrow)"/>
-<text x="478" y="169" class="muted">cos(ωt)</text><text x="600" y="312" class="muted">−sin(ωt)</text><text x="787" y="222" class="label">s(t)</text>
+<path d="M437 216 V158 H590 V136 M510 244 H549 V282 M549 330 V340 H590 V349" fill="none" stroke="#b05515" stroke-width="2.5" marker-end="url(#arrow)"/>
+<text x="480" y="149" class="muted">cos(ωt)</text><text x="607" y="337" class="muted">−sin(ωt)</text><text x="787" y="222" class="label">s(t)</text>
 <text x="450" y="467" text-anchor="middle" class="muted">Две ветви с несущими, сдвинутыми на 90°</text>'''
     write("qpsk-modulator.svg", body, "Схема квадратурного модулятора QPSK")
 
