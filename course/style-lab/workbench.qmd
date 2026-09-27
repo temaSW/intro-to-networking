@@ -1,0 +1,14 @@
+---
+title: "Инженерный рабочий стол"
+page-layout: full
+toc: false
+format:
+  html:
+    theme:
+      light: [cosmo, ../styles/base.scss, ../styles/variants/workbench.scss]
+      dark: [darkly, ../styles/base.scss, ../styles/variants/workbench.scss]
+---
+
+[← Style Lab](index.qmd) · [Технический учебник](textbook.qmd) · [Пошаговая лекция](guided.qmd)
+
+{{< include _content.qmd >}}

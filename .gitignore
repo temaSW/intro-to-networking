@@ -1,0 +1,7 @@
+course/_site/
+course/.quarto/
+__pycache__/
+.pytest_cache/
+.venv/
+AGENTS.md
+design/

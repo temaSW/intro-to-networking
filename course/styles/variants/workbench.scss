@@ -1,0 +1,26 @@
+/*-- scss:rules --*/
+body main.content { max-width: 78rem; margin-inline: auto; padding: 1rem 2rem 5rem; font-family: system-ui, sans-serif; line-height: 1.55; }
+main.content section.level1 > h1 { max-width: 60rem; font-size: clamp(2.2rem, 4vw, 3.5rem); font-weight: 800; line-height: 1.07; letter-spacing: -.04em; margin-block: 2rem 1.5rem; }
+main.content section.level1 > p { max-width: 60rem; font-size: 1.16rem; }
+main.content h2 { font-size: 1.35rem; font-weight: 750; }
+.engineering-problem { background: var(--accent-soft); border: 1px solid var(--accent); padding: 1.5rem 2rem; font-size: 1.12rem; }
+.predict { border-bottom: 1px solid var(--line); padding-bottom: 1.3rem; max-width: 61rem; }
+.figure-explanation { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(20rem, .7fr); gap: 1.5rem; align-items: stretch; }
+.figure { min-height: 22rem; display: flex; flex-direction: column; justify-content: center; padding: 2rem; }
+.resource-diagram { font-size: 1.05rem; }
+.explanation { background: var(--surface); border: 1px solid var(--line); padding: 1.5rem; }
+.model { display: grid; grid-template-columns: minmax(0, 1fr) minmax(18rem, .9fr); gap: 0 2rem; background: var(--surface); border-top: 4px solid var(--accent); padding: 1.7rem 2rem; }
+.model h2 { grid-column: 1 / -1; }
+.model table { grid-column: 2; grid-row: 2 / span 3; align-self: start; }
+.experiment { border: 2px solid var(--accent); background: var(--surface-alt); padding: 2rem; min-height: 12rem; }
+.experiment h2::before { content: "◉ "; color: var(--accent); }
+.takeaway { max-width: 65rem; }
+@media (max-width: 850px) {
+  .figure-explanation, .model { display: block; }
+  .figure { min-height: 0; }
+  .explanation { margin-top: 1rem; }
+}
+@media (max-width: 760px) {
+  body main.content { padding-inline: 1rem; }
+  .engineering-problem, .model, .experiment { padding: 1.2rem; }
+}

@@ -1,0 +1,38 @@
+project:
+  type: website
+  output-dir: _site
+
+website:
+  title: "ОПИСиС"
+  description: "Новая версия курса"
+  site-url: https://temasw.github.io/intro-to-networking/
+  search: true
+  page-navigation: true
+  navbar:
+    left:
+      - text: "О курсе"
+        href: index.qmd
+      - text: "Лекции"
+        href: lectures/index.qmd
+      - text: "Практика"
+        href: practice/index.qmd
+      - text: "Лабораторные"
+        href: labs/index.qmd
+      - text: "Справочник"
+        href: reference/index.qmd
+    right:
+      - text: "Style Lab"
+        href: style-lab/index.qmd
+
+format:
+  html:
+    lang: ru
+    theme:
+      light: [cosmo, styles/base.scss]
+      dark: [darkly, styles/base.scss]
+    respect-user-color-scheme: true
+    toc: true
+    anchor-sections: true
+
+execute:
+  freeze: auto
