@@ -55,8 +55,30 @@ table td, table th { border-color: var(--line); overflow-wrap: anywhere; }
 .experiment { border: 2px dashed var(--line); background: var(--surface-alt); padding: 1.4rem; }
 .takeaway { border-left: .3rem solid var(--accent); background: var(--accent-soft); padding: 1.1rem 1.3rem; }
 
+.states-diagram { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; text-align: center; }
+.states-diagram > div { display: grid; gap: .65rem; padding: 1rem; background: var(--surface); border: 1px solid var(--line); }
+.state-row { min-height: 2.1rem; display: flex; flex-wrap: wrap; align-content: center; justify-content: center; gap: .35rem; }
+.state-row i { width: 1rem; height: 1rem; background: var(--accent); border-radius: 50%; }
+.state-row.many i { width: .55rem; height: .55rem; }
+.tf-grid { position: relative; display: grid; grid-template-columns: repeat(6, minmax(2rem, 1fr)); gap: .2rem; max-width: 38rem; margin: 2rem auto 1rem 2rem; padding: .25rem; border-left: 2px solid var(--ink); border-bottom: 2px solid var(--ink); }
+.tf-grid i { min-height: 2rem; border: 1px solid var(--line); }
+.tf-grid .alice, .grid-legend .alice { background: #6bc4ce; }
+.tf-grid .bob, .grid-legend .bob { background: #f6bd60; }
+.tf-grid .carol, .grid-legend .carol { background: #b7d58b; }
+.tf-grid .empty, .grid-legend .empty { background: var(--surface); }
+.axis-y { position: absolute; left: -2rem; top: -1.5rem; font-size: .8rem; color: var(--muted); }
+.axis-x { position: absolute; right: 0; bottom: -1.5rem; font-size: .8rem; color: var(--muted); }
+.grid-legend { display: flex; flex-wrap: wrap; gap: .8rem; margin: 2rem 0 0; }
+.grid-legend span { padding: .2rem .55rem; border: 1px solid var(--line); color: var(--ink); }
+
+.quarto-dark .tf-grid .alice, .quarto-dark .grid-legend .alice { background: #296a73; }
+.quarto-dark .tf-grid .bob, .quarto-dark .grid-legend .bob { background: #7d571e; }
+.quarto-dark .tf-grid .carol, .quarto-dark .grid-legend .carol { background: #526d31; }
+
 @media (max-width: 760px) {
   .style-choice-grid { grid-template-columns: 1fr; }
   .resource-diagram { flex-wrap: wrap; justify-content: center; }
   .flow-arrow { transform: rotate(90deg); }
+  .states-diagram { grid-template-columns: 1fr; }
+  .tf-grid { margin-left: 1.8rem; }
 }
