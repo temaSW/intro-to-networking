@@ -1,0 +1,31 @@
+/*-- scss:rules --*/
+body main.content { max-width: 67rem; margin-inline: auto; padding: 1rem 2rem 6rem; font-family: system-ui, sans-serif; line-height: 1.7; }
+main.content section.level1 > h1 { max-width: 54rem; font-size: clamp(2.5rem, 5vw, 4.4rem); font-weight: 800; line-height: 1.08; letter-spacing: -.05em; margin-block: 3rem 2rem; }
+main.content section.level1 > p { max-width: 44rem; font-size: 1.22rem; }
+.engineering-problem, .predict, .figure-explanation, .model, .real-example, .experiment, .takeaway { margin-block: 4.5rem; }
+.engineering-problem, .predict, .model, .real-example, .experiment, .takeaway { position: relative; padding: 2rem 2.2rem; border-left: 4px solid var(--line); }
+.engineering-problem::before, .predict::before, .figure-explanation::before, .model::before, .real-example::before, .experiment::before, .takeaway::before { display: block; color: var(--accent); font-size: .8rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; margin-bottom: .8rem; }
+.engineering-problem::before { content: "01 / Проблема"; }
+.predict::before { content: "02 / Прогноз"; }
+.figure-explanation::before { content: "03 / Наблюдение"; }
+.model::before { content: "04 / Модель"; }
+.real-example::before { content: "05 / Реализация"; }
+.experiment::before { content: "06 / Исследование"; }
+.takeaway::before { content: "07 / Вывод"; }
+.engineering-problem { background: var(--surface); }
+.predict { background: var(--accent-soft); border-left-color: var(--accent); }
+.predict h2 { font-size: clamp(1.8rem, 3vw, 2.6rem); }
+.figure-explanation { padding-left: 2.2rem; border-left: 4px solid var(--line); }
+.figure { max-width: 52rem; }
+.explanation { max-width: 44rem; margin-top: 2rem; }
+.model { background: var(--surface); }
+.model table { margin-top: 2rem; }
+.real-example { background: var(--surface-alt); }
+.experiment { background: var(--surface); border: 3px dashed var(--accent); padding: 2.6rem; }
+.experiment h2 { font-size: 2rem; }
+.takeaway { background: var(--accent-soft); border-left-color: var(--accent); }
+@media (max-width: 760px) {
+  body main.content { padding-inline: 1rem; }
+  main.content section.level1 > h1 { font-size: clamp(2rem, 8vw, 3rem); overflow-wrap: anywhere; }
+  .engineering-problem, .predict, .figure-explanation, .model, .real-example, .experiment, .takeaway { margin-block: 3rem; padding: 1.2rem; }
+}
