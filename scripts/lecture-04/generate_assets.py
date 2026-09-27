@@ -208,7 +208,7 @@ def qpsk_modulator() -> None:
 <path d="M437 216 V158 H590 V136 M510 244 H549 V282 M549 330 V340 H590 V349" fill="none" stroke="#b05515" stroke-width="2.5" marker-end="url(#arrow)"/>
 <text x="480" y="149" class="muted">cos(ωt)</text><text x="607" y="337" class="muted">−sin(ωt)</text><text x="787" y="222" class="label">s(t)</text>
 <text x="450" y="467" text-anchor="middle" class="muted">Две ветви с несущими, сдвинутыми на 90°</text>'''
-    write("qpsk-modulator.svg", body, "Схема квадратурного модулятора QPSK")
+    write("qpsk-iq-modulator.svg", body, "Схема квадратурного модулятора QPSK")
 
 
 def main() -> None:

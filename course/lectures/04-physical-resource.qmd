@@ -38,7 +38,7 @@ $$\begin{aligned}
 
 **QPSK**: четыре фазовых состояния. **QAM**: состояния различаются двумя координатами сигнала.
 
-![Схема квадратурного модулятора QPSK](../assets/lecture-04/qpsk-modulator.svg)
+![Схема квадратурного модулятора QPSK](../assets/lecture-04/qpsk-iq-modulator.svg)
 
 $$I,Q\in\{-1,+1\},\qquad s(t)=\frac{A}{\sqrt2}\bigl[I\cos(2\pi f_ct)-Q\sin(2\pi f_ct)\bigr].$$
 
