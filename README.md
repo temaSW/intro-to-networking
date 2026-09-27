@@ -1,18 +1,6 @@
-# ОПИСиС — новая версия курса
+# Обновленный курс по основам построения инфокоммуникационных систем и сетей.
 
-Это чистая основа для обновляемого курса ОПИСиС. Учебный материал пока ограничен демонстрацией оформления. Исходники находятся в [GitHub-репозитории](https://github.com/temaSW/intro-to-networking).
+<img width="1147" height="1147" alt="qr-code (2)" src="https://github.com/user-attachments/assets/a268cfb9-b6c7-4d45-a6d9-7b450a6abf32" />
 
-- `design/` — локальные внутренние документы; каталог не отслеживается Git и не входит в сайт;
-- `course/` — публичный Quarto-сайт;
-- `course/style-lab/` — сравнение трёх вариантов оформления одного материала;
-- `interactives/` — место для будущих переиспользуемых моделей;
-- `scripts/` — локальная проверка, `.github/workflows/` — та же проверка в CI.
 
-Нужны Python 3.11+ и [Quarto CLI](https://quarto.org/docs/get-started/). Дополнительных Python-пакетов пока нет.
-
-```bash
-quarto preview course
-python scripts/check.py
-```
-
-Первая команда запускает локальный просмотр, вторая полностью собирает сайт в `course/_site/`. Workflow GitHub Actions выполняет ту же проверку для push и pull request; push в `main` также отправляет результат на GitHub Pages. Для первой публикации в настройках репозитория нужно выбрать **Settings → Pages → Build and deployment → Source: GitHub Actions**. Адрес сайта: https://temasw.github.io/intro-to-networking/.
+ Адрес сайта: https://temasw.github.io/intro-to-networking/.
