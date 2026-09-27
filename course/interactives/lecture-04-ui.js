@@ -63,7 +63,7 @@ function berSvg(rows, selected) {
   const left = 75, right = 735, top = 25, bottom = 370;
   const x = snr => left + (snr + 4) / 28 * (right - left);
   const y = ber => top + (-Math.log10(ber)) / 6 * (bottom - top);
-  let chart = `<svg viewBox="0 0 760 430" role="img" aria-label="Измеренная вероятность ошибки бита в зависимости от отношения сигнал/шум: кодированные и некодированные режимы"><rect width="760" height="430" fill="var(--surface)"/>`;
+  let chart = `<svg viewBox="0 0 760 430" role="img" aria-label="Измеренная вероятность ошибки бита в зависимости от Es/N0: кодированные и некодированные режимы"><rect width="760" height="430" fill="var(--surface)"/>`;
   for (const snr of [-4, 0, 4, 8, 12, 16, 20, 24]) {
     chart += `<line x1="${x(snr)}" y1="${top}" x2="${x(snr)}" y2="${bottom}" stroke="var(--line)"/><text x="${x(snr)}" y="395" text-anchor="middle" fill="var(--muted)">${snr}</text>`;
   }
@@ -74,9 +74,9 @@ function berSvg(rows, selected) {
   for (const series of berSeries.filter(item => selected.includes(item.id))) {
     const points = rows.filter(row => row.scheme === series.id && row.bit_errors > 0);
     chart += `<polyline points="${points.map(row => `${x(row.snr_db).toFixed(1)},${y(row.ber).toFixed(1)}`).join(" ")}" fill="none" stroke="${series.color}" stroke-width="3" ${series.uncoded ? 'stroke-dasharray="8 5"' : ""}/>`;
-    for (const row of points) chart += `<circle cx="${x(row.snr_db).toFixed(1)}" cy="${y(row.ber).toFixed(1)}" r="${series.uncoded ? 3 : 4}" fill="${series.color}"><title>${series.label}: ${row.bit_errors} ошибок на ${row.information_bits} бит, SNR=${row.snr_db} дБ</title></circle>`;
+    for (const row of points) chart += `<circle cx="${x(row.snr_db).toFixed(1)}" cy="${y(row.ber).toFixed(1)}" r="${series.uncoded ? 3 : 4}" fill="${series.color}"><title>${series.label}: ${row.bit_errors} ошибок на ${row.information_bits} бит, Es/N0=${row.snr_db} дБ</title></circle>`;
   }
-  chart += `<text x="405" y="424" text-anchor="middle" fill="var(--ink)">Отношение сигнал/шум, дБ</text><text x="17" y="200" transform="rotate(-90 17 200)" text-anchor="middle" fill="var(--ink)">BER</text></svg>`;
+  chart += `<text x="405" y="424" text-anchor="middle" fill="var(--ink)">Es/N0, дБ</text><text x="17" y="200" transform="rotate(-90 17 200)" text-anchor="middle" fill="var(--ink)">BER</text></svg>`;
   return chart;
 }
 
@@ -91,7 +91,7 @@ async function mountBer(root) {
       const [scheme, modulation, code_rate, snr_db, bit_errors, information_bits, ber] = line.split(",");
       return {scheme: +scheme, modulation, code_rate: +code_rate, snr_db: +snr_db, bit_errors: +bit_errors, information_bits: +information_bits, ber: +ber};
     });
-    root.innerHTML = `<div class="ber-controls" role="group" aria-label="Показать кривые">${berSeries.map(series => `<label><input type="checkbox" value="${series.id}" ${[1,3,5,6,7,8].includes(series.id) ? "checked" : ""}><span class="ber-swatch ${series.uncoded ? "ber-swatch-uncoded" : ""}" style="--curve-color:${series.color}"></span>${series.label}</label>`).join("")}</div><div class="ber-plot"></div><p class="interactive-note">Сплошные линии — после декодирования LDPC; штриховые — без кодирования. Точки с нулём обнаруженных ошибок не показаны.</p>`;
+    root.innerHTML = `<div class="ber-controls" role="group" aria-label="Показать кривые">${berSeries.map(series => `<label><input type="checkbox" value="${series.id}"><span class="ber-swatch ${series.uncoded ? "ber-swatch-uncoded" : ""}" style="--curve-color:${series.color}"></span>${series.label}</label>`).join("")}</div><div class="ber-plot"></div><p class="interactive-note">Выберите кривые для сравнения. Сплошные линии — после декодирования LDPC; штриховые — без кодирования. Точки с нулём обнаруженных ошибок не показаны.</p>`;
     const draw = () => {
       const selected = [...root.querySelectorAll('input:checked')].map(input => +input.value);
       root.querySelector(".ber-plot").innerHTML = berSvg(rows, selected);
