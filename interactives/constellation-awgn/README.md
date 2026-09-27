@@ -17,6 +17,10 @@ Show ideal constellation points, received points, nearest-point decisions, symbo
 
 Ask for a prediction with QPSK, then keep SNR unchanged and switch to 64-QAM. The component is not a BER calculator lesson; it makes the shrinking decision margin visible.
 
+## Current implementation
+
+The working browser component is in `course/interactives/lecture-04-model.js` and `lecture-04-ui.js`. It runs directly on the static Quarto site without a server. A marimo/Pyodide port can reuse the controls and scenario below.
+
 ## Implementation boundary
 
 Keep the channel/model in Python separately from the marimo UI. Use browser execution via Pyodide when the course integration is selected. Do not introduce a shared interactive framework here.
