@@ -115,9 +115,9 @@ $R_c$ — **кодовая скорость**. Меньшее значение �
 
 <div class="lecture-interactive" data-lecture-interactive="ber"></div>
 
-**Вопрос:** при одном BER сравните QPSK с $R_c=1/2$ и $R_c=3/4$. Какой режим требует большего SNR?
+**Вопрос:** сравните QPSK с $R_c=1/2$ и без кодирования при BER около $10^{-3}$. Сколько дБ выигрываем в этой модели?
 
-<small>BER измерена после декодирования LDPC для блоков по 1024 информационных бита в канале с белым гауссовским шумом. Это локальный опыт MATLAB/5G Toolbox, не пороги MCS или прогноз для реальной сети. [Данные](../data/lecture-04/nr-ber-awgn.csv) · [Методика и исходный код](https://github.com/temasw/intro-to-networking/blob/main/scripts/lecture-04/generate_nr_ber.m).</small>
+<small>SNR здесь относится к переданному символу: с кодированием для тех же данных требуется больше символов. Канал — белый гауссовский шум; это локальный опыт MATLAB/5G Toolbox, не пороги MCS или прогноз для сети. Данные: [с LDPC](../data/lecture-04/nr-ber-awgn.csv) · [без кода](../data/lecture-04/uncoded-ber-awgn.csv). Методика: [LDPC](https://github.com/temasw/intro-to-networking/blob/main/scripts/lecture-04/generate_nr_ber.m) · [без кода](https://github.com/temasw/intro-to-networking/blob/main/scripts/lecture-04/generate_uncoded_ber.m).</small>
 
 ## Реальная система выбирает готовые сочетания
 
@@ -159,5 +159,5 @@ $$R_u\approx20\cdot\frac14\cdot4\cdot\frac34=15\ \text{Мбит/с}.$$
 
 </details>
 
-<script type="module" src="../interactives/lecture-04-ui.js?v=20260928-ber"></script>
+<script type="module" src="../interactives/lecture-04-ui.js?v=20260928-uncoded"></script>
 <script src="../interactives/lecture-04-lightbox.js" defer></script>

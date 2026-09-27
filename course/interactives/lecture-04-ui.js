@@ -48,42 +48,50 @@ function mountGrid(root) {
   draw();
 }
 
+const berSeries = [
+  {id: 1, label: "QPSK · 1/2", color: "#087e8b"},
+  {id: 2, label: "QPSK · 3/4", color: "#4e9daa"},
+  {id: 3, label: "16-QAM · 1/2", color: "#a75c12"},
+  {id: 4, label: "16-QAM · 3/4", color: "#cf8736"},
+  {id: 5, label: "64-QAM · 3/4", color: "#7b59a6"},
+  {id: 6, label: "QPSK · без кода", color: "#087e8b", uncoded: true},
+  {id: 7, label: "16-QAM · без кода", color: "#a75c12", uncoded: true},
+  {id: 8, label: "64-QAM · без кода", color: "#7b59a6", uncoded: true},
+];
+
 function berSvg(rows, selected) {
   const left = 75, right = 735, top = 25, bottom = 370;
-  const x = snr => left + (snr + 4) / 23 * (right - left);
-  const y = ber => top + (-Math.log10(ber)) / 5 * (bottom - top);
-  const palette = ["#087e8b", "#c26b1a", "#628c24", "#7b59a6", "#bc4f61"];
-  let chart = `<svg viewBox="0 0 760 430" role="img" aria-label="Измеренная вероятность ошибки бита после декодирования в зависимости от отношения сигнал/шум"><rect width="760" height="430" fill="var(--surface)"/>`;
-  for (const snr of [-4, 0, 4, 8, 12, 16, 19]) {
+  const x = snr => left + (snr + 4) / 28 * (right - left);
+  const y = ber => top + (-Math.log10(ber)) / 6 * (bottom - top);
+  let chart = `<svg viewBox="0 0 760 430" role="img" aria-label="Измеренная вероятность ошибки бита в зависимости от отношения сигнал/шум: кодированные и некодированные режимы"><rect width="760" height="430" fill="var(--surface)"/>`;
+  for (const snr of [-4, 0, 4, 8, 12, 16, 20, 24]) {
     chart += `<line x1="${x(snr)}" y1="${top}" x2="${x(snr)}" y2="${bottom}" stroke="var(--line)"/><text x="${x(snr)}" y="395" text-anchor="middle" fill="var(--muted)">${snr}</text>`;
   }
-  for (let decade = 0; decade <= 5; decade++) {
+  for (let decade = 0; decade <= 6; decade++) {
     const value = 10 ** -decade;
     chart += `<line x1="${left}" y1="${y(value)}" x2="${right}" y2="${y(value)}" stroke="var(--line)"/><text x="${left-9}" y="${y(value)+5}" text-anchor="end" fill="var(--muted)">10<tspan dy="-5" font-size="11">${-decade}</tspan></text>`;
   }
-  for (const scheme of selected) {
-    const points = rows.filter(row => row.scheme === scheme && row.bit_errors > 0);
-    const color = palette[scheme - 1];
-    chart += `<polyline points="${points.map(row => `${x(row.snr_db).toFixed(1)},${y(row.ber).toFixed(1)}`).join(" ")}" fill="none" stroke="${color}" stroke-width="3"/>`;
-    for (const row of points) chart += `<circle cx="${x(row.snr_db).toFixed(1)}" cy="${y(row.ber).toFixed(1)}" r="4" fill="${color}"><title>${row.modulation}, R=${row.code_rate}: ${row.bit_errors} ошибок на ${row.information_bits} бит, SNR=${row.snr_db} дБ</title></circle>`;
+  for (const series of berSeries.filter(item => selected.includes(item.id))) {
+    const points = rows.filter(row => row.scheme === series.id && row.bit_errors > 0);
+    chart += `<polyline points="${points.map(row => `${x(row.snr_db).toFixed(1)},${y(row.ber).toFixed(1)}`).join(" ")}" fill="none" stroke="${series.color}" stroke-width="3" ${series.uncoded ? 'stroke-dasharray="8 5"' : ""}/>`;
+    for (const row of points) chart += `<circle cx="${x(row.snr_db).toFixed(1)}" cy="${y(row.ber).toFixed(1)}" r="${series.uncoded ? 3 : 4}" fill="${series.color}"><title>${series.label}: ${row.bit_errors} ошибок на ${row.information_bits} бит, SNR=${row.snr_db} дБ</title></circle>`;
   }
-  chart += `<text x="405" y="424" text-anchor="middle" fill="var(--ink)">Отношение сигнал/шум, дБ</text><text x="17" y="200" transform="rotate(-90 17 200)" text-anchor="middle" fill="var(--ink)">BER после декодирования</text></svg>`;
+  chart += `<text x="405" y="424" text-anchor="middle" fill="var(--ink)">Отношение сигнал/шум, дБ</text><text x="17" y="200" transform="rotate(-90 17 200)" text-anchor="middle" fill="var(--ink)">BER</text></svg>`;
   return chart;
 }
 
 async function mountBer(root) {
   root.textContent = "Загрузка результатов моделирования…";
   try {
-    const response = await fetch(new URL("../data/lecture-04/nr-ber-awgn.csv", import.meta.url));
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const lines = (await response.text()).trim().split(/\r?\n/).slice(1);
+    const filenames = ["nr-ber-awgn.csv", "uncoded-ber-awgn.csv"];
+    const responses = await Promise.all(filenames.map(name => fetch(new URL(`../data/lecture-04/${name}`, import.meta.url))));
+    if (responses.some(response => !response.ok)) throw new Error(`HTTP ${responses.find(response => !response.ok).status}`);
+    const lines = (await Promise.all(responses.map(response => response.text()))).flatMap(csv => csv.trim().split(/\r?\n/).slice(1));
     const rows = lines.map(line => {
       const [scheme, modulation, code_rate, snr_db, bit_errors, information_bits, ber] = line.split(",");
       return {scheme: +scheme, modulation, code_rate: +code_rate, snr_db: +snr_db, bit_errors: +bit_errors, information_bits: +information_bits, ber: +ber};
     });
-    const labels = ["QPSK · 1/2", "QPSK · 3/4", "16-QAM · 1/2", "16-QAM · 3/4", "64-QAM · 3/4"];
-    const palette = ["#087e8b", "#c26b1a", "#628c24", "#7b59a6", "#bc4f61"];
-    root.innerHTML = `<div class="ber-controls" role="group" aria-label="Показать кривые">${labels.map((label, i) => `<label><input type="checkbox" value="${i+1}" ${i < 4 ? "checked" : ""}><span class="user-swatch" style="background:${palette[i]}"></span>${label}</label>`).join("")}</div><div class="ber-plot"></div><p class="interactive-note">Точки — результаты моделирования. При нуле обнаруженных ошибок точка на логарифмическом графике не показана.</p>`;
+    root.innerHTML = `<div class="ber-controls" role="group" aria-label="Показать кривые">${berSeries.map(series => `<label><input type="checkbox" value="${series.id}" ${[1,3,5,6,7,8].includes(series.id) ? "checked" : ""}><span class="ber-swatch ${series.uncoded ? "ber-swatch-uncoded" : ""}" style="--curve-color:${series.color}"></span>${series.label}</label>`).join("")}</div><div class="ber-plot"></div><p class="interactive-note">Сплошные линии — после декодирования LDPC; штриховые — без кодирования. Точки с нулём обнаруженных ошибок не показаны.</p>`;
     const draw = () => {
       const selected = [...root.querySelectorAll('input:checked')].map(input => +input.value);
       root.querySelector(".ber-plot").innerHTML = berSvg(rows, selected);
