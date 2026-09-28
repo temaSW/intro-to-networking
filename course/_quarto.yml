@@ -28,6 +28,7 @@ website:
 format:
   html:
     lang: ru
+    include-after-body: _includes/navigation.html
     theme:
       light: [cosmo, styles/base.scss]
       dark: [darkly, styles/base.scss]
