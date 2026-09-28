@@ -13,4 +13,5 @@
 .line-wave-scroll .zero { stroke: var(--bs-secondary-color); stroke-dasharray: 3 3; stroke-width: 1; }
 .line-wave-scroll .marker { fill: var(--bs-danger); font-weight: 700; }
 .line-legend { font-size: .9rem; }
+.baseband-spectrum { display: block; width: 100%; max-width: 680px; height: auto; margin: 1rem auto; }
 @media (max-width: 600px) { .companding-line-widget { padding: .7rem; } }
