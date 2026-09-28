@@ -24,6 +24,7 @@ assert.equal(data.windows, 63);
 for (const estimate of Object.values(data.spectra)) {
   assert.equal(estimate.relativePower.length, 501);
   assert(estimate.relativePower.every(value => value >= 0 && value <= 1));
+  assert(estimate.referencePower > 0);
 }
 assert(data.spectra.nrz.mean > 0.49 && data.spectra.nrz.mean < 0.51);
 assert(data.spectra.rz.mean > 0.24 && data.spectra.rz.mean < 0.26);
