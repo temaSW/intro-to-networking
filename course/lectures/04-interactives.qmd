@@ -19,3 +19,4 @@ subtitle: "Модуляция и кодирование"
 
 <script type="module" src="../interactives/lecture-04-ui.js?v=20260928-ber-hidden"></script>
 <script type="module" src="../interactives/lecture-04-spectrum-ui.js?v=20260928-spectrum-wide"></script>
+<script src="../interactives/image-lightbox.js" defer></script>

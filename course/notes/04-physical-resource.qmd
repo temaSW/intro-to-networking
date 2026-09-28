@@ -233,4 +233,4 @@ $$R_u\approx20\cdot\frac14\cdot4\cdot\frac34=15\ \text{Мбит/с}.$$
 </details>
 
 <script type="module" src="../interactives/lecture-04-ui.js?v=20260928-ber-hidden"></script>
-<script src="../interactives/lecture-04-lightbox.js" defer></script>
+<script src="../interactives/image-lightbox.js" defer></script>
