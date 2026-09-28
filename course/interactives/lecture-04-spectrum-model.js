@@ -1,6 +1,7 @@
 // Normalized teaching envelopes for rectangular, independent binary symbols.
 // Frequency is an offset from the carrier in kHz; duration is in ms.
 const FSK_SHIFT_KHZ = 1;
+export const FREQUENCY_LIMIT_KHZ = 10;
 
 function sincSquared(value) {
   if (Math.abs(value) < 1e-12) return 1;
@@ -20,8 +21,8 @@ export function spectrumEnvelope(mode, offsetKhz, bitDurationMs) {
 
 export function sampleSpectrum(mode, bitDurationMs) {
   if (!(bitDurationMs > 0)) throw new Error("Bit duration must be positive");
-  const samples = Array.from({length: 501}, (_, index) => {
-    const offsetKhz = -5 + index / 50;
+  const samples = Array.from({length: 1001}, (_, index) => {
+    const offsetKhz = -FREQUENCY_LIMIT_KHZ + index / 50;
     return {offsetKhz, power: spectrumEnvelope(mode, offsetKhz, bitDurationMs)};
   });
   const maximum = Math.max(...samples.map(sample => sample.power));

@@ -186,7 +186,7 @@ $$(E_b/N_0)_{\mathrm{dB}}=(E_s/N_0)_{\mathrm{dB}}-10\log_{10}(Q_mR_c).$$
 
 <div class="lecture-interactive" data-lecture-interactive="ber"></div>
 
-**Опыт:** сравните выбранные по умолчанию QPSK без кода и QPSK с $R_c=1/2$ в области BER около $10^{-3}$. Горизонтальная ось — SNR в описанной нормировке. Смещение кривой на этой оси нельзя автоматически назвать выигрышем по $E_b/N_0$: учтите изменение числа символов на информационный бит.
+**Опыт:** включите QPSK без кода и QPSK с $R_c=1/2$, сравните их в области BER около $10^{-3}$. Горизонтальная ось — SNR в описанной нормировке. Смещение кривой на этой оси нельзя автоматически назвать выигрышем по $E_b/N_0$: учтите изменение числа символов на информационный бит.
 
 <small>Канал — белый гауссовский шум; это результаты моделирования MATLAB/5G Toolbox, а не пороги MCS или прогноз для сети. Данные: [с LDPC](../data/lecture-04/nr-ber-awgn.csv) · [без кода](../data/lecture-04/uncoded-ber-awgn.csv). Методика: [LDPC](https://github.com/temasw/intro-to-networking/blob/main/scripts/lecture-04/generate_nr_ber.m) · [без кода](https://github.com/temasw/intro-to-networking/blob/main/scripts/lecture-04/generate_uncoded_ber.m).</small>
 
@@ -232,5 +232,5 @@ $$R_u\approx20\cdot\frac14\cdot4\cdot\frac34=15\ \text{Мбит/с}.$$
 
 </details>
 
-<script type="module" src="../interactives/lecture-04-ui.js?v=20260928-snr"></script>
+<script type="module" src="../interactives/lecture-04-ui.js?v=20260928-ber-hidden"></script>
 <script src="../interactives/lecture-04-lightbox.js" defer></script>
