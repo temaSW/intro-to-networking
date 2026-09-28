@@ -21,7 +21,7 @@ assert.deepEqual([uniformPcm(1530).reconstructed, compand(1530).reconstructed], 
 assert.equal(compand(10).wireWord, '11011111');
 assert.equal(compand(1530).wireWord, '10100010');
 assert.equal(compand(2047).segment, 7);
-assert.deepEqual(data.comparisons.map(item => item.pattern), ['10', '110', '10000']);
+assert.deepEqual(data.comparisons.map(item => item.pattern), Array(3).fill('111000000000'));
 for (const comparison of data.comparisons) for (const key of comparison.keys) {
   const lines = comparison.spectra[key].lines;
   assert(lines.every(line => line.amplitude >= 0 && line.amplitude <= 100));
@@ -32,10 +32,15 @@ for (const comparison of data.comparisons) {
 }
 const [unipolar, ami, synchronizing] = data.comparisons;
 assert.equal(unipolar.spectra.nrz.lines.find(line => line.frequency === 1).amplitude, 0);
-assert(unipolar.spectra.rz.lines.find(line => line.frequency === 1).amplitude >= 49);
+assert(unipolar.spectra.nrz.lines[0].amplitude > 50);
+assert(unipolar.spectra.rz.lines[0].amplitude > 20);
+assert(unipolar.spectra.rz.lines.find(line => line.frequency === 1).amplitude > 30);
 assert.equal(ami.spectra.amiNrz.lines[0].amplitude, 0);
 assert.equal(ami.spectra.amiRz.lines[0].amplitude, 0);
-assert.equal(synchronizing.spectra.hdb.periodBits, 10);
+assert.equal(ami.spectra.amiNrz.periodBits, 24);
+assert.equal(ami.spectra.amiRz.periodBits, 24);
+assert.equal(synchronizing.spectra.hdb.periodBits, 12);
+assert(synchronizing.spectra.manchester.lines.find(line => line.frequency === 1).amplitude > 90);
 const bits = lineCodes('111000000000');
 assert.equal(bits.hdb.filter(cell => cell.marker === 'V').length, 2);
 """

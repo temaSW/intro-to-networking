@@ -1,4 +1,4 @@
-import {LINE_SPECTRA} from './line-spectrum-data.js?v=20260929-2';
+import {LINE_SPECTRA} from './line-spectrum-data.js?v=20260929-5';
 
 const titles = {
   nrz: 'NRZ', rz: 'RZ', amiNrz: 'ЧПИ NRZ', amiRz: 'ЧПИ RZ',
@@ -29,9 +29,9 @@ for (const root of document.querySelectorAll('[data-line-spectrum]')) {
   const keys = root.dataset.lineSpectrum.split(',').map(key => key.trim());
   const comparison = LINE_SPECTRA.comparisons.find(item => item.keys.join(',') === keys.join(','));
   if (!comparison) throw new Error(`Unknown line-code comparison: ${keys.join(',')}`);
-  root.innerHTML = `<figure class="line-spectrum-comparison"><figcaption>Гармоники повторяющихся битов <code>${comparison.pattern}</code></figcaption><p class="line-spectrum-instruction">Каждая вертикальная линия — одна гармоника; её положение показывает частоту, высота — относительную амплитуду.</p><div class="line-spectrum-scroll">${spectrumSvg(comparison)}</div></figure>`;
+  root.innerHTML = `<figure class="line-spectrum-comparison"><figcaption>${keys.map(key => titles[key]).join(' и ')}</figcaption><p class="line-spectrum-instruction">Входные биты <code>${comparison.pattern}</code> повторяются; каждая вертикальная линия — гармоника полученного сигнала.</p><div class="line-spectrum-scroll">${spectrumSvg(comparison)}</div></figure>`;
 }
 
 for (const root of document.querySelectorAll('[data-line-spectrum-method]')) {
-  root.textContent = 'Для каждого сравнения битовый шаблон многократно повторён, и по получившемуся периодическому сигналу вычислены коэффициенты ряда Фурье. Высоты линий в каждой паре приведены к её самой высокой линии (100%). У случайного потока появляется непрерывная часть спектра; эти графики показывают влияние правил кодирования на периодическом примере.';
+  root.textContent = 'Во всех трёх сравнениях повторён один и тот же блок 111000000000. Коэффициенты ряда Фурье вычислены для установившегося периодического сигнала каждого кода; у ЧПИ полный период полярностей длиннее одного блока битов. Высоты линий в каждой паре приведены к её самой высокой линии (100%). У случайного потока появляется непрерывная часть спектра.';
 }

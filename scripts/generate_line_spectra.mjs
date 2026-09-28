@@ -6,10 +6,11 @@ import {fileURLToPath} from 'node:url';
 import {lineCodes} from '../course/interactives/companding-line-model.js';
 
 const MAX_FREQUENCY = 2.5; // f/Rb
+const PATTERN = '111000000000';
 const COMPARISONS = [
-  {keys: ['nrz', 'rz'], pattern: '10'},
-  {keys: ['amiNrz', 'amiRz'], pattern: '110'},
-  {keys: ['hdb', 'manchester'], pattern: '10000'},
+  ['nrz', 'rz'],
+  ['amiNrz', 'amiRz'],
+  ['hdb', 'manchester'],
 ];
 
 function halfBitLevels(cells, key) {
@@ -49,11 +50,11 @@ function harmonics(period) {
   return lines;
 }
 
-const comparisons = COMPARISONS.map(({keys, pattern}) => {
-  const repeatedBits = pattern.repeat(128);
+const comparisons = COMPARISONS.map(keys => {
+  const repeatedBits = PATTERN.repeat(128);
   const codes = lineCodes(repeatedBits, repeatedBits.length);
   const spectra = Object.fromEntries(keys.map(key => {
-    const period = steadyPeriod(halfBitLevels(codes[key], key), pattern.length);
+    const period = steadyPeriod(halfBitLevels(codes[key], key), PATTERN.length);
     return [key, {periodBits: period.length / 2, lines: harmonics(period)}];
   }));
   const peak = Math.max(...keys.flatMap(key => spectra[key].lines.map(line => line.amplitude)));
@@ -63,7 +64,7 @@ const comparisons = COMPARISONS.map(({keys, pattern}) => {
       amplitude: Number((100 * line.amplitude / peak).toFixed(2)),
     }));
   }
-  return {keys, pattern, spectra};
+  return {keys, pattern: PATTERN, spectra};
 });
 
 const output = fileURLToPath(new URL('../course/interactives/line-spectrum-data.js', import.meta.url));
