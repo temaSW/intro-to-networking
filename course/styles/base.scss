@@ -120,6 +120,7 @@ main .zoomable-image { cursor: zoom-in; }
 
 /* Spectrum practice uses the same surfaces and colors as lecture interactives. */
 .impulse-ask { margin: 1.3rem 0 2rem; color: var(--ink); }
+.ia-formula { max-width: 100%; overflow-x: auto; }
 .ia-section { margin: 1.3rem 0; padding: clamp(.85rem, 2vw, 1.4rem); background: var(--surface-alt); border: 1px solid var(--line); border-radius: .6rem; }
 .ia-heading { display: flex; align-items: start; gap: .9rem; }
 .ia-number { flex: 0 0 auto; color: var(--accent); font-weight: 750; font-size: 1.4rem; line-height: 1.2; }
@@ -150,6 +151,10 @@ main .zoomable-image { cursor: zoom-in; }
 .ia-marker { stroke: var(--focus); stroke-width: 1.5; stroke-dasharray: 6 5; }
 .ia-observation { margin: .8rem 0 0; padding: .7rem .9rem; background: var(--accent-soft); border-left: .2rem solid var(--accent); }
 .ia-method { margin: .7rem 0 0; color: var(--muted); font-size: .9rem; }
+@media (max-width: 700px) {
+  .ia-figure { overflow-x: auto; }
+  .ia-figure svg { min-width: 36rem; }
+}
 .spectrum-key:first-child { margin-left: 0; }
 .spectrum-key-reference { border-color: var(--muted); border-top-style: dashed; }
 .metric-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .6rem; }
