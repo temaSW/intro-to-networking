@@ -117,3 +117,62 @@ export function mainLobeOverlap(fc1, fc2, bitRateKbps, duty = 1) {
   // First-null estimate for a rectangular bit pulse, only a visual guide.
   return Math.abs(fc1 - fc2) < 2 * bitRateKbps / duty;
 }
+
+// A repeatable, long bit stream makes the three modulation spectra comparable.
+export const PRACTICE_FFT_SIZE = 8192;
+export const PRACTICE_SAMPLE_COUNT = 65536;
+export const PRACTICE_CARRIER_KHZ = 100;
+export const PRACTICE_FSK_SHIFT_KHZ = 18;
+
+export function practiceSignals(bitRateKbps) {
+  if (!(bitRateKbps >= 5 && bitRateKbps <= 25)) throw new Error("Bit rate out of range");
+  let seed = 0x71ac37;
+  const bits = Array.from({length: Math.ceil(PRACTICE_SAMPLE_COUNT * bitRateKbps / SAMPLE_RATE_KHZ) + 1}, () => {
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+    return seed >>> 31;
+  });
+  const ask = new Float64Array(PRACTICE_SAMPLE_COUNT);
+  const fsk = new Float64Array(PRACTICE_SAMPLE_COUNT);
+  const psk = new Float64Array(PRACTICE_SAMPLE_COUNT);
+  let phase = 0;
+  for (let i = 0; i < PRACTICE_SAMPLE_COUNT; i++) {
+    const bit = bits[Math.floor(i * bitRateKbps / SAMPLE_RATE_KHZ)];
+    const carrierPhase = 2 * Math.PI * PRACTICE_CARRIER_KHZ * i / SAMPLE_RATE_KHZ;
+    ask[i] = bit * Math.cos(carrierPhase);
+    psk[i] = (bit ? 1 : -1) * Math.cos(carrierPhase);
+    phase += 2 * Math.PI * (PRACTICE_CARRIER_KHZ + (bit ? 1 : -1) * PRACTICE_FSK_SHIFT_KHZ) / SAMPLE_RATE_KHZ;
+    fsk[i] = Math.cos(phase);
+  }
+  return {bits, ask, fsk, psk};
+}
+
+// Welch power estimate: Hann windows, 50% overlap, then arithmetic power average.
+export function averagedPowerSpectrum(signal, windowSize = PRACTICE_FFT_SIZE) {
+  if (windowSize < 2 || (windowSize & (windowSize - 1)) || signal.length < windowSize)
+    throw new Error("Invalid FFT window");
+  const power = new Float64Array(windowSize / 2 + 1);
+  const window = Float64Array.from({length: windowSize}, (_, i) => .5 - .5 * Math.cos(2 * Math.PI * i / (windowSize - 1)));
+  let windows = 0;
+  for (let start = 0; start + windowSize <= signal.length; start += windowSize / 2) {
+    const segment = Float64Array.from(window, (weight, i) => weight * signal[start + i]);
+    const transformed = fft(segment);
+    for (let i = 0; i < power.length; i++)
+      power[i] += transformed.real[i] ** 2 + transformed.imag[i] ** 2;
+    windows++;
+  }
+  for (let i = 0; i < power.length; i++) power[i] /= windows;
+  return {power, stepKhz: SAMPLE_RATE_KHZ / windowSize, windows};
+}
+
+export function squareFourier(harmonics, frequencyKhz = 2) {
+  if (!(Number.isInteger(harmonics) && harmonics >= 1 && harmonics <= 25)) throw new Error("Invalid harmonic count");
+  const durationMs = 2;
+  const time = Array.from({length: 801}, (_, i) => i * durationMs / 800);
+  const values = time.map(t => {
+    let sum = 0;
+    for (let k = 1; k <= harmonics; k += 2) sum += Math.sin(2 * Math.PI * k * frequencyKhz * t) / k;
+    return 4 * sum / Math.PI;
+  });
+  const lines = Array.from({length: Math.ceil(harmonics / 2)}, (_, i) => ({frequencyKhz: (2 * i + 1) * frequencyKhz, amplitude: 4 / (Math.PI * (2 * i + 1))}));
+  return {time, values, lines};
+}

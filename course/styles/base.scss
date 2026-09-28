@@ -118,51 +118,32 @@ main .zoomable-image { cursor: zoom-in; }
 .spectrum-summary { padding: .6rem .2rem; font-weight: 600; }
 .spectrum-key { display: inline-block; width: 1.4rem; margin: 0 .35rem 0 .8rem; vertical-align: middle; border-top: 3px solid var(--accent); }
 
-/* Practice: one persistent workbench across eight stages. */
-.impulse-ask { --ia-second: #b05515; --ia-filtered: #5a8060; margin: 1.3rem 0 2rem; color: var(--ink); }
-.quarto-dark .impulse-ask { --ia-second: #ffc178; --ia-filtered: #a4dfaa; }
-.ia-shell { border: 1px solid var(--line); border-radius: .7rem; background: var(--surface-alt); overflow: hidden; }
-.ia-steps { display: flex; flex-wrap: wrap; gap: .3rem; padding: .7rem; background: var(--surface); border-bottom: 1px solid var(--line); }
-.ia-steps button, .ia-actions button { color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: .35rem; padding: .35rem .6rem; }
-.ia-steps button.active { background: var(--accent); color: var(--surface); border-color: var(--accent); }
-.ia-steps button:disabled, .ia-actions button:disabled { opacity: .45; cursor: default; }
-.ia-workspace { display: grid; grid-template-columns: minmax(16rem, 19rem) minmax(0, 1fr); gap: 1rem; padding: 1rem; align-items: start; }
-.ia-left { position: sticky; top: 1rem; background: var(--surface); border: 1px solid var(--line); border-radius: .5rem; padding: 1rem; }
-.ia-left h2 { margin: 0 0 .5rem; font-size: 1.25rem; }
-.ia-intro { color: var(--muted); font-size: .9rem; }
-.ia-controls { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: .7rem; }
-.ia-controls label { display: grid; gap: .15rem; align-content: start; font-weight: 600; font-size: .9rem; }
-.ia-controls input, .ia-controls select { width: 100%; max-width: 100%; color: var(--ink); background: var(--surface); }
-.ia-controls input[type="range"] { accent-color: var(--accent); }
-.ia-controls output, .ia-controls small { color: var(--muted); font-weight: 400; }
-.ia-controls small { font-size: .72rem; }
-.ia-question { margin: 1rem 0; padding: .75rem; background: var(--accent-soft); border-left: .2rem solid var(--accent); font-size: .9rem; }
-.ia-question p { margin: .4rem 0; }
-.ia-question details { margin-top: .6rem; }
-.ia-choices { display: grid; gap: .25rem; }
-.ia-summary { padding: .75rem; border: 1px solid var(--line); font-size: .9rem; line-height: 1.5; }
-.ia-actions { display: flex; justify-content: space-between; gap: .5rem; margin-top: 1rem; }
-.ia-plots { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: .8rem; }
-.ia-figure { margin: 0; padding: .6rem; border: 1px solid var(--line); border-radius: .4rem; background: var(--surface); min-width: 0; }
-.ia-figure figcaption { font-weight: 700; font-size: .88rem; min-height: 2.5em; }
-.ia-figure svg { display: block; width: 100%; height: auto; color: var(--ink); font-size: 14px; }
+/* Spectrum practice uses the same surfaces and colors as lecture interactives. */
+.impulse-ask { margin: 1.3rem 0 2rem; color: var(--ink); }
+.ia-section { margin: 1.3rem 0; padding: clamp(.85rem, 2vw, 1.4rem); background: var(--surface-alt); border: 1px solid var(--line); border-radius: .6rem; }
+.ia-heading { display: flex; align-items: start; gap: .9rem; }
+.ia-number { flex: 0 0 auto; color: var(--accent); font-weight: 750; font-size: 1.4rem; line-height: 1.2; }
+.ia-heading h2 { margin: 0 0 .35rem; font-size: 1.3rem; }
+.ia-heading p { margin: 0 0 1rem; max-width: 70rem; }
+.ia-controls { display: flex; flex-wrap: wrap; gap: .5rem 1rem; margin: .3rem 0 1rem; }
+.ia-controls label { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem; font-weight: 600; }
+.ia-controls select, .ia-controls input { color: var(--ink); background: var(--surface); accent-color: var(--accent); }
+.ia-controls input[type="range"] { width: min(18rem, 65vw); }
+.ia-controls output { min-width: 5.5rem; color: var(--muted); }
+.ia-fourier-plots, .ia-spectrum-plots { display: grid; grid-template-columns: 1fr; gap: .75rem; }
+.ia-figure { margin: 0; min-width: 0; padding: .65rem; background: var(--surface); border: 1px solid var(--line); border-radius: .35rem; }
+.ia-figure figcaption { margin: 0 0 .25rem; font-weight: 700; }
+.ia-figure svg { display: block; width: 100%; height: auto; color: var(--ink); font-size: 17px; }
+.ia-figure svg text { fill: var(--ink); }
+.ia-plot-note { margin: .4rem .2rem .1rem; line-height: 1.5; }
 .ia-paper { fill: var(--surface); }
-.ia-grid { stroke: var(--line); stroke-width: 1; opacity: .6; }
+.ia-grid { stroke: var(--line); stroke-width: 1; }
 .ia-axis { stroke: var(--ink); stroke-width: 1.5; }
-.ia-line { fill: none; stroke: var(--accent); stroke-width: 2.2; vector-effect: non-scaling-stroke; }
-.ia-line.ia-second { stroke: var(--ia-second); }
-.ia-line.ia-filtered { stroke: var(--ia-filtered); stroke-dasharray: 6 4; }
-.ia-stem { stroke: var(--ia-second); stroke-width: 1.8; }
-.ia-marker { stroke: var(--focus); stroke-width: 1.5; stroke-dasharray: 5 4; }
-.ia-channel { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1; }
-.ia-outside { fill: var(--focus); opacity: .07; }
-.ia-legend { display: flex; flex-wrap: wrap; gap: .7rem; font-size: .78rem; }
-.ia-legend span::before { content: ""; display: inline-block; width: 1.1rem; margin-right: .25rem; vertical-align: middle; border-top: 3px solid var(--accent); }
-.ia-legend .ia-second::before { border-color: var(--ia-second); }
-.ia-legend .ia-filtered::before { border-color: var(--ia-filtered); border-style: dashed; }
-@media (max-width: 1050px) { .ia-workspace { grid-template-columns: 1fr; } .ia-left { position: static; } }
-@media (max-width: 700px) { .ia-plots { grid-template-columns: 1fr; } .ia-controls { grid-template-columns: 1fr 1fr; } .ia-steps button { flex: 1 1 9rem; } }
-@media (max-width: 430px) { .ia-controls { grid-template-columns: 1fr; } }
+.ia-line { fill: none; stroke: var(--accent); stroke-width: 2.5; vector-effect: non-scaling-stroke; }
+.ia-stem { stroke: var(--accent); stroke-width: 3; vector-effect: non-scaling-stroke; }
+.ia-marker { stroke: var(--focus); stroke-width: 1.5; stroke-dasharray: 6 5; }
+.ia-observation { margin: .8rem 0 0; padding: .7rem .9rem; background: var(--accent-soft); border-left: .2rem solid var(--accent); }
+.ia-method { margin: .7rem 0 0; color: var(--muted); font-size: .9rem; }
 .spectrum-key:first-child { margin-left: 0; }
 .spectrum-key-reference { border-color: var(--muted); border-top-style: dashed; }
 .metric-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .6rem; }

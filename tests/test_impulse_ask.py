@@ -93,3 +93,24 @@ def test_component_import_smoke():
     page = (ROOT / "course" / "practice" / "impulse-to-carrier.qmd").read_text(encoding="utf-8")
     assert 'data-impulse-ask' in page
     assert 'impulse-ask-ui.js' in page
+
+
+def test_practice_fourier_and_averaged_spectra():
+    run_js("""
+const one = m.squareFourier(1);
+const many = m.squareFourier(19);
+assert.equal(one.lines.length, 1);
+assert.equal(many.lines.length, 10);
+assert.deepEqual(many.lines.slice(0, 3).map(v => v.frequencyKhz), [2, 6, 10]);
+const signals = m.practiceSignals(10);
+const ask = m.averagedPowerSpectrum(signals.ask);
+const fsk = m.averagedPowerSpectrum(signals.fsk);
+const psk = m.averagedPowerSpectrum(signals.psk);
+assert.equal(ask.windows, 15);
+assert.equal(ask.stepKhz, 1000 / 8192);
+const at = (s, f) => s.power[Math.round(f / s.stepKhz)];
+assert(at(ask, 100) > at(ask, 82) * 5);
+assert(at(fsk, 82) > at(fsk, 100) * 2);
+assert(at(fsk, 118) > at(fsk, 100) * 2);
+assert(at(ask, 100) > at(psk, 100) * 5);
+""")
