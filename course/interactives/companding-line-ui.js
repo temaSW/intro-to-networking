@@ -1,10 +1,10 @@
-import {compand, lineCodes, SEGMENTS} from './companding-line-model.js';
+import {compand, uniformPcm, lineCodes, SEGMENTS} from './companding-line-model.js';
 
 const esc = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 function segmentChart(active, sample) {
   // Schematic horizontal spacing follows the textbook so the small segments remain visible.
-  const boundaries = [0, 16, 32, 64, 128, 256, 512, 1024, 2048];
+  const boundaries = [0, 32, 64, 128, 256, 512, 1024, 2048, 4096];
   const offsets = [0, 44, 84, 129, 180, 238, 306, 383, 450];
   const centerX = 480, centerY = 260;
   const side = sample < 0 ? -1 : 1, magnitude = Math.abs(sample);
@@ -35,7 +35,29 @@ function segmentChart(active, sample) {
     return `${guides}${ticks}<polyline class="segment-curve" points="${curve}"/>${labels}${levels}${segments}`;
   }).join('');
   const activeLine = `<line class="segment-active" x1="${x(side, offsets[active])}" y1="${y(side, active * 16)}" x2="${x(side, offsets[active + 1])}" y2="${y(side, (active + 1) * 16)}"/>`;
-  return `<svg viewBox="0 0 960 530" role="img" aria-label="A-характеристика 87,6/13 с положительной и отрицательной ветвями; на каждой восемь сегментов по 16 выходных позиций"><line class="segment-axis" x1="16" y1="${centerY}" x2="944" y2="${centerY}"/><line class="segment-axis" x1="${centerX}" y1="22" x2="${centerX}" y2="502"/>${branches}${activeLine}<path class="sample-guide" d="M ${markerX} ${centerY} V ${markerY} H ${centerX}"/><circle class="sample-point" cx="${markerX}" cy="${markerY}" r="6"/><text x="${centerX + 12}" y="20">Sвых / Δ₀</text><text x="944" y="${centerY - 10}" text-anchor="end">Sвх / Δ₀</text><text x="${centerX}" y="${centerY + 24}" text-anchor="middle">0</text></svg>`;
+  return `<svg viewBox="0 0 960 530" role="img" aria-label="Сегментная A-характеристика G.711: ближе к нулю шаг квантования меньше"><line class="segment-axis" x1="16" y1="${centerY}" x2="944" y2="${centerY}"/><line class="segment-axis" x1="${centerX}" y1="22" x2="${centerX}" y2="502"/>${branches}${activeLine}<path class="sample-guide" d="M ${markerX} ${centerY} V ${markerY} H ${centerX}"/><circle class="sample-point" cx="${markerX}" cy="${markerY}" r="6"/><text x="${centerX + 12}" y="20">Кодовая позиция</text><text x="944" y="${centerY - 10}" text-anchor="end">Амплитуда, ед.</text><text x="${centerX}" y="${centerY + 24}" text-anchor="middle">0</text></svg>`;
+}
+
+const chainRoot = document.querySelector('[data-pcm-chain]');
+if (chainRoot) {
+  const steps = [
+    ['Отсчёт', 'После дискретизации мы получили амплитуду в выбранный момент времени. Её ещё нельзя передать конечным числом бит без квантования.'],
+    ['Компрессор', 'Преобразование растягивает область малых амплитуд в кодовой шкале. Один шаг следующего квантователя будет соответствовать разным шагам исходного сигнала.'],
+    ['Квантователь', 'Равномерный квантователь выбирает одну из 256 позиций в преобразованной шкале; на исходной шкале интервалы получаются неравномерными.'],
+    ['Кодовое слово', 'Выбранная позиция становится 8-битным словом: знак, сегмент и позиция внутри сегмента. После передачи приёмник находит соответствующий уровень.'],
+    ['Экспандер', 'Обратное нелинейное преобразование переводит выбранный уровень в исходную шкалу амплитуд. Потерянную при квантовании точность оно не восстанавливает.'],
+  ];
+  chainRoot.innerHTML = `<div class="pcm-chain-steps" role="group" aria-label="Этапы компандирования">${steps.map(([name], i) => `<button type="button" data-step="${i}" aria-pressed="${i === 0}">${name}</button>`).join('<span aria-hidden="true">→</span>')}</div><p class="pcm-chain-detail" aria-live="polite"></p>`;
+  const detail = chainRoot.querySelector('.pcm-chain-detail');
+  const select = index => {
+    chainRoot.querySelectorAll('button').forEach((button, i) => { button.setAttribute('aria-pressed', String(i === index)); });
+    detail.textContent = steps[index][1];
+  };
+  chainRoot.addEventListener('click', event => {
+    const button = event.target.closest('button[data-step]');
+    if (button) select(Number(button.dataset.step));
+  });
+  select(0);
 }
 
 function waveSvg(model, rows) {
@@ -61,14 +83,20 @@ function waveSvg(model, rows) {
 
 const compRoot = document.querySelector('[data-companding-widget]');
 if (compRoot) {
-  compRoot.innerHTML = `<div class="companding-controls"><label for="companding-sample">Отсчёт в единицах Δ₀</label><output for="companding-sample">+86 Δ₀</output><input id="companding-sample" type="range" min="-2047" max="2047" step="1" value="86"></div><div class="companding-result" aria-live="polite"></div>`;
+  compRoot.innerHTML = `<div class="companding-controls"><label for="companding-sample">Отсчёт, условные единицы G.711</label><output for="companding-sample">+20</output><input id="companding-sample" type="range" min="-4095" max="4095" step="1" value="20"></div><div class="companding-presets"><button type="button" data-sample="20">Слабый: +20</button><button type="button" data-sample="3060">Сильный: +3060</button></div><div class="companding-result" aria-live="polite"></div>`;
   const input=compRoot.querySelector('input'), output=compRoot.querySelector('output'), result=compRoot.querySelector('.companding-result');
   const render=()=>{
     const c=compand(input.value);
-    output.value=`${c.value >= 0 ? '+' : '−'}${Math.abs(c.value)} Δ₀`;
+    const u=uniformPcm(input.value);
+    const relative = error => c.value === 0 ? '—' : `${(100 * Math.abs(error) / Math.abs(c.value)).toFixed(2).replace('.', ',')}%`;
+    output.value=`${c.value >= 0 ? '+' : '−'}${Math.abs(c.value)}`;
     const branchBase = c.value < 0 && c.base > 0 ? `−${c.base}` : c.base;
-    result.innerHTML=`<div class="segment-chart">${segmentChart(c.segment, c.value)}</div><p><strong>${esc(c.word[0])} ${esc(c.word.slice(1,4))} ${esc(c.word.slice(4))}</strong> · сегмент ${c.segment}, U<sub>эт,${c.segment}</sub>=${branchBase}Δ₀, Δ<sub>${c.segment}</sub>=${c.step}Δ₀, позиция ${c.position}.</p>`;
+    result.innerHTML=`<div class="segment-chart">${segmentChart(c.segment, c.value)}</div><p>Сегмент ${c.segment}: начало ${branchBase}, шаг ${c.step}, позиция ${c.position}. Слово до инверсии чётных бит: <strong>${esc(c.word[0])} ${esc(c.word.slice(1,4))} ${esc(c.word.slice(4))}</strong>; на выходе кодека G.711: <strong>${esc(c.wireWord)}</strong>.</p><div class="lecture-table"><table><thead><tr><th>8-битная шкала</th><th>Шаг</th><th>Восстановлено</th><th>Абсолютная ошибка</th><th>Относительная ошибка</th></tr></thead><tbody><tr><td>Равномерная</td><td>${u.step}</td><td>${u.reconstructed}</td><td>${Math.abs(u.error)}</td><td>${relative(u.error)}</td></tr><tr><td>A-law G.711</td><td>${c.step}</td><td>${c.reconstructed}</td><td>${Math.abs(c.error)}</td><td>${relative(c.error)}</td></tr></tbody></table></div>`;
   };
+  compRoot.querySelector('.companding-presets').addEventListener('click', event => {
+    const button=event.target.closest('button[data-sample]');
+    if (button) { input.value=button.dataset.sample; render(); }
+  });
   input.addEventListener('input',render);render();
 }
 

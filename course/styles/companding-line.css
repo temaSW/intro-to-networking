@@ -9,6 +9,13 @@
 .companding-controls { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: .5rem 1rem; }
 .companding-controls output { font-variant-numeric: tabular-nums; font-weight: 700; }
 .companding-line-widget .companding-controls [type=range] { grid-column: 1 / -1; width: 100%; max-width: none; min-width: 0; padding: 0; accent-color: var(--bs-primary); }
+.pcm-chain-steps { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem; }
+.pcm-chain-steps button, .companding-presets button { border: 1px solid var(--bs-primary); border-radius: .35rem; padding: .4rem .65rem; color: var(--bs-body-color); background: var(--bs-body-bg); cursor: pointer; }
+.pcm-chain-steps button:hover, .companding-presets button:hover { background: var(--bs-secondary-bg); }
+.pcm-chain-steps button[aria-pressed=true] { background: var(--bs-primary); color: var(--bs-body-bg); }
+.pcm-chain-steps button:focus-visible, .companding-presets button:focus-visible { outline: 3px solid var(--bs-warning); outline-offset: 2px; }
+.pcm-chain-detail { margin: .8rem 0 0; min-height: 3em; }
+.companding-presets { display: flex; flex-wrap: wrap; gap: .5rem; margin: .75rem 0; }
 .segment-chart { overflow-x: auto; }
 .segment-chart svg { display: block; width: 100%; min-width: 800px; max-width: 960px; margin: .7rem auto; }
 .segment-chart .segment-axis { stroke: var(--bs-body-color); stroke-width: 1.5; }
@@ -26,5 +33,17 @@
 .line-wave-scroll .zero { stroke: var(--bs-secondary-color); stroke-dasharray: 3 3; stroke-width: 1; }
 .line-wave-scroll .marker { fill: var(--bs-danger); font-weight: 700; }
 .line-legend { font-size: .9rem; }
-.baseband-spectrum { display: block; width: 100%; max-width: 680px; height: auto; margin: 1rem auto; }
+.line-spectrum-grid-layout { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; }
+.line-spectrum-card { margin: 0; padding: .7rem; border: 1px solid var(--bs-border-color); border-radius: .5rem; background: var(--bs-body-bg); }
+.line-spectrum-card figcaption { font-weight: 700; }
+.line-spectrum-card svg { display: block; width: 100%; height: auto; color: var(--bs-body-color); }
+.line-spectrum-card svg text { fill: currentColor; font-size: 14px; }
+.line-spectrum-paper { fill: var(--bs-body-bg); }
+.line-spectrum-grid { stroke: var(--bs-border-color); stroke-width: 1; }
+.line-spectrum-trace { fill: none; stroke: var(--bs-info); stroke-width: 3.2; }
+.line-spectrum-dc { stroke: var(--bs-danger); stroke-width: 3; }
+.line-spectrum-card svg .line-spectrum-dc-label { fill: var(--bs-danger); font-weight: 700; }
+.line-spectrum-card p { margin: .1rem 0 0; font-size: .9rem; }
+.line-spectrum-method { margin-top: .8rem; font-size: .9rem; color: var(--bs-secondary-color); }
+@media (max-width: 760px) { .line-spectrum-grid-layout { grid-template-columns: 1fr; } }
 @media (max-width: 600px) { .companding-line-widget { padding: .7rem; } }
