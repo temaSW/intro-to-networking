@@ -17,9 +17,9 @@ Each allocated cell belongs to one user only. Show unused cells, served demand a
 
 First assign equal static shares while demands differ; then change to dynamic allocation. The key observation is opportunity cost: a cell given to Alice is unavailable to Bob at the same time and frequency.
 
-## Current implementation
+## Current course use
 
-The working browser component is in `course/interactives/lecture-04-model.js` and `lecture-04-ui.js`. Static allocation reserves equal shares even when a queue is empty; dynamic allocation fills cells for nonempty queues.
+Lecture 04 uses a static, responsive comparison of FDMA, TDMA, CDMA, OFDMA and SDMA/MU-MIMO in `course/_includes/lecture-04-access.qmd`. The resource-grid browser component was removed from the lecture because its allocation controls did not make the access methods clear.
 
 ## Implementation boundary
 

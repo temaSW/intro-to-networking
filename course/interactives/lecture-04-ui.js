@@ -1,8 +1,7 @@
-import {allocateGrid, simulateConstellation} from "./lecture-04-model.js";
+import {simulateConstellation} from "./lecture-04-model.js";
 
-const users = ["Алиса", "Боб", "Кира", "Дима"];
-const colors = ["#087e8b", "#c26b1a", "#628c24", "#7b59a6"];
 const clean = value => Number.isFinite(Number(value)) ? Number(value) : 0;
+const symbolCount = 10000;
 
 function constellationSvg(result) {
   const all = [...result.ideal, ...result.points.map(point => point.received)];
@@ -14,37 +13,19 @@ function constellationSvg(result) {
 }
 
 function mountConstellation(root) {
-  root.innerHTML = `<div class="interactive-controls"><label>Модуляция <select name="order"><option value="4">QPSK</option><option value="16">16-QAM</option><option value="64">64-QAM</option><option value="256">256-QAM</option></select></label><label>Сигнал/шум <input name="snr" type="range" min="0" max="30" value="14"><output name="snr-value">14 дБ</output></label><label>Число символов <select name="count"><option>100</option><option selected>400</option><option>1000</option></select></label><button type="button" name="repeat">Новая передача</button></div><div class="interactive-output"><div class="interactive-plot"></div><div class="interactive-metrics" aria-live="polite"></div></div>`;
+  root.innerHTML = `<div class="interactive-controls"><label>Модуляция <select name="order"><option value="4">QPSK</option><option value="16">16-QAM</option><option value="64">64-QAM</option><option value="256">256-QAM</option></select></label><label>Сигнал/шум <input name="snr" type="range" min="0" max="30" value="14"><output name="snr-value">14 дБ</output></label><button type="button" name="repeat">Новая передача</button></div><p class="interactive-note">В каждом опыте передаётся 10 000 символов; на рисунке показана часть принятых точек.</p><div class="interactive-output"><div class="interactive-plot"></div><div class="interactive-metrics" aria-live="polite"></div></div>`;
   let seed = 42;
   const draw = () => {
     const order = clean(root.querySelector('[name="order"]').value);
     const snr = clean(root.querySelector('[name="snr"]').value);
-    const count = clean(root.querySelector('[name="count"]').value);
-    const result = simulateConstellation(order, snr, count, seed);
+    const result = simulateConstellation(order, snr, symbolCount, seed);
     root.querySelector('[name="snr-value"]').textContent = `${snr} дБ`;
     root.querySelector(".interactive-plot").innerHTML = constellationSvg(result);
-    root.querySelector(".interactive-metrics").innerHTML = `<p><strong>${Math.log2(order)}</strong> бит/символ</p><p>Ошибочных символов: <strong>${result.symbolErrors} / ${count}</strong></p><p>Ошибочных битов: <strong>${result.bitErrors} / ${result.transmittedBits}</strong></p><p class="interactive-note">Синие точки — переданные состояния; оранжевые — принятые, красные — ошибочно распознанные. Модель: квадратная QAM и гауссовский шум.</p>`;
+    root.querySelector(".interactive-metrics").innerHTML = `<p><strong>${Math.log2(order)}</strong> бит/символ</p><p>Ошибочных символов: <strong>${result.symbolErrors} / ${symbolCount}</strong></p><p>Ошибочных битов: <strong>${result.bitErrors} / ${result.transmittedBits}</strong></p><p class="interactive-note">Синие точки — переданные состояния; оранжевые — принятые, красные — ошибочно распознанные. Модель: квадратная QAM и гауссовский шум.</p>`;
   };
   root.addEventListener("input", draw);
   root.addEventListener("change", draw);
   root.querySelector('[name="repeat"]').addEventListener("click", () => {seed++; draw();});
-  draw();
-}
-
-function mountGrid(root) {
-  root.innerHTML = `<div class="interactive-controls"><label>Распределение <select name="mode"><option value="static">Поровну заранее</option><option value="dynamic">По текущей потребности</option></select></label>${users.map((user, i) => `<label>${user}: нужно клеток <input name="demand-${i}" type="range" min="0" max="48" value="${[28, 5, 14, 0][i]}"><output name="demand-value-${i}"></output></label>`).join("")}</div><div class="interactive-output"><div class="interactive-grid" role="img"></div><div class="interactive-metrics" aria-live="polite"></div></div>`;
-  const draw = () => {
-    const demands = users.map((_, i) => clean(root.querySelector(`[name="demand-${i}"]`).value));
-    const mode = root.querySelector('[name="mode"]').value;
-    const result = allocateGrid(demands, mode);
-    const grid = root.querySelector(".interactive-grid");
-    grid.innerHTML = result.cells.map(user => `<span class="grid-cell" style="${user >= 0 ? `--cell-color:${colors[user]}` : ""}" title="${user >= 0 ? users[user] : "Не используется"}">${user >= 0 ? users[user][0] : "·"}</span>`).join("");
-    grid.setAttribute("aria-label", `Сетка из 48 клеток. Использовано ${48 - result.unused}, не использовано ${result.unused}.`);
-    users.forEach((_, i) => {root.querySelector(`[name="demand-value-${i}"]`).textContent = demands[i];});
-    root.querySelector(".interactive-metrics").innerHTML = `<p>Использовано: <strong>${48 - result.unused} / 48</strong> клеток</p><p>Пустых клеток: <strong>${result.unused}</strong></p>${users.map((user, i) => `<p><span class="user-swatch" style="background:${colors[i]}"></span>${user}: <strong>${result.served[i]} / ${demands[i]}</strong>, осталось ${result.remaining[i]}</p>`).join("")}<p class="interactive-note">Каждая клетка может обслужить одну единицу спроса только одного пользователя.</p>`;
-  };
-  root.addEventListener("input", draw);
-  root.addEventListener("change", draw);
   draw();
 }
 
@@ -63,7 +44,7 @@ function berSvg(rows, selected) {
   const left = 75, right = 735, top = 25, bottom = 370;
   const x = snr => left + (snr + 4) / 28 * (right - left);
   const y = ber => top + (-Math.log10(ber)) / 6 * (bottom - top);
-  let chart = `<svg viewBox="0 0 760 430" role="img" aria-label="Измеренная вероятность ошибки бита в зависимости от Es/N0: кодированные и некодированные режимы"><rect width="760" height="430" fill="var(--surface)"/>`;
+  let chart = `<svg viewBox="0 0 760 430" role="img" aria-label="Измеренная вероятность ошибки бита в зависимости от SNR: кодированные и некодированные режимы"><rect width="760" height="430" fill="var(--surface)"/>`;
   for (const snr of [-4, 0, 4, 8, 12, 16, 20, 24]) {
     chart += `<line x1="${x(snr)}" y1="${top}" x2="${x(snr)}" y2="${bottom}" stroke="var(--line)"/><text x="${x(snr)}" y="395" text-anchor="middle" fill="var(--muted)">${snr}</text>`;
   }
@@ -74,9 +55,9 @@ function berSvg(rows, selected) {
   for (const series of berSeries.filter(item => selected.includes(item.id))) {
     const points = rows.filter(row => row.scheme === series.id && row.bit_errors > 0);
     chart += `<polyline points="${points.map(row => `${x(row.snr_db).toFixed(1)},${y(row.ber).toFixed(1)}`).join(" ")}" fill="none" stroke="${series.color}" stroke-width="3" ${series.uncoded ? 'stroke-dasharray="8 5"' : ""}/>`;
-    for (const row of points) chart += `<circle cx="${x(row.snr_db).toFixed(1)}" cy="${y(row.ber).toFixed(1)}" r="${series.uncoded ? 3 : 4}" fill="${series.color}"><title>${series.label}: ${row.bit_errors} ошибок на ${row.information_bits} бит, Es/N0=${row.snr_db} дБ</title></circle>`;
+    for (const row of points) chart += `<circle cx="${x(row.snr_db).toFixed(1)}" cy="${y(row.ber).toFixed(1)}" r="${series.uncoded ? 3 : 4}" fill="${series.color}"><title>${series.label}: ${row.bit_errors} ошибок на ${row.information_bits} бит, SNR=${row.snr_db} дБ</title></circle>`;
   }
-  chart += `<text x="405" y="424" text-anchor="middle" fill="var(--ink)">Es/N0, дБ</text><text x="17" y="200" transform="rotate(-90 17 200)" text-anchor="middle" fill="var(--ink)">BER</text></svg>`;
+  chart += `<text x="405" y="424" text-anchor="middle" fill="var(--ink)">SNR, дБ</text><text x="17" y="200" transform="rotate(-90 17 200)" text-anchor="middle" fill="var(--ink)">BER</text></svg>`;
   return chart;
 }
 
@@ -91,7 +72,7 @@ async function mountBer(root) {
       const [scheme, modulation, code_rate, snr_db, bit_errors, information_bits, ber] = line.split(",");
       return {scheme: +scheme, modulation, code_rate: +code_rate, snr_db: +snr_db, bit_errors: +bit_errors, information_bits: +information_bits, ber: +ber};
     });
-    root.innerHTML = `<div class="ber-controls" role="group" aria-label="Показать кривые">${berSeries.map(series => `<label><input type="checkbox" value="${series.id}"><span class="ber-swatch ${series.uncoded ? "ber-swatch-uncoded" : ""}" style="--curve-color:${series.color}"></span>${series.label}</label>`).join("")}</div><div class="ber-plot"></div><p class="interactive-note">Выберите кривые для сравнения. Сплошные линии — после декодирования LDPC; штриховые — без кодирования. Точки с нулём обнаруженных ошибок не показаны.</p>`;
+    root.innerHTML = `<div class="ber-controls" role="group" aria-label="Показать кривые">${berSeries.map(series => `<label><input type="checkbox" value="${series.id}" ${[1, 6].includes(series.id) ? "checked" : ""}><span class="ber-swatch ${series.uncoded ? "ber-swatch-uncoded" : ""}" style="--curve-color:${series.color}"></span>${series.label}</label>`).join("")}</div><div class="ber-plot"></div><p class="interactive-note">Выберите кривые для сравнения. Сплошные линии — после декодирования LDPC; штриховые — без кодирования. Точки с нулём обнаруженных ошибок не показаны.</p>`;
     const draw = () => {
       const selected = [...root.querySelectorAll('input:checked')].map(input => +input.value);
       root.querySelector(".ber-plot").innerHTML = berSvg(rows, selected);
@@ -106,6 +87,5 @@ async function mountBer(root) {
 for (const root of document.querySelectorAll("[data-lecture-interactive]")) {
   const kind = root.dataset.lectureInteractive;
   if (kind === "constellation") mountConstellation(root);
-  if (kind === "grid") mountGrid(root);
   if (kind === "ber") mountBer(root);
 }

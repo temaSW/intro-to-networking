@@ -3,5 +3,6 @@ course/.quarto/
 __pycache__/
 .pytest_cache/
 .venv/
+.tools/
 AGENTS.md
 design/

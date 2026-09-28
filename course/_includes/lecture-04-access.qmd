@@ -1,0 +1,24 @@
+<div class="access-diagrams" aria-label="Схемы пяти способов множественного доступа">
+  <figure class="access-card">
+    <figcaption><strong>FDMA · разные частоты</strong><span>Все передают одновременно, каждый в своей полосе.</span></figcaption>
+    <div class="access-grid" aria-hidden="true"><i class="access-a">А</i><i class="access-a">А</i><i class="access-a">А</i><i class="access-a">А</i><i class="access-b">Б</i><i class="access-b">Б</i><i class="access-b">Б</i><i class="access-b">Б</i><i class="access-c">К</i><i class="access-c">К</i><i class="access-c">К</i><i class="access-c">К</i></div>
+  </figure>
+  <figure class="access-card">
+    <figcaption><strong>TDMA · разное время</strong><span>Вся полоса по очереди достаётся разным пользователям.</span></figcaption>
+    <div class="access-grid" aria-hidden="true"><i class="access-a">А</i><i class="access-b">Б</i><i class="access-c">К</i><i class="access-a">А</i><i class="access-a">А</i><i class="access-b">Б</i><i class="access-c">К</i><i class="access-a">А</i><i class="access-a">А</i><i class="access-b">Б</i><i class="access-c">К</i><i class="access-a">А</i></div>
+  </figure>
+  <figure class="access-card">
+    <figcaption><strong>CDMA · разные коды</strong><span>Передачи накладываются во времени и частоте; приёмник различает их по кодам.</span></figcaption>
+    <div class="access-overlay" aria-hidden="true"><span class="access-a">А · код 1</span><span class="access-b">Б · код 2</span><span class="access-c">К · код 3</span></div>
+  </figure>
+  <figure class="access-card">
+    <figcaption><strong>OFDMA · клетки время × частота</strong><span>Планировщик назначает пользователям разные клетки сетки.</span></figcaption>
+    <div class="access-grid" aria-hidden="true"><i class="access-a">А</i><i class="access-a">А</i><i class="access-b">Б</i><i class="access-b">Б</i><i class="access-a">А</i><i class="access-c">К</i><i class="access-c">К</i><i class="access-b">Б</i><i class="access-c">К</i><i class="access-c">К</i><i class="access-b">Б</i><i class="access-a">А</i></div>
+  </figure>
+  <figure class="access-card access-card-wide">
+    <figcaption><strong>SDMA / MU-MIMO · разные пространственные потоки</strong><span>Одна частотно-временная область может обслужить нескольких пользователей, если каналы позволяют разделить потоки.</span></figcaption>
+    <div class="access-space" aria-hidden="true"><span class="access-base">Базовая станция</span><span class="access-beam access-a">↗ поток А</span><span class="access-beam access-b">→ поток Б</span><span class="access-beam access-c">↘ поток К</span></div>
+  </figure>
+</div>
+
+<p class="access-caption">В сетках горизонталь — время, вертикаль — частота. Буквы обозначают Алису, Боба и Киру; рисунки условные, без масштаба.</p>

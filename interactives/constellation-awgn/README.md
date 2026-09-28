@@ -6,7 +6,7 @@ Reusable learning component: compare QPSK, 16-QAM, 64-QAM and optionally 256-QAM
 
 - modulation order;
 - SNR in dB;
-- number of transmitted symbols;
+- a fixed 10,000 transmitted symbols per experiment;
 - optional fixed random seed / «new experiment».
 
 ## Observable result
@@ -19,7 +19,7 @@ Ask for a prediction with QPSK, then keep SNR unchanged and switch to 64-QAM. Th
 
 ## Current implementation
 
-The working browser component is in `course/interactives/lecture-04-model.js` and `lecture-04-ui.js`. It runs directly on the static Quarto site without a server. A marimo/Pyodide port can reuse the controls and scenario below.
+The working browser component is in `course/interactives/lecture-04-model.js` and `lecture-04-ui.js`. It computes errors across all 10,000 symbols and plots a subset of 500 points for readability. It runs directly on the static Quarto site without a server. A marimo/Pyodide port can reuse the controls and scenario below.
 
 ## Implementation boundary
 
