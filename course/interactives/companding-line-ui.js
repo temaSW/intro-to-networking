@@ -1,10 +1,10 @@
-import {compand, uniformPcm, lineCodes, SEGMENTS} from './companding-line-model.js';
+import {compand, uniformPcm, lineCodes, SEGMENTS} from './companding-line-model.js?v=20260929-4';
 
 const esc = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 function segmentChart(active, sample) {
-  // The model uses G.711 input units; the textbook plots input / Δ₀ with Δ₀ = 2 units.
-  const boundaries = [0, 32, 64, 128, 256, 512, 1024, 2048, 4096];
+  // The model and horizontal labels both use the textbook's Δ₀ units.
+  const boundaries = [0, 16, 32, 64, 128, 256, 512, 1024, 2048];
   const offsets = [0, 59, 116, 191, 279, 379, 486, 604, 732];
   const left = 92, bottom = 349;
   const x = offset => left + offset;
@@ -25,13 +25,13 @@ function segmentChart(active, sample) {
   }).join('')).join('');
   const curve = offsets.map((offset, i) => `${x(offset)},${y(i * 16)}`).join(' ');
   const labels = boundaries.slice(1).map((value, i) =>
-    `<text x="${x(offsets[i + 1])}" y="${bottom + 24}" text-anchor="middle">${value / 2}</text>`).join('');
+    `<text x="${x(offsets[i + 1])}" y="${bottom + 24}" text-anchor="middle">${value}</text>`).join('');
   const levels = boundaries.slice(1).map((_, i) =>
     `<text x="${left - 12}" y="${y((i + 1) * 16) + 4}" text-anchor="end">${(i + 1) * 16}</text>`).join('');
   const segments = SEGMENTS.map((_, i) =>
     `<text class="segment-number" x="${x((offsets[i] + offsets[i + 1]) / 2)}" y="${y((i + .5) * 16) - 9}" text-anchor="middle">${i}</text>`).join('');
   const activeLine = `<line class="segment-active" x1="${x(offsets[active])}" y1="${y(active * 16)}" x2="${x(offsets[active + 1])}" y2="${y((active + 1) * 16)}"/>`;
-  return `<svg viewBox="0 0 900 420" role="img" aria-label="Положительная ветвь A-характеристики G.711, как в пособии: вход от 0 до 2048 в единицах Δ₀, выход от 0 до 128 кодовых позиций"><line class="segment-axis" x1="${left}" y1="${bottom}" x2="850" y2="${bottom}"/><line class="segment-axis" x1="${left}" y1="${bottom}" x2="${left}" y2="43"/>${guides}${ticks}<polyline class="segment-curve" points="${curve}"/>${activeLine}<path class="sample-guide" d="M ${markerX} ${bottom} V ${markerY} H ${left}"/><circle class="sample-point" cx="${markerX}" cy="${markerY}" r="6"/>${labels}${levels}${segments}<text x="${left}" y="28">Выход / Δ₀ · кодовая позиция</text><text x="850" y="402" text-anchor="end">Вход / Δ₀ (Δ₀ = 2 ед. отсчёта)</text><text x="${left - 12}" y="${bottom + 5}" text-anchor="end">0</text></svg>`;
+  return `<svg viewBox="0 0 900 420" role="img" aria-label="Положительная ветвь A-характеристики ИКМ: вход от 0 до 2048 в единицах Δ₀, выход от 0 до 128 кодовых позиций"><line class="segment-axis" x1="${left}" y1="${bottom}" x2="850" y2="${bottom}"/><line class="segment-axis" x1="${left}" y1="${bottom}" x2="${left}" y2="43"/>${guides}${ticks}<polyline class="segment-curve" points="${curve}"/>${activeLine}<path class="sample-guide" d="M ${markerX} ${bottom} V ${markerY} H ${left}"/><circle class="sample-point" cx="${markerX}" cy="${markerY}" r="6"/>${labels}${levels}${segments}<text x="${left}" y="28">Выход / Δ₀ · кодовая позиция</text><text x="850" y="402" text-anchor="end">Вход / Δ₀</text><text x="${left - 12}" y="${bottom + 5}" text-anchor="end">0</text></svg>`;
 }
 
 const chainRoot = document.querySelector('[data-pcm-chain]');
@@ -79,15 +79,16 @@ function waveSvg(model, rows) {
 
 const compRoot = document.querySelector('[data-companding-widget]');
 if (compRoot) {
-  compRoot.innerHTML = `<div class="companding-controls"><label for="companding-sample">Отсчёт, условные единицы G.711</label><output for="companding-sample">+20</output><input id="companding-sample" type="range" min="-4095" max="4095" step="1" value="20"></div><div class="companding-presets"><button type="button" data-sample="20">Слабый: +20</button><button type="button" data-sample="3060">Сильный: +3060</button></div><div class="companding-result" aria-live="polite"></div>`;
+  compRoot.innerHTML = `<div class="companding-controls"><label for="companding-sample">Отсчёт в единицах Δ₀</label><output for="companding-sample">+10</output><input id="companding-sample" type="range" min="-2047" max="2047" step="1" value="10"></div><div class="companding-presets"><button type="button" data-sample="10">Слабый: +10</button><button type="button" data-sample="1530">Сильный: +1530</button></div><div class="companding-result" aria-live="polite"></div>`;
   const input=compRoot.querySelector('input'), output=compRoot.querySelector('output'), result=compRoot.querySelector('.companding-result');
   const render=()=>{
     const c=compand(input.value);
     const u=uniformPcm(input.value);
+    const number = value => String(value).replace('.', ',');
     const relative = error => c.value === 0 ? '—' : `${(100 * Math.abs(error) / Math.abs(c.value)).toFixed(2).replace('.', ',')}%`;
     output.value=`${c.value >= 0 ? '+' : '−'}${Math.abs(c.value)}`;
     const branchBase = c.value < 0 && c.base > 0 ? `−${c.base}` : c.base;
-    result.innerHTML=`<div class="segment-chart">${segmentChart(c.segment, c.value)}</div><p>Сегмент ${c.segment}: начало ${branchBase}, шаг ${c.step}, позиция ${c.position}. Слово до инверсии чётных бит: <strong>${esc(c.word[0])} ${esc(c.word.slice(1,4))} ${esc(c.word.slice(4))}</strong>; на выходе кодека G.711: <strong>${esc(c.wireWord)}</strong>.</p><div class="lecture-table"><table><thead><tr><th>8-битная шкала</th><th>Шаг</th><th>Восстановлено</th><th>Абсолютная ошибка</th><th>Относительная ошибка</th></tr></thead><tbody><tr><td>Равномерная</td><td>${u.step}</td><td>${u.reconstructed}</td><td>${Math.abs(u.error)}</td><td>${relative(u.error)}</td></tr><tr><td>A-law G.711</td><td>${c.step}</td><td>${c.reconstructed}</td><td>${Math.abs(c.error)}</td><td>${relative(c.error)}</td></tr></tbody></table></div>`;
+    result.innerHTML=`<div class="segment-chart">${segmentChart(c.segment, c.value)}</div><p>Сегмент ${c.segment}: начало ${branchBase}, шаг ${c.step}, сигнал коррекции ${number(c.step / 2)}, позиция ${c.position}. Слово до инверсии чётных бит: <strong>${esc(c.word[0])} ${esc(c.word.slice(1,4))} ${esc(c.word.slice(4))}</strong>; на выходе кодека G.711: <strong>${esc(c.wireWord)}</strong>.</p><div class="lecture-table"><table><thead><tr><th>8-битная шкала</th><th>Шаг</th><th>Восстановлено</th><th>Абсолютная ошибка</th><th>Относительная ошибка</th></tr></thead><tbody><tr><td>Равномерная</td><td>${u.step}</td><td>${number(u.reconstructed)}</td><td>${number(Math.abs(u.error))}</td><td>${relative(u.error)}</td></tr><tr><td>A-law G.711</td><td>${c.step}</td><td>${number(c.reconstructed)}</td><td>${number(Math.abs(c.error))}</td><td>${relative(c.error)}</td></tr></tbody></table></div>`;
   };
   compRoot.querySelector('.companding-presets').addEventListener('click', event => {
     const button=event.target.closest('button[data-sample]');
