@@ -1,26 +1,36 @@
 // Pure models shared by the lecture widget and reusable exercises.
 export const SEGMENTS = [
-  { base: 0, step: 1 }, { base: 16, step: 1 },
-  { base: 32, step: 2 }, { base: 64, step: 4 },
-  { base: 128, step: 8 }, { base: 256, step: 16 },
-  { base: 512, step: 32 }, { base: 1024, step: 64 },
+  { base: 0, step: 2 }, { base: 32, step: 2 },
+  { base: 64, step: 4 }, { base: 128, step: 8 },
+  { base: 256, step: 16 }, { base: 512, step: 32 },
+  { base: 1024, step: 64 }, { base: 2048, step: 128 },
 ];
 
 export function compand(sample) {
-  const value = Math.max(-2047, Math.min(2047, Math.trunc(Number(sample) || 0)));
+  const value = Math.max(-4095, Math.min(4095, Math.trunc(Number(sample) || 0)));
   const magnitude = Math.abs(value);
   const segment = Math.max(0, SEGMENTS.findLastIndex(({base}) => magnitude >= base));
   const {base, step} = SEGMENTS[segment];
   const position = Math.min(15, Math.floor((magnitude - base) / step));
   const word = `${value >= 0 ? 1 : 0}${segment.toString(2).padStart(3, '0')}${position.toString(2).padStart(4, '0')}`;
+  // G.711 inverts even-numbered bits before transmission (mask 01010101).
+  const wireWord = (parseInt(word, 2) ^ 0x55).toString(2).padStart(8, '0');
   const reconstructed = (value >= 0 ? 1 : -1) * (base + (position + 0.5) * step);
-  return {value, segment, base, step, position, word, reconstructed,
+  return {value, segment, base, step, position, word, wireWord, reconstructed,
     error: reconstructed - value};
 }
 
+export function uniformPcm(sample) {
+  const value = Math.max(-4095, Math.min(4095, Math.trunc(Number(sample) || 0)));
+  const step = 32; // 256 words over the same signed range [-4096, 4096).
+  const position = Math.floor((value + 4096) / step);
+  const reconstructed = -4096 + (position + 0.5) * step;
+  return {value, step, position, reconstructed, error: reconstructed - value};
+}
+
 // Each bit is represented by two equal half-bit levels; B/V markers retain the HDB-3 decisions.
-export function lineCodes(input) {
-  const bits = String(input).replace(/[^01]/g, '').slice(0, 64);
+export function lineCodes(input, maxBits = 64) {
+  const bits = String(input).replace(/[^01]/g, '').slice(0, maxBits);
   const nrz = [], rz = [], amiNrz = [], amiRz = [], hdb = [], manchester = [];
   let polarity = -1, onesSince = 0, lastPulse = -1;
   for (let i = 0; i < bits.length; i++) {
