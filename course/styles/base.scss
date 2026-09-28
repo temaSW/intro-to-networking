@@ -88,6 +88,26 @@ main img:not(.no-lightbox) { cursor: zoom-in; }
 .lightbox-close { position: fixed; top: .6rem; right: 1rem; border: 1px solid #fff; border-radius: .5rem; color: #fff; background: #263b46; font-size: 2rem; line-height: 1; padding: .2rem .65rem; }
 
 .lecture-interactive { background: var(--surface-alt); border: 1px solid var(--line); border-radius: .6rem; padding: 1.2rem; margin: 1.4rem 0; }
+.constellation-figures { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-block: 1.5rem; }
+.constellation-figures figure { margin: 0; padding: .8rem; background: var(--surface); border: 1px solid var(--line); overflow: hidden; }
+.constellation-figures figure:last-child { grid-column: 1 / -1; max-width: 38rem; width: 100%; justify-self: center; }
+.constellation-figures figcaption { font-weight: 700; margin-bottom: .4rem; }
+.constellation-figures img { display: block; width: 180%; max-width: none; height: auto; margin-left: -40%; }
+.access-diagrams { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-block: 1.4rem .5rem; }
+.access-card { margin: 0; padding: 1rem; background: var(--surface); border: 1px solid var(--line); border-radius: .5rem; }
+.access-card-wide { grid-column: 1 / -1; }
+.access-card figcaption { display: grid; gap: .2rem; min-height: 5.2rem; }
+.access-card figcaption span, .access-caption { color: var(--muted); font-size: .9rem; }
+.access-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: .2rem; }
+.access-grid i { min-height: 2.1rem; display: grid; place-items: center; font-style: normal; font-weight: 700; border-radius: .2rem; }
+.access-a { background: #087e8b; color: #fff; }
+.access-b { background: #9b5512; color: #fff; }
+.access-c { background: #5a7320; color: #fff; }
+.access-overlay { display: grid; grid-template-columns: repeat(3, 1fr); gap: .3rem; padding: .7rem; border: 2px dashed var(--line); border-radius: .3rem; }
+.access-overlay span { text-align: center; padding: .8rem .2rem; font-weight: 700; border-radius: .3rem; }
+.access-space { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .5rem; }
+.access-base { padding: .7rem; border: 2px solid var(--accent); border-radius: .3rem; font-weight: 700; }
+.access-beam { padding: .7rem; border-radius: .3rem; font-weight: 700; }
 .bottleneck-widget .bottleneck-summary { background: var(--surface); border: 1px solid var(--line); padding: .8rem 1rem; margin: .8rem 0; font-weight: 600; }
 .bottleneck-widget .bottleneck-segments { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .7rem; }
 .bottleneck-widget .bottleneck-segment { display: grid; gap: .35rem; background: var(--surface); border: 1px solid var(--line); padding: .8rem; }
@@ -105,10 +125,6 @@ main img:not(.no-lightbox) { cursor: zoom-in; }
 .interactive-metrics { background: var(--surface); border: 1px solid var(--line); padding: .8rem 1rem; }
 .interactive-metrics p { margin: .25rem 0 .65rem; }
 .interactive-note { color: var(--muted); font-size: .9rem; }
-.interactive-grid { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: .2rem; width: 100%; max-width: 32rem; aspect-ratio: 4 / 3; }
-.grid-cell { display: grid; place-items: center; min-width: 0; background: var(--cell-color, var(--surface)); border: 1px solid var(--line); color: #fff; font-weight: 700; }
-.grid-cell:not([style]) { color: var(--muted); }
-.user-swatch { display: inline-block; width: .75rem; height: .75rem; margin-right: .45rem; border-radius: .2rem; }
 .metric-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .6rem; }
 .metric-row > div { display: grid; gap: .2rem; }
 .metric-row strong { font-size: 1.25rem; }
@@ -127,6 +143,8 @@ main img:not(.no-lightbox) { cursor: zoom-in; }
 }
 
 @media (max-width: 760px) {
+  .constellation-figures, .access-diagrams { grid-template-columns: 1fr; }
+  .constellation-figures figure:last-child, .access-card-wide { grid-column: auto; }
   .bottleneck-widget .bottleneck-segments { grid-template-columns: 1fr; }
   .style-choice-grid { grid-template-columns: 1fr; }
   .resource-diagram { flex-wrap: wrap; justify-content: center; }

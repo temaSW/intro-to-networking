@@ -57,26 +57,8 @@ export function simulateConstellation(order, snrDb, count, seed = 42) {
     const errors = bits.reduce((sum, bit, i) => sum + (bit !== result.decided[i] ? 1 : 0), 0);
     symbolErrors += errors > 0 ? 1 : 0;
     bitErrors += errors;
-    points.push({...result, error: errors > 0});
+    // Count every symbol, but keep the SVG responsive with a representative subset.
+    if (n % Math.max(1, Math.ceil(count / 500)) === 0) points.push({...result, error: errors > 0});
   }
   return {points, ideal: idealConstellation(order), symbolErrors, bitErrors, transmittedBits: count * bitCount};
-}
-
-export function allocateGrid(demands, mode, columns = 8, rows = 6) {
-  const remaining = [...demands];
-  const cells = [];
-  const count = columns * rows;
-  for (let cell = 0; cell < count; cell++) {
-    let user;
-    if (mode === "static") {
-      user = Math.floor(cell / (count / demands.length));
-      if (remaining[user] <= 0) user = -1;
-    } else {
-      const maximum = Math.max(...remaining);
-      user = maximum > 0 ? remaining.indexOf(maximum) : -1;
-    }
-    if (user >= 0) remaining[user]--;
-    cells.push(user);
-  }
-  return {cells, remaining, served: demands.map((demand, i) => demand - remaining[i]), unused: cells.filter(cell => cell < 0).length};
 }
