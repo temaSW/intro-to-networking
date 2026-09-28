@@ -2,10 +2,18 @@
 .companding-line-widget label { display: flex; flex-wrap: wrap; align-items: center; gap: .65rem; font-weight: 650; }
 .companding-line-widget input { max-width: 100%; min-width: 12rem; padding: .35rem .55rem; color: var(--bs-body-color); background: var(--bs-body-bg); border: 1px solid var(--bs-border-color); border-radius: .3rem; }
 .companding-line-widget [type=text] { width: 30rem; font-family: ui-monospace, Consolas, monospace; }
-.segment-chart svg { display: block; width: 100%; max-width: 760px; margin: .7rem auto; }
-.segment-chart rect { fill: color-mix(in srgb, var(--bs-primary) 11%, transparent); stroke: var(--bs-border-color); }
-.segment-chart rect.active { fill: color-mix(in srgb, var(--bs-primary) 42%, transparent); }
-.segment-chart line { stroke: var(--bs-body-color); }
+.companding-controls { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: .5rem 1rem; }
+.companding-controls output { font-variant-numeric: tabular-nums; font-weight: 700; }
+.companding-line-widget .companding-controls [type=range] { grid-column: 1 / -1; width: 100%; max-width: none; min-width: 0; padding: 0; accent-color: var(--bs-primary); }
+.segment-chart { overflow-x: auto; }
+.segment-chart svg { display: block; width: 100%; min-width: 620px; max-width: 760px; margin: .7rem auto; }
+.segment-chart .segment-axis { stroke: var(--bs-body-color); stroke-width: 1.5; }
+.segment-chart .segment-guide { fill: none; stroke: var(--bs-secondary-color); stroke-width: 1; stroke-dasharray: 5 5; }
+.segment-chart .segment-tick { stroke: var(--bs-body-color); stroke-width: 1; }
+.segment-chart .segment-curve { fill: none; stroke: var(--bs-body-color); stroke-width: 2.5; }
+.segment-chart .segment-active { stroke: var(--bs-primary); stroke-width: 5; }
+.segment-chart .sample-guide { fill: none; stroke: var(--bs-primary); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.segment-chart .sample-point { fill: var(--bs-primary); stroke: var(--bs-body-bg); stroke-width: 2; }
 .segment-chart text, .line-wave-scroll text { fill: var(--bs-body-color); font-size: 12px; }
 .line-wave-scroll { overflow-x: auto; margin-top: .8rem; }
 .line-wave-scroll svg { display: block; height: auto; max-width: none; }
