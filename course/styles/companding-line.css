@@ -33,23 +33,23 @@
 .line-wave-scroll .zero { stroke: var(--bs-secondary-color); stroke-dasharray: 3 3; stroke-width: 1; }
 .line-wave-scroll .marker { fill: var(--bs-danger); font-weight: 700; }
 .line-legend { font-size: .9rem; }
-.line-spectrum-grid-layout { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; margin: 1rem 0 1.6rem; }
-.line-spectrum-card { margin: 0; padding: .8rem; border: 1px solid var(--bs-border-color); border-radius: .55rem; background: var(--bs-body-bg); }
-.line-spectrum-card figcaption { font-weight: 700; font-size: 1.05rem; margin-bottom: .4rem; }
-.line-spectrum-panel { margin: .45rem 0; padding: .35rem; background: var(--bs-body-bg); border: 1px solid var(--bs-border-color); border-radius: .3rem; }
-.line-spectrum-panel > span { display: block; padding: 0 .3rem; color: var(--bs-secondary-color); font-size: .85rem; }
-.line-spectrum-card svg { display: block; width: 100%; height: auto; color: var(--bs-body-color); }
-.line-spectrum-card svg text { fill: currentColor; font-size: 19px; }
-.line-spectrum-bit-guide, .line-spectrum-grid { stroke: var(--bs-border-color); stroke-width: 1; }
-.line-spectrum-zero, .line-spectrum-axis { stroke: var(--bs-secondary-color); stroke-width: 1.3; }
-.line-spectrum-wave { fill: none; stroke: var(--bs-primary); stroke-width: 3.4; stroke-linejoin: round; }
-.line-spectrum-area { fill: var(--bs-info); opacity: .23; }
-.line-spectrum-trace { fill: none; stroke: var(--bs-info); stroke-width: 3; }
-.line-spectrum-clock { stroke: var(--bs-warning); stroke-width: 2; stroke-dasharray: 5 5; }
-.line-spectrum-dc-dot { fill: var(--bs-danger); }
-.line-spectrum-card svg .line-spectrum-dc-label { fill: var(--bs-danger); font-weight: 700; }
-.line-spectrum-card svg .line-spectrum-clock-label { fill: var(--bs-body-color); font-weight: 700; }
-.line-spectrum-card p { margin: .55rem 0 0; font-size: .9rem; }
+.line-spectrum-comparison { margin: 1rem 0 1.6rem; padding: .85rem; border: 1px solid var(--bs-border-color); border-radius: .55rem; background: var(--bs-body-bg); }
+.line-spectrum-comparison figcaption { font-weight: 700; margin-bottom: .5rem; }
+.line-spectrum-legend { display: flex; flex-wrap: wrap; gap: .35rem 1.2rem; margin-bottom: .25rem; }
+.line-spectrum-legend span { display: inline-flex; align-items: center; gap: .45rem; }
+.line-spectrum-swatch { display: inline-block; width: 1.8rem; height: 0; border-top: 3px solid; }
+.line-spectrum-swatch-1 { border-color: var(--bs-primary); }
+.line-spectrum-swatch-2 { border-color: var(--bs-danger); }
+.line-spectrum-scroll { overflow-x: auto; }
+.line-spectrum-comparison svg { display: block; width: 100%; min-width: 540px; height: auto; color: var(--bs-body-color); }
+.line-spectrum-comparison svg text { fill: currentColor; font-size: 18px; }
+.line-spectrum-comparison svg .line-spectrum-axis-title { font-size: 20px; font-weight: 600; }
+.line-spectrum-grid { stroke: var(--bs-border-color); stroke-width: 1; }
+.line-spectrum-curve { fill: none; stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; }
+.line-spectrum-curve-1 { stroke: var(--bs-primary); }
+.line-spectrum-curve-2 { stroke: var(--bs-danger); }
+.line-spectrum-clock { stroke: var(--bs-body-color); stroke-width: 2; stroke-dasharray: 7 6; }
+.line-spectrum-comparison svg .line-spectrum-clock-label { fill: var(--bs-body-color); font-weight: 700; }
+.line-spectrum-lines { margin: .35rem 0 0; font-size: .9rem; }
 .line-spectrum-method { margin-top: .8rem; font-size: .9rem; color: var(--bs-secondary-color); }
-@media (max-width: 760px) { .line-spectrum-grid-layout { grid-template-columns: 1fr; } }
 @media (max-width: 600px) { .companding-line-widget { padding: .7rem; } }

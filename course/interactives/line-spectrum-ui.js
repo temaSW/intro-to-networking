@@ -1,57 +1,39 @@
 import {LINE_SPECTRA} from './line-spectrum-data.js';
-import {lineCodes} from './companding-line-model.js';
 
-const EXAMPLE_BITS = '111000000000';
-const example = lineCodes(EXAMPLE_BITS);
-const entries = {
-  nrz: ['NRZ', 'Единица держится весь бит. У сигнала есть постоянная составляющая.'],
-  rz: ['RZ', 'Импульс короче: энергия заметна на более высоких частотах. Переходы единиц дают тактовую линию.'],
-  amiNrz: ['ЧПИ NRZ', 'Чередование знака единиц подавляет составляющие около нулевой частоты.'],
-  amiRz: ['ЧПИ RZ', 'Полярность чередуется, а импульсы короче: энергия смещается выше, чем у ЧПИ NRZ.'],
-  hdb: ['HDB-3', 'Вставки разрывают длинные нули ЧПИ и меняют форму спектра.'],
-  manchester: ['Manchester', 'Переход в середине каждого бита подавляет область около нуля и смещает мощность к битовой частоте.'],
+const titles = {
+  nrz: 'NRZ', rz: 'RZ', amiNrz: 'ЧПИ NRZ', amiRz: 'ЧПИ RZ',
+  hdb: 'HDB-3', manchester: 'Manchester',
 };
 
-function waveformSvg(key, title) {
-  const values = example[key];
-  const left = 30, right = 590, top = 18, bottom = 100;
-  const cell = (right - left) / EXAMPLE_BITS.length;
-  const middle = (top + bottom) / 2;
-  const levelY = value => middle - value * 27;
-  let path = `M${left} ${levelY(key === 'hdb' ? values[0].level : values[0][0])}`;
-  for (let i = 0; i < values.length; i++) {
-    const second = key === 'hdb' ? values[i].level : values[i][1];
-    const next = i + 1 < values.length ? (key === 'hdb' ? values[i + 1].level : values[i + 1][0]) : second;
-    const x = left + i * cell;
-    path += `H${x + cell / 2}V${levelY(second)}H${x + cell}V${levelY(next)}`;
-  }
-  const guides = [...EXAMPLE_BITS].map((bit, i) => `<line x1="${left + i * cell}" x2="${left + i * cell}" y1="${top}" y2="${bottom}" class="line-spectrum-bit-guide"/><text x="${left + (i + .5) * cell}" y="13" text-anchor="middle">${bit}</text>`).join('');
-  return `<svg viewBox="0 0 620 112" role="img" aria-label="Фрагмент ${title} для битов ${EXAMPLE_BITS}">${guides}<line x1="${left}" x2="${right}" y1="${middle}" y2="${middle}" class="line-spectrum-zero"/><path d="${path}" class="line-spectrum-wave"/></svg>`;
-}
-
-function spectrumSvg(key, title) {
-  const {relativePower, mean} = LINE_SPECTRA.spectra[key];
-  const left = 55, right = 590, top = 15, bottom = 172;
+function spectrumSvg(keys) {
+  const left = 74, right = 792, top = 34, bottom = 245;
   const x = frequency => left + frequency / LINE_SPECTRA.maxFrequency * (right - left);
-  const y = power => bottom - power * (bottom - top);
-  const ticks = [0, .5, 1, 1.5, 2, 2.5].map(f => `<line x1="${x(f)}" x2="${x(f)}" y1="${top}" y2="${bottom}" class="line-spectrum-grid"/><text x="${x(f)}" y="191" text-anchor="middle">${String(f).replace('.', ',')}</text>`).join('');
-  const trace = relativePower.map((power, i) => `${i ? 'L' : 'M'}${x(i * LINE_SPECTRA.maxFrequency / (relativePower.length - 1)).toFixed(1)},${y(power).toFixed(1)}`).join(' ');
-  const area = `${trace} L${right},${bottom} L${left},${bottom} Z`;
-  const dc = mean > .01 ? `<circle cx="${x(0) + 5}" cy="${top + 5}" r="4" class="line-spectrum-dc-dot"/><text x="${x(0) + 24}" y="${top + 10}" class="line-spectrum-dc-label">DC</text>` : '';
-  const clock = key === 'rz' ? `<line x1="${x(1)}" x2="${x(1)}" y1="${top + 5}" y2="${bottom}" class="line-spectrum-clock"/><text x="${x(1) + 8}" y="${top + 13}" class="line-spectrum-clock-label">такт</text>` : '';
-  return `<svg viewBox="0 0 620 225" role="img" aria-label="Сглаженная относительная мощность ${title} в зависимости от частоты"><line x1="${left}" x2="${right}" y1="${bottom}" y2="${bottom}" class="line-spectrum-axis"/><text x="${left - 8}" y="${top + 5}" text-anchor="end">1</text><text x="${left - 8}" y="${bottom + 5}" text-anchor="end">0</text>${ticks}<path d="${area}" class="line-spectrum-area"/><path d="${trace}" class="line-spectrum-trace"/>${clock}${dc}<text x="322" y="218" text-anchor="middle">Частота / битовая скорость</text></svg>`;
-}
-
-function card(key) {
-  const [title, note] = entries[key];
-  return `<figure class="line-spectrum-card"><figcaption>${title}</figcaption><div class="line-spectrum-panel"><span>Форма сигнала · ${EXAMPLE_BITS}</span>${waveformSvg(key, title)}</div><div class="line-spectrum-panel"><span>Где сосредоточена мощность</span>${spectrumSvg(key, title)}</div><p>${note}</p></figure>`;
+  const y = fraction => bottom - fraction * (bottom - top);
+  const pairPeak = Math.max(...keys.map(key => LINE_SPECTRA.spectra[key].referencePower));
+  const horizontal = [0, .25, .5, .75, 1].map(fraction =>
+    `<line x1="${left}" x2="${right}" y1="${y(fraction)}" y2="${y(fraction)}" class="line-spectrum-grid"/><text x="${left - 12}" y="${y(fraction) + 6}" text-anchor="end">${Math.round(fraction * 100)}</text>`).join('');
+  const vertical = [0, .5, 1, 1.5, 2, 2.5].map(frequency =>
+    `<line x1="${x(frequency)}" x2="${x(frequency)}" y1="${top}" y2="${bottom}" class="line-spectrum-grid"/><text x="${x(frequency)}" y="270" text-anchor="middle">${String(frequency).replace('.', ',')}</text>`).join('');
+  const curves = keys.map((key, index) => {
+    const estimate = LINE_SPECTRA.spectra[key];
+    const scale = estimate.referencePower / pairPeak;
+    const path = estimate.relativePower.map((power, point) =>
+      `${point ? 'L' : 'M'}${x(point * LINE_SPECTRA.maxFrequency / (estimate.relativePower.length - 1)).toFixed(1)},${y(power * scale).toFixed(1)}`).join(' ');
+    return `<path d="${path}" class="line-spectrum-curve line-spectrum-curve-${index + 1}"/>`;
+  }).join('');
+  const clock = keys.includes('rz') ? `<line x1="${x(1)}" x2="${x(1)}" y1="${top}" y2="${bottom}" class="line-spectrum-clock"/><text x="${x(1) + 8}" y="${top + 21}" class="line-spectrum-clock-label">такт RZ</text>` : '';
+  return `<svg viewBox="0 0 820 310" role="img" aria-label="Линейные спектры мощности ${keys.map(key => titles[key]).join(' и ')} на общей шкале: частота от нуля до 2,5 битовых скоростей, мощность от нуля до 100 процентов максимума пары"><text x="${left}" y="24" class="line-spectrum-axis-title">Мощность, %</text>${horizontal}${vertical}${curves}${clock}<text x="433" y="303" text-anchor="middle" class="line-spectrum-axis-title">Частота / битовая скорость</text></svg>`;
 }
 
 for (const root of document.querySelectorAll('[data-line-spectrum]')) {
   const keys = root.dataset.lineSpectrum.split(',').map(key => key.trim());
-  root.innerHTML = `<div class="line-spectrum-grid-layout">${keys.map(card).join('')}</div>`;
+  const legend = keys.map((key, index) => `<span><i class="line-spectrum-swatch line-spectrum-swatch-${index + 1}" aria-hidden="true"></i>${titles[key]}</span>`).join('');
+  const separateLines = keys.includes('rz')
+    ? '<p class="line-spectrum-lines">Отдельно от плавных кривых: у обоих кодов есть постоянная составляющая при частоте 0; пунктир отмечает тактовую линию RZ.</p>'
+    : '';
+  root.innerHTML = `<figure class="line-spectrum-comparison"><figcaption>Непрерывная часть спектра · линейная шкала</figcaption><div class="line-spectrum-legend">${legend}</div><div class="line-spectrum-scroll">${spectrumSvg(keys)}</div>${separateLines}</figure>`;
 }
 
 for (const root of document.querySelectorAll('[data-line-spectrum-method]')) {
-  root.textContent = `Метод для всех шести графиков одинаков: ${LINE_SPECTRA.bitCount.toLocaleString('ru-RU')} псевдослучайных бит, ${LINE_SPECTRA.windows} перекрывающихся окон БПФ по ${LINE_SPECTRA.fftSize.toLocaleString('ru-RU')} отсчётов (4096 бит на окно), окно Ханна и усреднение мощности. Кривая показывает сглаженную непрерывную часть спектра каждого кода, нормированную к её собственному максимуму; метка DC указывает на постоянную составляющую, а пунктир у RZ — на частоту тактовой линии. По высоте разных карточек нельзя сравнивать абсолютную мощность.`;
+  root.textContent = `Все три сравнения рассчитаны для одних и тех же ${LINE_SPECTRA.bitCount.toLocaleString('ru-RU')} псевдослучайных бит. Мощность усреднена по ${LINE_SPECTRA.windows} перекрывающимся окнам БПФ длиной ${LINE_SPECTRA.fftSize.toLocaleString('ru-RU')} отсчётов (4096 бит), с окном Ханна; соседние частотные точки дополнительно сглажены. В каждой паре 100% — максимум более высокой из двух кривых. Высоты между разными парами не сравниваются.`;
 }

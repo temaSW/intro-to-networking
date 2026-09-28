@@ -52,10 +52,24 @@ for (const key of KEYS) {
     }
     points.push(included ? total / included : (points.at(-1) ?? 0));
   }
-  const reference = Math.max(...points);
+  // The long FFT windows resolve fine detail; a short triangular display
+  // average removes residual Monte Carlo noise without hiding the main lobes.
+  const smoothed = points.map((_, index) => {
+    let weighted = 0, weightSum = 0;
+    for (let offset = -5; offset <= 5; offset++) {
+      const neighbor = index + offset;
+      if (neighbor < 0 || neighbor >= points.length) continue;
+      const weight = 6 - Math.abs(offset);
+      weighted += weight * points[neighbor];
+      weightSum += weight;
+    }
+    return weighted / weightSum;
+  });
+  const reference = Math.max(...smoothed);
   spectra[key] = {
     mean: Number(mean.toFixed(5)),
-    relativePower: points.map(value => Number((value / reference).toFixed(4))),
+    referencePower: Number(reference.toPrecision(8)),
+    relativePower: smoothed.map(value => Number((value / reference).toFixed(4))),
   };
   if (windows !== 63) throw new Error(`Expected 63 Welch windows, got ${windows}`);
 }
