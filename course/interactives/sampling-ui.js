@@ -11,8 +11,8 @@ function waveSvg(result) {
     return `${index ? "L" : "M"}${x(time).toFixed(1)} ${y(value(time)).toFixed(1)}`;
   }).join(" ");
   const ticks = Array.from({length: 6}, (_, time) => `<line class="ks-grid" x1="${x(time)}" y1="${top}" x2="${x(time)}" y2="${bottom}"/><text x="${x(time)}" y="242" text-anchor="middle">${time}</text>`).join("");
-  const samples = result.samples.map(point => `<circle class="ks-sample" cx="${x(point.timeMs).toFixed(1)}" cy="${y(point.amplitude).toFixed(1)}" r="5"/>`).join("");
-  return `<svg viewBox="0 0 800 264" role="img" aria-label="Сигнал, видимая по отсчётам синусоида и отсчёты за пять миллисекунд"><rect class="ks-paper" width="800" height="264"/>${ticks}<line class="ks-axis" x1="${left}" y1="${y(0)}" x2="${right}" y2="${y(0)}"/><path class="ks-apparent" d="${curve(result.apparent)}"/><path class="ks-original" d="${curve(result.original)}"/>${samples}<text x="${right}" y="259" text-anchor="end">Время, мс</text></svg>`;
+  const samples = result.samples.map(point => `<line class="ks-sample" x1="${x(point.timeMs).toFixed(1)}" y1="${y(0)}" x2="${x(point.timeMs).toFixed(1)}" y2="${y(point.amplitude).toFixed(1)}"/>`).join("");
+  return `<svg viewBox="0 0 800 264" role="img" aria-label="Исходная и видимая по отсчётам синусоиды и вертикальные импульсы отсчётов за пять миллисекунд"><rect class="ks-paper" width="800" height="264"/>${ticks}<line class="ks-axis" x1="${left}" y1="${y(0)}" x2="${right}" y2="${y(0)}"/><path class="ks-apparent" d="${curve(result.apparent)}"/><path class="ks-original" d="${curve(result.original)}"/>${samples}<text x="${right}" y="259" text-anchor="end">Время, мс</text></svg>`;
 }
 
 function spectrumSvg(result) {
@@ -31,7 +31,7 @@ function spectrumSvg(result) {
 }
 
 function mountTone(root) {
-  root.innerHTML = `<div class="ks-controls"><label>Частота синусоиды <output data-frequency>1,2 кГц</output><input data-frequency-input type="range" min="0.2" max="2.4" step="0.1" value="1.2"></label><label>Частота дискретизации <output data-rate>2 кГц</output><input data-rate-input type="range" min="1" max="5" step="0.1" value="2"></label></div><div class="ks-chart" data-chart></div><div class="ks-legend"><span><i class="ks-original-key"></i>Исходная синусоида</span><span><i class="ks-apparent-key"></i>Частота, видимая по отсчётам</span><span><i class="ks-sample-key"></i>Отсчёты</span></div><p class="ks-result" data-result aria-live="polite"></p>`;
+  root.innerHTML = `<div class="ks-controls"><label>Частота синусоиды <output data-frequency>1,2 кГц</output><input data-frequency-input type="range" min="0.2" max="2.4" step="0.1" value="1.2"></label><label>Частота дискретизации <output data-rate>2 кГц</output><input data-rate-input type="range" min="1" max="5" step="0.1" value="2"></label></div><div class="ks-chart" data-chart></div><div class="ks-legend"><span><i class="ks-original-key"></i>Исходная синусоида</span><span><i class="ks-apparent-key"></i>Частота, видимая по отсчётам</span><span><i class="ks-sample-key"></i>Импульсы отсчётов</span></div><p class="ks-result" data-result aria-live="polite"></p>`;
   const frequencyInput = root.querySelector("[data-frequency-input]");
   const rateInput = root.querySelector("[data-rate-input]");
   const draw = () => {
