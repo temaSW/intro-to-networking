@@ -68,7 +68,6 @@ for (const key of KEYS) {
   const reference = Math.max(...smoothed);
   spectra[key] = {
     mean: Number(mean.toFixed(5)),
-    referencePower: Number(reference.toPrecision(8)),
     relativePower: smoothed.map(value => Number((value / reference).toFixed(4))),
   };
   if (windows !== 63) throw new Error(`Expected 63 Welch windows, got ${windows}`);
