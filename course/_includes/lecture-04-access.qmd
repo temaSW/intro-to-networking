@@ -1,24 +1,12 @@
-<div class="access-diagrams" aria-label="Схемы пяти способов множественного доступа">
-  <figure class="access-card">
-    <figcaption><strong>FDMA · разные частоты</strong><span>Все передают одновременно, каждый в своей полосе.</span></figcaption>
-    <div class="access-grid" aria-hidden="true"><i class="access-a">А</i><i class="access-a">А</i><i class="access-a">А</i><i class="access-a">А</i><i class="access-b">Б</i><i class="access-b">Б</i><i class="access-b">Б</i><i class="access-b">Б</i><i class="access-c">К</i><i class="access-c">К</i><i class="access-c">К</i><i class="access-c">К</i></div>
+<div class="access-figures">
+  <figure class="access-figure" tabindex="0">
+    <img src="../assets/lecture-04/multiple-access-methods.png" alt="Сравнение FDMA, TDMA, CDMA и OFDMA: полосы частот, интервалы времени, наложенные кодовые слои и клетки сетки время × частота">
+    <figcaption>Слева направо, сверху вниз: FDMA разделяет частоты, TDMA — время, CDMA — коды, OFDMA назначает клетки сетки время × частота. Иллюстрация из <a href="https://theconversation.com/what-is-3g-and-why-is-it-being-shut-down-an-electrical-engineer-explains-176781">The Conversation</a>, <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>; изображение не изменено.</figcaption>
   </figure>
-  <figure class="access-card">
-    <figcaption><strong>TDMA · разное время</strong><span>Вся полоса по очереди достаётся разным пользователям.</span></figcaption>
-    <div class="access-grid" aria-hidden="true"><i class="access-a">А</i><i class="access-b">Б</i><i class="access-c">К</i><i class="access-a">А</i><i class="access-a">А</i><i class="access-b">Б</i><i class="access-c">К</i><i class="access-a">А</i><i class="access-a">А</i><i class="access-b">Б</i><i class="access-c">К</i><i class="access-a">А</i></div>
-  </figure>
-  <figure class="access-card">
-    <figcaption><strong>CDMA · разные коды</strong><span>Передачи накладываются во времени и частоте; приёмник различает их по кодам.</span></figcaption>
-    <div class="access-overlay" aria-hidden="true"><span class="access-a">А · код 1</span><span class="access-b">Б · код 2</span><span class="access-c">К · код 3</span></div>
-  </figure>
-  <figure class="access-card">
-    <figcaption><strong>OFDMA · клетки время × частота</strong><span>Планировщик назначает пользователям разные клетки сетки.</span></figcaption>
-    <div class="access-grid" aria-hidden="true"><i class="access-a">А</i><i class="access-a">А</i><i class="access-b">Б</i><i class="access-b">Б</i><i class="access-a">А</i><i class="access-c">К</i><i class="access-c">К</i><i class="access-b">Б</i><i class="access-c">К</i><i class="access-c">К</i><i class="access-b">Б</i><i class="access-a">А</i></div>
-  </figure>
-  <figure class="access-card access-card-wide">
-    <figcaption><strong>SDMA / MU-MIMO · разные пространственные потоки</strong><span>Одна частотно-временная область может обслужить нескольких пользователей, если каналы позволяют разделить потоки.</span></figcaption>
-    <div class="access-space" aria-hidden="true"><span class="access-base">Базовая станция</span><span class="access-beam access-a">↗ поток А</span><span class="access-beam access-b">→ поток Б</span><span class="access-beam access-c">↘ поток К</span></div>
+  <figure class="access-figure access-figure-mimo" tabindex="0">
+    <img src="../assets/lecture-04/mu-mimo-comparison.png" alt="Слева одна точка доступа обслуживает устройства по очереди, справа она одновременно передаёт нескольким устройствам по пространственным потокам">
+    <figcaption>Разница между обслуживанием одного и нескольких пользователей: при MU-MIMO пространственные потоки могут идти одновременно. Изображение: <a href="https://www.everythingrf.com/community/what-is-mu-mimo">everything RF</a>.</figcaption>
   </figure>
 </div>
 
-<p class="access-caption">В сетках горизонталь — время, вертикаль — частота. Буквы обозначают Алису, Боба и Киру; рисунки условные, без масштаба.</p>
+<p class="access-caption">Изображения схематичны: условия разделения пространственных потоков и помехи на них не показаны. На узком экране рисунки можно прокручивать по горизонтали.</p>

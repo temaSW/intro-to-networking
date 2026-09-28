@@ -87,6 +87,9 @@ def constellation(name: str, side: int, noise: float = 0) -> None:
         for q in levels:
             cx, cy = 450 + i * scale / 2, 242 - q * scale / 2
             body += f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="5" fill="{ACCENT}"/>'
+            if name == "QPSK":
+                bits = f'{int(i > 0)}{int(q > 0)}'
+                body += f'<text x="{cx + 12:.1f}" y="{cy - 10:.1f}" class="label">{bits}</text>'
             if noise:
                 for _ in range(7):
                     nx, ny = cx + random.gauss(0, noise * scale), cy + random.gauss(0, noise * scale)
