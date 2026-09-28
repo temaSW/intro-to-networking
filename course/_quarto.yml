@@ -4,6 +4,7 @@ project:
   resources:
     - interactives/*.js
     - styles/companding-line.css
+    - styles/scrambler.css
 
 website:
   title: "ОПИСиС"
