@@ -1,77 +1,71 @@
 // Rebuild with: node scripts/generate_line_spectra.mjs
-// One deterministic 131072-bit stream for every line code. Rectangular half-bit
-// levels are sampled 8 times per bit; the existing Welch implementation uses
-// 32768-sample Hann windows with 50% overlap (63 windows per spectrum).
+// Fourier series of steady, periodically repeated bit patterns. Each bit has
+// two constant half-bit levels; exact integration includes their sinc shape.
 import {writeFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import {lineCodes} from '../course/interactives/companding-line-model.js';
-import {averagedPowerSpectrum, PRACTICE_FFT_SIZE} from '../course/interactives/impulse-ask-model.js';
 
-const BIT_COUNT = 131072;
-const SAMPLES_PER_BIT = 8;
-const MAX_FREQUENCY = 2.5;
-const KEYS = ['nrz', 'rz', 'amiNrz', 'amiRz', 'manchester', 'hdb'];
-let seed = 0x71ac37;
-let bits = '';
-for (let i = 0; i < BIT_COUNT; i++) {
-  seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
-  bits += seed >>> 31;
+const MAX_FREQUENCY = 2.5; // f/Rb
+const COMPARISONS = [
+  {keys: ['nrz', 'rz'], pattern: '10'},
+  {keys: ['amiNrz', 'amiRz'], pattern: '110'},
+  {keys: ['hdb', 'manchester'], pattern: '10000'},
+];
+
+function halfBitLevels(cells, key) {
+  return cells.flatMap(cell => key === 'hdb' ? [cell.level, cell.level] : cell);
 }
-const codes = lineCodes(bits, BIT_COUNT);
-const spectra = {};
-for (const key of KEYS) {
-  const levels = codes[key];
-  const signal = new Float64Array(BIT_COUNT * SAMPLES_PER_BIT);
-  let sum = 0;
-  for (let bit = 0; bit < BIT_COUNT; bit++) {
-    const pair = key === 'hdb' ? [levels[bit].level, levels[bit].level] : levels[bit];
-    for (let sample = 0; sample < SAMPLES_PER_BIT; sample++) {
-      const value = pair[sample < SAMPLES_PER_BIT / 2 ? 0 : 1];
-      signal[bit * SAMPLES_PER_BIT + sample] = value;
-      sum += value;
+
+function steadyPeriod(levels, patternBits) {
+  const halfBitsPerPattern = 2 * patternBits;
+  for (let repeats = 1; repeats <= 16; repeats++) {
+    const length = repeats * halfBitsPerPattern;
+    if (levels.length < 3 * length) continue;
+    const end = levels.length;
+    if (levels.slice(end - length).every((value, index) =>
+      value === levels[end - 2 * length + index] &&
+      value === levels[end - 3 * length + index])) {
+      return levels.slice(end - length);
     }
   }
-  const mean = sum / signal.length;
-  for (let i = 0; i < signal.length; i++) signal[i] -= mean;
-  const {power, windows} = averagedPowerSpectrum(signal, PRACTICE_FFT_SIZE);
-  // f/Rb = FFT bin / 4096: each window spans 4096 bits. Average nearby
-  // frequency bins for a legible power envelope; isolate deterministic clock
-  // lines so they do not distort the continuous part of the spectrum.
-  const binsPerBitRate = PRACTICE_FFT_SIZE / SAMPLES_PER_BIT;
-  const points = [];
-  const pointCount = 500;
-  for (let point = 0; point <= pointCount; point++) {
-    const from = Math.round(point * MAX_FREQUENCY * binsPerBitRate / pointCount);
-    const to = Math.round((point + 1) * MAX_FREQUENCY * binsPerBitRate / pointCount);
-    let total = 0;
-    let included = 0;
-    for (let bin = Math.max(1, from); bin < to; bin++) {
-      if (key === 'rz' && Math.abs(bin - binsPerBitRate) <= 4) continue;
-      total += power[bin];
-      included++;
-    }
-    points.push(included ? total / included : (points.at(-1) ?? 0));
-  }
-  // The long FFT windows resolve fine detail; a short triangular display
-  // average removes residual Monte Carlo noise without hiding the main lobes.
-  const smoothed = points.map((_, index) => {
-    let weighted = 0, weightSum = 0;
-    for (let offset = -5; offset <= 5; offset++) {
-      const neighbor = index + offset;
-      if (neighbor < 0 || neighbor >= points.length) continue;
-      const weight = 6 - Math.abs(offset);
-      weighted += weight * points[neighbor];
-      weightSum += weight;
-    }
-    return weighted / weightSum;
-  });
-  const reference = Math.max(...smoothed);
-  spectra[key] = {
-    mean: Number(mean.toFixed(5)),
-    relativePower: smoothed.map(value => Number((value / reference).toFixed(4))),
-  };
-  if (windows !== 63) throw new Error(`Expected 63 Welch windows, got ${windows}`);
+  throw new Error('No steady periodic line-code waveform found');
 }
+
+function harmonics(period) {
+  const halfBitCount = period.length;
+  const periodBits = halfBitCount / 2;
+  const lines = [];
+  for (let order = 0; order <= Math.floor(MAX_FREQUENCY * periodBits); order++) {
+    let real = 0, imaginary = 0;
+    for (let cell = 0; cell < halfBitCount; cell++) {
+      const phase = 2 * Math.PI * order * (cell + .5) / halfBitCount;
+      real += period[cell] * Math.cos(phase);
+      imaginary -= period[cell] * Math.sin(phase);
+    }
+    const sinc = order === 0 ? 1 : Math.sin(Math.PI * order / halfBitCount) / (Math.PI * order / halfBitCount);
+    const amplitude = (order === 0 ? 1 : 2) * Math.abs(sinc) * Math.hypot(real, imaginary) / halfBitCount;
+    lines.push({frequency: Number((order / periodBits).toFixed(6)), amplitude});
+  }
+  return lines;
+}
+
+const comparisons = COMPARISONS.map(({keys, pattern}) => {
+  const repeatedBits = pattern.repeat(128);
+  const codes = lineCodes(repeatedBits, repeatedBits.length);
+  const spectra = Object.fromEntries(keys.map(key => {
+    const period = steadyPeriod(halfBitLevels(codes[key], key), pattern.length);
+    return [key, {periodBits: period.length / 2, lines: harmonics(period)}];
+  }));
+  const peak = Math.max(...keys.flatMap(key => spectra[key].lines.map(line => line.amplitude)));
+  for (const key of keys) {
+    spectra[key].lines = spectra[key].lines.map(line => ({
+      frequency: line.frequency,
+      amplitude: Number((100 * line.amplitude / peak).toFixed(2)),
+    }));
+  }
+  return {keys, pattern, spectra};
+});
+
 const output = fileURLToPath(new URL('../course/interactives/line-spectrum-data.js', import.meta.url));
-writeFileSync(output, `// Generated by scripts/generate_line_spectra.mjs; do not edit by hand.\nexport const LINE_SPECTRA = ${JSON.stringify({bitCount:BIT_COUNT, samplesPerBit:SAMPLES_PER_BIT, fftSize:PRACTICE_FFT_SIZE, windows:63, maxFrequency:MAX_FREQUENCY, spectra})};\n`);
-console.log(`Wrote six line-code spectra from ${BIT_COUNT} bits, 63 overlapping FFT windows each.`);
+writeFileSync(output, `// Generated by scripts/generate_line_spectra.mjs; do not edit by hand.\nexport const LINE_SPECTRA = ${JSON.stringify({maxFrequency: MAX_FREQUENCY, comparisons})};\n`);
+console.log('Wrote Fourier lines for three periodic line-code comparisons.');
