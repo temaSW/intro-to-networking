@@ -3,7 +3,7 @@ title: "Теорема Котельникова: как часто брать о
 description: "Краткий справочник по частоте дискретизации, восстановлению сигнала и наложению спектров."
 format:
   html:
-    css: ../styles/sampling.css
+    css: ../styles/sampling-vivid.css
 ---
 
 ::: {.engineering-problem}
