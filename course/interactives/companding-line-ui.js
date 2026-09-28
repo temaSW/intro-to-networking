@@ -1,4 +1,4 @@
-import {compand, lineCodes, SEGMENTS, fourBThreeT} from './companding-line-model.js';
+import {compand, lineCodes, SEGMENTS} from './companding-line-model.js';
 
 const esc = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
@@ -35,25 +35,24 @@ function waveSvg(model, rows) {
 
 const compRoot = document.querySelector('[data-companding-widget]');
 if (compRoot) {
-  compRoot.innerHTML = `<label>Отсчёт в единицах Δ₀ <input type="number" min="-2047" max="2047" step="1" value="934"></label><div class="companding-result" aria-live="polite"></div>`;
+  compRoot.innerHTML = `<label>Отсчёт в единицах Δ₀ <input type="number" min="-2047" max="2047" step="1" value="86"></label><div class="companding-result" aria-live="polite"></div>`;
   const input=compRoot.querySelector('input'), result=compRoot.querySelector('.companding-result');
   const render=()=>{
     const c=compand(input.value);
-    result.innerHTML=`<div class="segment-chart">${segmentChart(c.segment)}</div><p><strong>${esc(c.word[0])} ${esc(c.word.slice(1,4))} ${esc(c.word.slice(4))}</strong> · сегмент ${c.segment}, U<sub>эт,${c.segment}</sub>=${c.base}Δ₀, Δ<sub>${c.segment}</sub>=${c.step}Δ₀, позиция ${c.position}.</p><p>Восстановление: ${c.value<0?'−':'+'}(${c.base}+(${c.position}+½)·${c.step})Δ₀ = <strong>${c.reconstructed}Δ₀</strong>. Ошибка Û−U = ${c.error}Δ₀.</p>`;
+    result.innerHTML=`<div class="segment-chart">${segmentChart(c.segment)}</div><p><strong>${esc(c.word[0])} ${esc(c.word.slice(1,4))} ${esc(c.word.slice(4))}</strong> · сегмент ${c.segment}, U<sub>эт,${c.segment}</sub>=${c.base}Δ₀, Δ<sub>${c.segment}</sub>=${c.step}Δ₀, позиция ${c.position}.</p>`;
   };
   input.addEventListener('input',render);render();
 }
 
 const lineRoot=document.querySelector('[data-line-widget]');
 if (lineRoot) {
-  lineRoot.innerHTML=`<label>Биты <input type="text" inputmode="numeric" spellcheck="false" value="111000000001101000001000" aria-describedby="line-hint"></label><p id="line-hint">Измените биты и сравните переходы во всех строках.</p><div class="line-result" aria-live="polite"></div>`;
+  lineRoot.innerHTML=`<label>Биты <input type="text" inputmode="numeric" spellcheck="false" value="111000000000" aria-describedby="line-hint"></label><p id="line-hint">Измените биты и сравните переходы во всех строках.</p><div class="line-result" aria-live="polite"></div>`;
   const input=lineRoot.querySelector('input'), result=lineRoot.querySelector('.line-result');
   const render=()=>{
     const m=lineCodes(input.value);
     if(!m.bits){result.textContent='Введите хотя бы один бит 0 или 1.';return;}
     const rows=[['NRZ','nrz'],['RZ','rz'],['ЧПИ NRZ','amiNrz'],['ЧПИ RZ','amiRz'],['HDB-3','hdb'],['Manchester','manchester'],['Относит. биимп.','differential'],['CMI','cmi']];
-    const blocks=fourBThreeT(m.bits);
-    result.innerHTML=waveSvg(m,rows)+`<p class="line-legend">Уровни +1 / 0 / −1; границы клеток — границы битов; тонкая линия — нулевой уровень. B — балансирующий импульс, V — нарушение чередования. Manchester: 1 = +−, 0 = −+. Относительный: 1 меняет фазу пары. CMI: 0 = −+, единицы попеременно + + и − −.</p><p><strong>4B3T:</strong> ${blocks.blocks.map(b=>`${b.word} → ${b.first}`).join(' · ') || 'нет полной тетрады'}${blocks.remainder ? ` · последние ${blocks.remainder} бит остаются до следующего блока` : ''}. Показан первый вариант таблицы; полярность блоков выбирают с учётом баланса.</p>`;
+    result.innerHTML=waveSvg(m,rows)+`<p class="line-legend">Уровни +1 / 0 / −1; вертикальные линии — границы битов. B — балансирующий импульс, V — нарушение чередования. Manchester: 1 = +−, 0 = −+. Относительный: 1 меняет фазу пары. CMI: 0 = −+, единицы попеременно ++ и −−.</p>`;
   };
   input.addEventListener('input',render);render();
 }
