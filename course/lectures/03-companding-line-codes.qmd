@@ -3,7 +3,7 @@ title: "Лекция 03. Компандирование и линейные ко
 subtitle: "От аналогового отсчёта до сигнала основной полосы"
 format:
   html:
-    css: ../styles/companding-line.css?v=20260929-3
+    css: ../styles/companding-line.css?v=20260929-4
 ---
 
 `Аналоговый сигнал → отсчёты → кодовые слова → поток битов → сигнал в линии`
@@ -161,6 +161,6 @@ format:
 
 <p class="line-spectrum-method" data-line-spectrum-method></p>
 
-<script type="module" src="../interactives/companding-line-ui.js?v=20260929-4"></script>
+<script type="module" src="../interactives/companding-line-ui.js?v=20260929-5"></script>
 <script type="module" src="../interactives/line-spectrum-ui.js?v=20260929-5"></script>
 <script src="../interactives/image-lightbox.js" defer></script>

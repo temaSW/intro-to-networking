@@ -43,17 +43,21 @@ if (chainRoot) {
     ['Кодовое слово', 'Выбранная позиция становится 8-битным словом: знак, сегмент и позиция внутри сегмента. После передачи приёмник находит соответствующий уровень.'],
     ['Экспандер', 'Обратное нелинейное преобразование переводит выбранный уровень в исходную шкалу амплитуд. Потерянную при квантовании точность оно не восстанавливает.'],
   ];
-  chainRoot.innerHTML = `<div class="pcm-chain-steps" role="group" aria-label="Этапы компандирования">${steps.map(([name], i) => `<button type="button" data-step="${i}" aria-pressed="${i === 0}">${name}</button>`).join('<span aria-hidden="true">→</span>')}</div><p class="pcm-chain-detail" aria-live="polite"></p>`;
+  chainRoot.innerHTML = `<div class="pcm-chain-steps" role="group" aria-label="Этапы компандирования">${steps.map(([name], i) => `<button type="button" data-step="${i}" aria-expanded="false" aria-controls="pcm-chain-detail">${name}</button>`).join('<span aria-hidden="true">→</span>')}</div><p id="pcm-chain-detail" class="pcm-chain-detail" aria-live="polite" hidden></p>`;
   const detail = chainRoot.querySelector('.pcm-chain-detail');
+  let active = null;
   const select = index => {
-    chainRoot.querySelectorAll('button').forEach((button, i) => { button.setAttribute('aria-pressed', String(i === index)); });
-    detail.textContent = steps[index][1];
+    active = active === index ? null : index;
+    chainRoot.querySelectorAll('button[data-step]').forEach((button, i) => {
+      button.setAttribute('aria-expanded', String(i === active));
+    });
+    detail.hidden = active === null;
+    detail.textContent = active === null ? '' : steps[active][1];
   };
   chainRoot.addEventListener('click', event => {
     const button = event.target.closest('button[data-step]');
     if (button) select(Number(button.dataset.step));
   });
-  select(0);
 }
 
 function waveSvg(model, rows) {
