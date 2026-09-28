@@ -19,7 +19,7 @@ First assign equal static shares while demands differ; then change to dynamic al
 
 ## Current course use
 
-Lecture 04 uses a static, responsive comparison of FDMA, TDMA, CDMA, OFDMA and SDMA/MU-MIMO in `course/_includes/lecture-04-access.qmd`. The resource-grid browser component was removed from the lecture because its allocation controls did not make the access methods clear.
+Lecture 04 uses sourced illustrations of FDMA, TDMA, CDMA, OFDMA and MU-MIMO in `course/_includes/lecture-04-access.qmd`. The resource-grid browser component was removed from the lecture because its allocation controls did not make the access methods clear.
 
 ## Implementation boundary
 
