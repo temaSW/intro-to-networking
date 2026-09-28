@@ -14,8 +14,6 @@ website:
     left:
       - text: "О курсе"
         href: index.qmd
-      - text: "Конспект"
-        href: notes/index.qmd
       - text: "Лекции"
         href: lectures/index.qmd
       - text: "Практика"
@@ -24,9 +22,6 @@ website:
         href: labs/index.qmd
       - text: "Справочник"
         href: reference/index.qmd
-    right:
-      - text: "Style Lab"
-        href: style-lab/index.qmd
 
 format:
   html:

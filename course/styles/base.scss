@@ -29,16 +29,12 @@ main.content * { min-width: 0; }
 a { color: var(--accent); text-underline-offset: .18em; }
 a:hover, a:focus-visible { color: var(--focus); }
 :focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+.quarto-color-scheme-toggle { display: none !important; }
 h1, h2, h3 { color: var(--ink); text-wrap: balance; }
 table { color: var(--ink); border-color: var(--line); width: 100%; max-width: 100%; table-layout: fixed; }
 table th { background: var(--surface-alt); color: var(--ink); }
 table td, table th { border-color: var(--line); overflow-wrap: anywhere; }
 .callout { background: var(--surface); border-color: var(--line); }
-
-.style-choice-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.2rem; margin: 2rem 0; }
-.style-choice { background: var(--surface); border: 1px solid var(--line); padding: 1.3rem; display: flex; flex-direction: column; }
-.style-choice h3 { margin-top: 0; }
-.style-choice p:last-child { margin-top: auto; }
 
 .engineering-problem, .predict, .model, .real-example, .experiment, .takeaway { margin-block: 2rem; }
 .engineering-problem h2, .predict h2, .model h2, .real-example h2, .experiment h2, .takeaway h2, .explanation h2 { margin-top: 0; }
@@ -193,7 +189,6 @@ main .zoomable-image { cursor: zoom-in; }
   .constellation-figures { grid-template-columns: 1fr; }
   .constellation-figures figure:last-child { grid-column: auto; }
   .bottleneck-widget .bottleneck-segments { grid-template-columns: 1fr; }
-  .style-choice-grid { grid-template-columns: 1fr; }
   .resource-diagram { flex-wrap: wrap; justify-content: center; }
   .flow-arrow { transform: rotate(90deg); }
   .states-diagram { grid-template-columns: 1fr; }
