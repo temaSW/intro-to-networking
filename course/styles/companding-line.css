@@ -13,6 +13,4 @@
 .line-wave-scroll .zero { stroke: var(--bs-secondary-color); stroke-dasharray: 3 3; stroke-width: 1; }
 .line-wave-scroll .marker { fill: var(--bs-danger); font-weight: 700; }
 .line-legend { font-size: .9rem; }
-.lecture-route { display: grid; grid-template-columns: repeat(auto-fit,minmax(10rem,1fr)); gap: .35rem; padding: 0; list-style: none; }
-.lecture-route li { border: 1px solid var(--bs-border-color); border-radius: .3rem; padding: .4rem .6rem; }
-@media (max-width: 600px) { .companding-line-widget { padding: .7rem; } .lecture-route { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 600px) { .companding-line-widget { padding: .7rem; } }

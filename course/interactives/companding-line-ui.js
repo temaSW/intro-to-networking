@@ -46,7 +46,7 @@ if (compRoot) {
 
 const lineRoot=document.querySelector('[data-line-widget]');
 if (lineRoot) {
-  lineRoot.innerHTML=`<label>Биты <input type="text" inputmode="numeric" spellcheck="false" value="111000000001101000001000" aria-describedby="line-hint"></label><p id="line-hint">Общая последовательность для всех строк. Рекомендуется сначала предсказать места без переходов и вставки HDB-3.</p><div class="line-result" aria-live="polite"></div>`;
+  lineRoot.innerHTML=`<label>Биты <input type="text" inputmode="numeric" spellcheck="false" value="111000000001101000001000" aria-describedby="line-hint"></label><p id="line-hint">Измените биты и сравните переходы во всех строках.</p><div class="line-result" aria-live="polite"></div>`;
   const input=lineRoot.querySelector('input'), result=lineRoot.querySelector('.line-result');
   const render=()=>{
     const m=lineCodes(input.value);
