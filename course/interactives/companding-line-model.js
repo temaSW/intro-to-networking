@@ -21,8 +21,8 @@ export function compand(sample) {
 // Each bit is represented by two equal half-bit levels; B/V markers retain the HDB-3 decisions.
 export function lineCodes(input) {
   const bits = String(input).replace(/[^01]/g, '').slice(0, 64);
-  const nrz = [], rz = [], amiNrz = [], amiRz = [], hdb = [], manchester = [], differential = [], cmi = [];
-  let polarity = -1, onesSince = 0, lastPulse = -1, phase = 1, cmiOne = -1;
+  const nrz = [], rz = [], amiNrz = [], amiRz = [], hdb = [], manchester = [];
+  let polarity = -1, onesSince = 0, lastPulse = -1;
   for (let i = 0; i < bits.length; i++) {
     const bit = bits[i];
     nrz.push(bit === '1' ? [1, 1] : [0, 0]);
@@ -33,10 +33,6 @@ export function lineCodes(input) {
       amiRz.push([polarity, 0]);
     } else { amiNrz.push([0, 0]); amiRz.push([0, 0]); }
     manchester.push(bit === '1' ? [1, -1] : [-1, 1]);
-    if (bit === '1') phase *= -1;
-    differential.push([phase, -phase]);
-    if (bit === '1') { cmiOne *= -1; cmi.push([cmiOne, cmiOne]); }
-    else cmi.push([-1, 1]);
 
     if (bit === '1') {
       lastPulse *= -1;
@@ -58,26 +54,5 @@ export function lineCodes(input) {
       }
     }
   }
-  return {bits, nrz, rz, amiNrz, amiRz, hdb,
-    hdbRz:hdb.map(({level}) => [level, 0]),
-    manchester, differential, cmi};
-}
-
-// The first two columns of the teaching table are opposite-polarity variants.
-export const FOUR_B_THREE_T = {
-  '0000':'---','0001':'--0','0010':'-0-','0011':'0--',
-  '0100':'--+','0101':'-+-','0110':'+--','0111':'-+0',
-  '1000':'+0-','1001':'0-+','1010':'+-0','1011':'-0+',
-  '1100':'0+-','1101':'-++','1110':'++-','1111':'+-+',
-};
-
-export function fourBThreeT(input) {
-  const bits = String(input).replace(/[^01]/g, '');
-  const blocks = [];
-  for (let i = 0; i + 4 <= bits.length; i += 4) {
-    const word = bits.slice(i, i + 4);
-    const first = FOUR_B_THREE_T[word];
-    blocks.push({word, first, opposite:first.replace(/[+-]/g, c => c === '+' ? '-' : '+')});
-  }
-  return {blocks, remainder:bits.length % 4};
+  return {bits, nrz, rz, amiNrz, amiRz, hdb, manchester};
 }

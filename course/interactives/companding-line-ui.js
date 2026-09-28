@@ -79,8 +79,8 @@ if (lineRoot) {
   const render=()=>{
     const m=lineCodes(input.value);
     if(!m.bits){result.textContent='Введите хотя бы один бит 0 или 1.';return;}
-    const rows=[['NRZ','nrz'],['RZ','rz'],['ЧПИ NRZ','amiNrz'],['ЧПИ RZ','amiRz'],['HDB-3','hdb'],['Manchester','manchester'],['Относит. биимп.','differential'],['CMI','cmi']];
-    result.innerHTML=waveSvg(m,rows)+`<p class="line-legend">Уровни +1 / 0 / −1; вертикальные линии — границы битов. B — балансирующий импульс, V — нарушение чередования. Manchester: 1 = +−, 0 = −+. Относительный: 1 меняет фазу пары. CMI: 0 = −+, единицы попеременно ++ и −−.</p>`;
+    const rows=[['NRZ','nrz'],['RZ','rz'],['ЧПИ NRZ','amiNrz'],['ЧПИ RZ','amiRz'],['Manchester','manchester'],['HDB-3','hdb']];
+    result.innerHTML=waveSvg(m,rows)+`<p class="line-legend">Уровни +1 / 0 / −1; вертикальные линии — границы битов. B — балансирующий импульс, V — нарушение чередования. Manchester: 1 = +−, 0 = −+.</p>`;
   };
   input.addEventListener('input',render);render();
 }
