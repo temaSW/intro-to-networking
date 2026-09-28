@@ -160,7 +160,8 @@ def welch_db(signal: list[float], size: int) -> list[float]:
 def keying_figures() -> None:
     """One figure: short oscillograms and Welch spectra from 4096 random bits."""
     shown_bits = [0, 1, 0, 1, 1, 0, 1, 0]
-    samples_per_bit = 32
+    # Highest tone is 5 cycles/bit; 64 samples/bit exceed 5 × Nyquist (50).
+    samples_per_bit = 64
     rng = random.Random(42)
     long_bits = [rng.randrange(2) for _ in range(4096)]
     modes = [("ask", "ASK · амплитуда"), ("fsk", "FSK · частота"), ("psk", "PSK · фаза")]
@@ -174,12 +175,12 @@ def keying_figures() -> None:
         body += f'<text x="35" y="{top+24}" class="title">{label}</text>'
         for j, bit in enumerate(shown_bits):
             x = x0 + j * (x1-x0) / len(shown_bits)
-            body += f'<rect x="{x:.1f}" y="{top+39}" width="{(x1-x0)/len(shown_bits):.1f}" height="153" fill="{"#e9f1f0" if j%2 == 0 else BG}"/><line x1="{x:.1f}" y1="{top+39}" x2="{x:.1f}" y2="{top+192}" class="grid"/><text x="{x+(x1-x0)/16:.1f}" y="{top+59}" text-anchor="middle" class="muted">{bit}</text>'
+            body += f'<rect x="{x:.1f}" y="{top+39}" width="{(x1-x0)/len(shown_bits):.1f}" height="153" fill="{"#e9f1f0" if j%2 == 0 else BG}"/><line x1="{x:.1f}" y1="{top+39}" x2="{x:.1f}" y2="{top+192}" class="grid"/><text x="{x+(x1-x0)/16:.1f}" y="{top+35}" text-anchor="middle" class="muted">{bit}</text>'
         signal = keying_signal(mode, shown_bits, samples_per_bit)
         points = " ".join(f"{x0+i/(len(signal)-1)*(x1-x0):.1f},{baseline-65*v:.1f}" for i, v in enumerate(signal))
         body += f'<line x1="{x0}" y1="{baseline}" x2="{x1}" y2="{baseline}" class="axis"/><polyline points="{points}" fill="none" stroke="{ACCENT}" stroke-width="2"/>'
 
-        db = welch_db(keying_signal(mode, long_bits, samples_per_bit), 4096)
+        db = welch_db(keying_signal(mode, long_bits, samples_per_bit), 8192)
         peak = max(db)
         chart_top, chart_bottom = top + 39, top + 192
         for frequency in (0, 2, 4, 6, 8):
@@ -188,7 +189,7 @@ def keying_figures() -> None:
         for level in (0, -20, -40, -60):
             y = chart_top - level/60 * (chart_bottom-chart_top)
             body += f'<line x1="{sx0}" y1="{y:.1f}" x2="{sx1}" y2="{y:.1f}" class="grid"/><text x="{sx0-9}" y="{y+5:.1f}" text-anchor="end" class="muted">{level}</text>'
-        # 0..8 cycles per bit: 1025 of the 2049 one-sided FFT bins.
+        # 0..8 cycles per bit: 1025 of the 4097 one-sided FFT bins.
         spectrum = " ".join(f"{sx0+i/1024*(sx1-sx0):.1f},{chart_top+min(60,max(0,peak-db[i]))/60*(chart_bottom-chart_top):.1f}" for i in range(1025))
         body += f'<polyline points="{spectrum}" fill="none" stroke="{ORANGE}" stroke-width="2"/><line x1="{sx0}" y1="{chart_bottom}" x2="{sx1}" y2="{chart_bottom}" class="axis"/>'
     body += '<text x="920" y="846" text-anchor="middle" class="label">Частота, циклов на битовый интервал</text>'

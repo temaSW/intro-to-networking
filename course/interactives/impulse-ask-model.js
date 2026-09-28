@@ -1,6 +1,7 @@
-// Deterministic sampled model shared by every stage of the practice page.
-export const SAMPLE_RATE_KHZ = 1000;
-export const FFT_SIZE = 4096;
+// At least five times the Nyquist minimum for the highest modelled carrier
+// plus four bit-rate offsets: 3.2 MHz >= 10 * (200 + 4 * 25) kHz.
+export const SAMPLE_RATE_KHZ = 3200;
+export const FFT_SIZE = 16384;
 export const MAX_CARRIER_KHZ = 200;
 export const MAX_BIT_RATE_KBPS = 25;
 export const MAX_USERS = 2;
@@ -21,9 +22,9 @@ export function rectangularPulse(amplitude, tauMs, count = FFT_SIZE) {
 }
 
 export function validateSampling(carrierKhz = MAX_CARRIER_KHZ, bitRateKbps = MAX_BIT_RATE_KBPS) {
-  // The first several sidelobes remain below Nyquist at every UI setting.
+  // Keep at least ten samples per period at the highest represented frequency.
   return carrierKhz > 0 && bitRateKbps > 0 &&
-    carrierKhz + 4 * bitRateKbps < SAMPLE_RATE_KHZ / 2;
+    carrierKhz + 4 * bitRateKbps <= SAMPLE_RATE_KHZ / 10;
 }
 
 export function bitWaveform(bits, bitRateKbps, duty = 1, count = FFT_SIZE) {
@@ -119,8 +120,8 @@ export function mainLobeOverlap(fc1, fc2, bitRateKbps, duty = 1) {
 }
 
 // A repeatable, long bit stream makes the three modulation spectra comparable.
-export const PRACTICE_FFT_SIZE = 8192;
-export const PRACTICE_SAMPLE_COUNT = 65536;
+export const PRACTICE_FFT_SIZE = 32768;
+export const PRACTICE_SAMPLE_COUNT = 262144;
 export const PRACTICE_CARRIER_KHZ = 100;
 export const PRACTICE_FSK_SHIFT_KHZ = 18;
 
@@ -166,7 +167,8 @@ export function averagedPowerSpectrum(signal, windowSize = PRACTICE_FFT_SIZE) {
 
 export function squareFourier(harmonics, frequencyKhz = 2) {
   if (!(Number.isInteger(harmonics) && harmonics >= 1 && harmonics <= 25)) throw new Error("Invalid harmonic count");
-  const durationMs = 2;
+  // 800 kHz display sampling > 10 * 38 kHz at the maximum 19th harmonic.
+  const durationMs = 1;
   const time = Array.from({length: 801}, (_, i) => i * durationMs / 800);
   const values = time.map(t => {
     let sum = 0;

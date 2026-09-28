@@ -31,10 +31,11 @@ def test_bit_waveform_duration_and_levels():
     run_js("""
 const wave = m.bitWaveform('1010', 10, 1);
 assert.equal(wave[0], 1);
-assert.equal(wave[99], 1);
-assert.equal(wave[100], 0);
-assert.equal(wave[200], 1);
-assert.equal(wave[400], 0);
+const samplesPerBit = m.SAMPLE_RATE_KHZ / 10;
+assert.equal(wave[samplesPerBit - 1], 1);
+assert.equal(wave[samplesPerBit], 0);
+assert.equal(wave[2 * samplesPerBit], 1);
+assert.equal(wave[4 * samplesPerBit], 0);
 assert([...wave].every(v => v === 0 || v === 1));
 """)
 
@@ -75,7 +76,7 @@ assert(at(160) < .001);
 def test_ui_sampling_range_and_two_users():
     run_js("""
 assert(m.validateSampling(m.MAX_CARRIER_KHZ, m.MAX_BIT_RATE_KBPS));
-assert(m.MAX_CARRIER_KHZ + 4 * m.MAX_BIT_RATE_KBPS < m.SAMPLE_RATE_KHZ / 2);
+assert(m.MAX_CARRIER_KHZ + 4 * m.MAX_BIT_RATE_KBPS <= m.SAMPLE_RATE_KHZ / 10);
 const a = m.ook(m.bitWaveform('1010', 10), 100);
 const b = m.ook(m.bitWaveform('0101', 10), 140);
 const sum = m.addSignals(a, b);
@@ -107,7 +108,10 @@ const ask = m.averagedPowerSpectrum(signals.ask);
 const fsk = m.averagedPowerSpectrum(signals.fsk);
 const psk = m.averagedPowerSpectrum(signals.psk);
 assert.equal(ask.windows, 15);
-assert.equal(ask.stepKhz, 1000 / 8192);
+assert.equal(ask.stepKhz, m.SAMPLE_RATE_KHZ / m.PRACTICE_FFT_SIZE);
+assert(m.SAMPLE_RATE_KHZ >= 10 * (m.PRACTICE_CARRIER_KHZ + m.PRACTICE_FSK_SHIFT_KHZ + 4 * 25));
+assert.equal(m.squareFourier(19).time[1], 1 / 800);
+assert(1 / (many.time[1] - many.time[0]) >= 10 * 38);
 const at = (s, f) => s.power[Math.round(f / s.stepKhz)];
 assert(at(ask, 100) > at(ask, 82) * 5);
 assert(at(fsk, 82) > at(fsk, 100) * 2);
