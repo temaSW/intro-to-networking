@@ -12,9 +12,9 @@
 .pcm-chain-steps { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem; }
 .pcm-chain-steps button, .companding-presets button { border: 1px solid var(--bs-primary); border-radius: .35rem; padding: .4rem .65rem; color: var(--bs-body-color); background: var(--bs-body-bg); cursor: pointer; }
 .pcm-chain-steps button:hover, .companding-presets button:hover { background: var(--bs-secondary-bg); }
-.pcm-chain-steps button[aria-pressed=true] { background: var(--bs-primary); color: var(--bs-body-bg); }
+.pcm-chain-steps button[aria-expanded=true] { background: var(--bs-primary); color: var(--bs-body-bg); }
 .pcm-chain-steps button:focus-visible, .companding-presets button:focus-visible { outline: 3px solid var(--bs-warning); outline-offset: 2px; }
-.pcm-chain-detail { margin: .8rem 0 0; min-height: 3em; }
+.pcm-chain-detail { margin: .8rem 0 0; }
 .companding-presets { display: flex; flex-wrap: wrap; gap: .5rem; margin: .75rem 0; }
 .segment-chart { overflow-x: auto; }
 .segment-chart svg { display: block; width: 100%; min-width: 760px; max-width: 960px; margin: .7rem auto; }
