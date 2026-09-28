@@ -1,4 +1,4 @@
-import {PRACTICE_FFT_SIZE, averagedPowerSpectrum, practiceSignals, squareFourier} from "./impulse-ask-model.js";
+import {PRACTICE_FFT_SIZE, SAMPLE_RATE_KHZ, averagedPowerSpectrum, practiceSignals, squareFourier} from "./impulse-ask-model.js";
 
 function plot(title, points, {xMax, yMin, yMax, xLabel, yLabel, ticks, stems = false, marks = [], tickOffset = 0, note = ""}) {
   const l = 60, r = 940, t = 26, b = 274;
@@ -35,7 +35,7 @@ function mount(root) {
     const count = Number(root.querySelector('[name="harmonics"]').value);
     const series = squareFourier(count);
     root.querySelector(".ia-fourier-plots").innerHTML =
-      plot("Сигнал во времени",series.time.map((t,i)=>[t,series.values[i]]),{xMax:2,yMin:-1.5,yMax:1.5,xLabel:"Время, мс",yLabel:"Амплитуда",ticks:[0,.5,1,1.5,2]}) +
+      plot("Сигнал во времени",series.time.map((t,i)=>[t,series.values[i]]),{xMax:1,yMin:-1.5,yMax:1.5,xLabel:"Время, мс",yLabel:"Амплитуда",ticks:[0,.25,.5,.75,1]}) +
       plot("Составляющие ряда Фурье",series.lines.map(line=>[line.frequencyKhz,line.amplitude]),{xMax:40,yMin:0,yMax:1.4,xLabel:"Частота, кГц",yLabel:"Амплитуда",ticks:[0,10,20,30,40],stems:true});
     root.querySelector("[data-fourier-note]").textContent = `Число составляющих: ${series.lines.length}. Частоты кратны 2 кГц; амплитуда убывает как 1/n. Пики — спектральные линии периодического сигнала.`;
   }
@@ -45,7 +45,7 @@ function mount(root) {
     const signals = practiceSignals(rate);
     const spectra = ["ask","fsk","psk"].map(name=>[name,averagedPowerSpectrum(signals[name])]);
     root.querySelector(".ia-spectrum-plots").innerHTML = spectra.map(([name,estimate])=>spectrumPlot(name,estimate)).join("");
-    root.querySelector("[data-method]").textContent = `Относительная мощность: ${spectra[0][1].windows} перекрывающихся окон БПФ по ${PRACTICE_FFT_SIZE} отсчётов (8,192 мс на окно), частотный шаг ${spectra[0][1].stepKhz.toFixed(2).replace(".",",")} кГц. Неровности конечной оценки возможны; сравнивайте устойчивую форму, а не отдельные зубцы.`;
+    root.querySelector("[data-method]").textContent = `Частота дискретизации ${(SAMPLE_RATE_KHZ/1000).toFixed(1).replace(".",",")} МГц. Относительная мощность: ${spectra[0][1].windows} перекрывающихся окон БПФ по ${PRACTICE_FFT_SIZE} отсчётов (${(PRACTICE_FFT_SIZE/SAMPLE_RATE_KHZ).toFixed(2).replace(".",",")} мс на окно), частотный шаг ${spectra[0][1].stepKhz.toFixed(2).replace(".",",")} кГц. Неровности конечной оценки возможны; сравнивайте устойчивую форму, а не отдельные зубцы.`;
   }
   root.addEventListener("change", event => {
     if (event.target.name === "harmonics") drawFourier();
