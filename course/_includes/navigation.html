@@ -1,0 +1,13 @@
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const toc = document.querySelector('#quarto-margin-sidebar > #TOC');
+  if (!toc) return;
+
+  const disclosure = document.createElement('details');
+  disclosure.className = 'toc-disclosure';
+  const summary = document.createElement('summary');
+  summary.textContent = 'Содержание страницы';
+  disclosure.append(summary, toc);
+  document.querySelector('#quarto-margin-sidebar').append(disclosure);
+});
+</script>
