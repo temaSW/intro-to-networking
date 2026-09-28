@@ -54,17 +54,6 @@ if (main) {
     dialog.querySelector("button").focus();
   };
   main.addEventListener("click", event => {
-    const templateTrigger = event.target.closest('[data-lightbox-template]');
-    if (templateTrigger) {
-      const template = document.getElementById(templateTrigger.dataset.lightboxTemplate);
-      if (!(template instanceof HTMLTemplateElement)) return;
-      previousFocus = templateTrigger;
-      stage.replaceChildren(template.content.cloneNode(true));
-      caption.textContent = templateTrigger.dataset.lightboxDescription || "Схема";
-      dialog.showModal();
-      dialog.querySelector("button").focus();
-      return;
-    }
     const figure = event.target.closest(selector);
     if (!figure) return;
     event.preventDefault();
