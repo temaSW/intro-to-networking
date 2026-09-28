@@ -1,4 +1,4 @@
-import {sampleSpectrum} from "./lecture-04-spectrum-model.js";
+import {FREQUENCY_LIMIT_KHZ, sampleSpectrum} from "./lecture-04-spectrum-model.js";
 
 const durations = [0.25, 0.5, 1, 2, 4];
 const names = {ask: "ASK", fsk: "FSK", psk: "PSK"};
@@ -7,11 +7,11 @@ function spectrumSvg(mode, duration) {
   const current = sampleSpectrum(mode, duration);
   const reference = sampleSpectrum(mode, 1);
   const left = 72, right = 768, top = 30, bottom = 352;
-  const x = frequency => left + (frequency + 5) / 10 * (right - left);
+  const x = frequency => left + (frequency + FREQUENCY_LIMIT_KHZ) / (2 * FREQUENCY_LIMIT_KHZ) * (right - left);
   const y = db => top + (-db) / 45 * (bottom - top);
   const path = samples => samples.map((point, index) => `${index ? "L" : "M"}${x(point.offsetKhz).toFixed(1)},${y(point.db).toFixed(1)}`).join(" ");
   let svg = `<svg viewBox="0 0 800 420" role="img" aria-label="Спектр ${names[mode]} при длительности бита ${duration} мс в сравнении с 1 мс"><rect width="800" height="420" fill="var(--surface)"/>`;
-  for (let frequency = -5; frequency <= 5; frequency++) {
+  for (let frequency = -FREQUENCY_LIMIT_KHZ; frequency <= FREQUENCY_LIMIT_KHZ; frequency += 2) {
     svg += `<line x1="${x(frequency)}" y1="${top}" x2="${x(frequency)}" y2="${bottom}" stroke="var(--line)"/><text x="${x(frequency)}" y="376" text-anchor="middle" fill="var(--muted)">${frequency}</text>`;
   }
   for (const db of [0, -10, -20, -30, -40]) {

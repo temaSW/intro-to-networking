@@ -72,7 +72,7 @@ async function mountBer(root) {
       const [scheme, modulation, code_rate, snr_db, bit_errors, information_bits, ber] = line.split(",");
       return {scheme: +scheme, modulation, code_rate: +code_rate, snr_db: +snr_db, bit_errors: +bit_errors, information_bits: +information_bits, ber: +ber};
     });
-    root.innerHTML = `<div class="ber-controls" role="group" aria-label="Показать кривые">${berSeries.map(series => `<label><input type="checkbox" value="${series.id}" ${[1, 6].includes(series.id) ? "checked" : ""}><span class="ber-swatch ${series.uncoded ? "ber-swatch-uncoded" : ""}" style="--curve-color:${series.color}"></span>${series.label}</label>`).join("")}</div><div class="ber-plot"></div><p class="interactive-note">Выберите кривые для сравнения. Сплошные линии — после декодирования LDPC; штриховые — без кодирования. Точки с нулём обнаруженных ошибок не показаны.</p>`;
+    root.innerHTML = `<div class="ber-controls" role="group" aria-label="Показать кривые">${berSeries.map(series => `<label><input type="checkbox" value="${series.id}"><span class="ber-swatch ${series.uncoded ? "ber-swatch-uncoded" : ""}" style="--curve-color:${series.color}"></span>${series.label}</label>`).join("")}</div><div class="ber-plot"></div><p class="interactive-note">Кривые скрыты при открытии страницы. Выберите нужные для сравнения. Сплошные линии — после декодирования LDPC; штриховые — без кодирования. Точки с нулём обнаруженных ошибок не показаны.</p>`;
     const draw = () => {
       const selected = [...root.querySelectorAll('input:checked')].map(input => +input.value);
       root.querySelector(".ber-plot").innerHTML = berSvg(rows, selected);
