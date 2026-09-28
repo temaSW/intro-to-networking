@@ -33,23 +33,26 @@
 .line-wave-scroll .zero { stroke: var(--bs-secondary-color); stroke-dasharray: 3 3; stroke-width: 1; }
 .line-wave-scroll .marker { fill: var(--bs-danger); font-weight: 700; }
 .line-legend { font-size: .9rem; }
-.line-spectrum-comparison { margin: 1rem 0 1.6rem; padding: .85rem; border: 1px solid var(--bs-border-color); border-radius: .55rem; background: var(--bs-body-bg); }
+.line-spectrum-comparison { --line-color-1: #0877e6; --line-color-2: #c90032; margin: 1rem 0 1.6rem; padding: .85rem; border: 1px solid var(--bs-border-color); border-radius: .55rem; background: var(--bs-body-bg); }
+.quarto-dark .line-spectrum-comparison { --line-color-1: #57a8ff; --line-color-2: #ff667e; }
 .line-spectrum-comparison figcaption { font-weight: 700; margin-bottom: .5rem; }
 .line-spectrum-legend { display: flex; flex-wrap: wrap; gap: .35rem 1.2rem; margin-bottom: .25rem; }
 .line-spectrum-legend span { display: inline-flex; align-items: center; gap: .45rem; }
 .line-spectrum-swatch { display: inline-block; width: 1.8rem; height: 0; border-top: 3px solid; }
-.line-spectrum-swatch-1 { border-color: var(--bs-primary); }
-.line-spectrum-swatch-2 { border-color: var(--bs-danger); }
+.line-spectrum-swatch-1 { border-color: var(--line-color-1); }
+.line-spectrum-swatch-2 { border-color: var(--line-color-2); }
 .line-spectrum-scroll { overflow-x: auto; }
 .line-spectrum-comparison svg { display: block; width: 100%; min-width: 540px; height: auto; color: var(--bs-body-color); }
 .line-spectrum-comparison svg text { fill: currentColor; font-size: 18px; }
 .line-spectrum-comparison svg .line-spectrum-axis-title { font-size: 20px; font-weight: 600; }
 .line-spectrum-grid { stroke: var(--bs-border-color); stroke-width: 1; }
 .line-spectrum-curve { fill: none; stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; }
-.line-spectrum-curve-1 { stroke: var(--bs-primary); }
-.line-spectrum-curve-2 { stroke: var(--bs-danger); }
-.line-spectrum-clock { stroke: var(--bs-body-color); stroke-width: 2; stroke-dasharray: 7 6; }
-.line-spectrum-comparison svg .line-spectrum-clock-label { fill: var(--bs-body-color); font-weight: 700; }
+.line-spectrum-curve-1 { stroke: var(--line-color-1); }
+.line-spectrum-curve-2 { stroke: var(--line-color-2); }
+.line-spectrum-null-1 { fill: var(--line-color-1); }
+.line-spectrum-null-2 { fill: var(--line-color-2); }
+.line-spectrum-comparison svg .line-spectrum-null-text-1 { fill: var(--line-color-1); font-weight: 700; }
+.line-spectrum-comparison svg .line-spectrum-null-text-2 { fill: var(--line-color-2); font-weight: 700; }
 .line-spectrum-lines { margin: .35rem 0 0; font-size: .9rem; }
 .line-spectrum-method { margin-top: .8rem; font-size: .9rem; color: var(--bs-secondary-color); }
 .baseband-bridge { overflow-x: auto; margin: .9rem 0 1.2rem; padding: .4rem; border: 1px solid var(--bs-border-color); border-radius: .4rem; }
