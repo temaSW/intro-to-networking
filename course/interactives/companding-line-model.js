@@ -1,13 +1,13 @@
 // Pure models shared by the lecture widget and reusable exercises.
 export const SEGMENTS = [
-  { base: 0, step: 2 }, { base: 32, step: 2 },
-  { base: 64, step: 4 }, { base: 128, step: 8 },
-  { base: 256, step: 16 }, { base: 512, step: 32 },
-  { base: 1024, step: 64 }, { base: 2048, step: 128 },
+  { base: 0, step: 1 }, { base: 16, step: 1 },
+  { base: 32, step: 2 }, { base: 64, step: 4 },
+  { base: 128, step: 8 }, { base: 256, step: 16 },
+  { base: 512, step: 32 }, { base: 1024, step: 64 },
 ];
 
 export function compand(sample) {
-  const value = Math.max(-4095, Math.min(4095, Math.trunc(Number(sample) || 0)));
+  const value = Math.max(-2047, Math.min(2047, Math.trunc(Number(sample) || 0)));
   const magnitude = Math.abs(value);
   const segment = Math.max(0, SEGMENTS.findLastIndex(({base}) => magnitude >= base));
   const {base, step} = SEGMENTS[segment];
@@ -21,10 +21,10 @@ export function compand(sample) {
 }
 
 export function uniformPcm(sample) {
-  const value = Math.max(-4095, Math.min(4095, Math.trunc(Number(sample) || 0)));
-  const step = 32; // 256 words over the same signed range [-4096, 4096).
-  const position = Math.floor((value + 4096) / step);
-  const reconstructed = -4096 + (position + 0.5) * step;
+  const value = Math.max(-2047, Math.min(2047, Math.trunc(Number(sample) || 0)));
+  const step = 16; // 256 words over the same signed range [-2048, 2048).
+  const position = Math.floor((value + 2048) / step);
+  const reconstructed = -2048 + (position + 0.5) * step;
   return {value, step, position, reconstructed, error: reconstructed - value};
 }
 

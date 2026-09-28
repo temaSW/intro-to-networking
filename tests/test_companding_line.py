@@ -10,13 +10,17 @@ ROOT = Path(__file__).resolve().parents[1]
 def test_g711_examples_and_line_code_harmonics():
     script = """
 import assert from 'node:assert/strict';
-import {compand, uniformPcm, lineCodes} from './course/interactives/companding-line-model.js';
+import {compand, uniformPcm, lineCodes, SEGMENTS} from './course/interactives/companding-line-model.js';
 import {LINE_SPECTRA as data} from './course/interactives/line-spectrum-data.js';
 
-assert.deepEqual([uniformPcm(20).reconstructed, compand(20).reconstructed], [16, 21]);
-assert.deepEqual([uniformPcm(3060).reconstructed, compand(3060).reconstructed], [3056, 3008]);
-assert.equal(compand(20).wireWord, '11011111');
-assert.equal(compand(3060).wireWord, '10100010');
+assert.deepEqual(SEGMENTS.map(item => item.base), [0, 16, 32, 64, 128, 256, 512, 1024]);
+assert.deepEqual(SEGMENTS.map(item => item.step), [1, 1, 2, 4, 8, 16, 32, 64]);
+assert.deepEqual(SEGMENTS.map(item => item.step / 2), [.5, .5, 1, 2, 4, 8, 16, 32]);
+assert.deepEqual([uniformPcm(10).reconstructed, compand(10).reconstructed], [8, 10.5]);
+assert.deepEqual([uniformPcm(1530).reconstructed, compand(1530).reconstructed], [1528, 1504]);
+assert.equal(compand(10).wireWord, '11011111');
+assert.equal(compand(1530).wireWord, '10100010');
+assert.equal(compand(2047).segment, 7);
 assert.deepEqual(data.comparisons.map(item => item.pattern), ['10', '110', '10000']);
 for (const comparison of data.comparisons) for (const key of comparison.keys) {
   const lines = comparison.spectra[key].lines;
