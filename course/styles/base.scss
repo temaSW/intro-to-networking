@@ -131,16 +131,22 @@ main .zoomable-image { cursor: zoom-in; }
 .ia-controls input[type="range"] { width: min(18rem, 65vw); }
 .ia-controls output { min-width: 5.5rem; color: var(--muted); }
 .ia-fourier-plots, .ia-spectrum-plots { display: grid; grid-template-columns: 1fr; gap: .75rem; }
+.ia-modulation-card { display: grid; gap: .7rem; padding: .75rem; border: 1px solid var(--line); border-radius: .45rem; background: var(--surface); }
 .ia-figure { margin: 0; min-width: 0; padding: .65rem; background: var(--surface); border: 1px solid var(--line); border-radius: .35rem; }
 .ia-figure figcaption { margin: 0 0 .25rem; font-weight: 700; }
 .ia-figure svg { display: block; width: 100%; height: auto; color: var(--ink); font-size: 17px; }
 .ia-figure svg text { fill: var(--ink); }
 .ia-plot-note { margin: .4rem .2rem .1rem; line-height: 1.5; }
 .ia-paper { fill: var(--surface); }
+.ia-bit-shade { fill: transparent; }
+.ia-bit-shade.ia-bit-one { fill: var(--accent-soft); }
 .ia-grid { stroke: var(--line); stroke-width: 1; }
 .ia-axis { stroke: var(--ink); stroke-width: 1.5; }
 .ia-line { fill: none; stroke: var(--accent); stroke-width: 2.5; vector-effect: non-scaling-stroke; }
+.ia-reference { fill: none; stroke: var(--muted); stroke-width: 1.8; stroke-dasharray: 7 5; vector-effect: non-scaling-stroke; }
+.ia-average { stroke: var(--focus); stroke-width: 1.5; stroke-dasharray: 3 5; }
 .ia-stem { stroke: var(--accent); stroke-width: 3; vector-effect: non-scaling-stroke; }
+.ia-stem.ia-dc-stem { stroke: var(--focus); stroke-width: 5; }
 .ia-marker { stroke: var(--focus); stroke-width: 1.5; stroke-dasharray: 6 5; }
 .ia-observation { margin: .8rem 0 0; padding: .7rem .9rem; background: var(--accent-soft); border-left: .2rem solid var(--accent); }
 .ia-method { margin: .7rem 0 0; color: var(--muted); font-size: .9rem; }

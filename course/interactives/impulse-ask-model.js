@@ -132,6 +132,7 @@ export function practiceSignals(bitRateKbps) {
     seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
     return seed >>> 31;
   });
+  bits.splice(0, 5, 1, 0, 1, 1, 0); // A readable 10110 fragment in every time-domain example.
   const ask = new Float64Array(PRACTICE_SAMPLE_COUNT);
   const fsk = new Float64Array(PRACTICE_SAMPLE_COUNT);
   const psk = new Float64Array(PRACTICE_SAMPLE_COUNT);
@@ -165,16 +166,25 @@ export function averagedPowerSpectrum(signal, windowSize = PRACTICE_FFT_SIZE) {
   return {power, stepKhz: SAMPLE_RATE_KHZ / windowSize, windows};
 }
 
-export function squareFourier(harmonics, frequencyKhz = 2) {
-  if (!(Number.isInteger(harmonics) && harmonics >= 1 && harmonics <= 25)) throw new Error("Invalid harmonic count");
+export function periodicPulseFourier(harmonics, low = -1, duty = .5, frequencyKhz = 2) {
+  if (!(Number.isInteger(harmonics) && harmonics >= 1 && harmonics <= 19 &&
+    (low === -1 || low === 0) && duty > 0 && duty < 1 && frequencyKhz > 0))
+    throw new Error("Invalid periodic pulse parameters");
   // 800 kHz display sampling > 10 * 38 kHz at the maximum 19th harmonic.
-  const durationMs = 1;
-  const time = Array.from({length: 801}, (_, i) => i * durationMs / 800);
-  const values = time.map(t => {
-    let sum = 0;
-    for (let k = 1; k <= harmonics; k += 2) sum += Math.sin(2 * Math.PI * k * frequencyKhz * t) / k;
-    return 4 * sum / Math.PI;
-  });
-  const lines = Array.from({length: Math.ceil(harmonics / 2)}, (_, i) => ({frequencyKhz: (2 * i + 1) * frequencyKhz, amplitude: 4 / (Math.PI * (2 * i + 1))}));
-  return {time, values, lines};
+  const time = Array.from({length: 801}, (_, i) => i / 800);
+  const dc = low + (1 - low) * duty;
+  const lines = [{frequencyKhz: 0, amplitude: Math.abs(dc), signed: dc}];
+  for (let n = 1; n <= harmonics; n++) {
+    const coefficient = 2 * (1 - low) * Math.sin(Math.PI * n * duty) / (Math.PI * n);
+    lines.push({frequencyKhz: n * frequencyKhz, amplitude: Math.abs(coefficient), coefficient, harmonic: n});
+  }
+  const values = time.map(t => dc + lines.slice(1).reduce((sum, line) =>
+    sum + line.coefficient * Math.cos(2 * Math.PI * line.frequencyKhz * t - Math.PI * line.harmonic * duty), 0));
+  const ideal = time.map(t => (t * frequencyKhz) % 1 < duty ? 1 : low);
+  return {time, values, ideal, lines, dc, low, duty, frequencyKhz};
+}
+
+export function squareFourier(harmonics, frequencyKhz = 2) {
+  const result = periodicPulseFourier(harmonics, -1, .5, frequencyKhz);
+  return {...result, lines: result.lines.slice(1).filter(line => line.amplitude > 1e-10)};
 }
