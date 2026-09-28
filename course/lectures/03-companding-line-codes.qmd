@@ -148,3 +148,4 @@ $U_{\text{эт},N}$ — начало сегмента, $\Delta_N$ — его ш�
 Этот вопрос ведёт к [модуляции](04-physical-resource.qmd): как перенести информацию в подходящую для канала полосу.
 
 <script type="module" src="../interactives/companding-line-ui.js"></script>
+<script src="../interactives/image-lightbox.js" defer></script>

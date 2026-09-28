@@ -30,3 +30,4 @@ toc: false
 Мы научились определять, сколько частотного ресурса занимает сигнал и где этот сигнал расположен. Следующий вопрос — как ограниченный ресурс одновременно используется несколькими передачами.
 
 <script type="module" src="../interactives/impulse-ask-ui.js"></script>
+<script src="../interactives/image-lightbox.js" defer></script>

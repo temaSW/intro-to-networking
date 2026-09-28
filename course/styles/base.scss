@@ -75,15 +75,18 @@ table td, table th { border-color: var(--line); overflow-wrap: anywhere; }
 .quarto-dark .tf-grid .bob, .quarto-dark .grid-legend .bob { background: #7d571e; }
 .quarto-dark .tf-grid .carol, .quarto-dark .grid-legend .carol { background: #526d31; }
 
-/* Lecture 04: diagrams expand via the native dialog element. */
-main img:not(.no-lightbox) { cursor: zoom-in; }
+/* Course illustrations expand via the native dialog element. */
+main .zoomable-image { cursor: zoom-in; }
 .lecture-lightbox {
   position: fixed; inset: 0; width: 100vw; height: 100dvh; max-width: none; max-height: none;
   margin: 0; padding: 3.5rem 1rem 1rem; border: 0; background: #0d171eea; color: #fff;
   text-align: center; overflow: auto;
 }
 .lecture-lightbox::backdrop { background: #0d171eea; }
+.lightbox-stage { display: flex; align-items: center; justify-content: center; width: 100%; min-height: calc(100dvh - 8rem); overflow: auto; }
+.lightbox-stage > div { max-width: 100%; overflow: auto; }
 .lecture-lightbox img { width: auto; height: auto; max-width: 96vw; max-height: calc(100dvh - 7rem); object-fit: contain; cursor: default !important; }
+.lecture-lightbox .lightbox-stage svg { display: block; width: min(96vw, 90rem); min-width: 0; max-width: 96vw; height: auto; max-height: calc(100dvh - 8rem); margin: auto; cursor: default; }
 .lecture-lightbox p { color: #fff; margin: .5rem auto; max-width: 70rem; }
 .lightbox-close { position: fixed; top: .6rem; right: 1rem; border: 1px solid #fff; border-radius: .5rem; color: #fff; background: #263b46; font-size: 2rem; line-height: 1; padding: .2rem .65rem; }
 
