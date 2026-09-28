@@ -21,12 +21,15 @@ assert.deepEqual(Object.keys(data.spectra), ['nrz', 'rz', 'amiNrz', 'amiRz', 'ma
 assert.equal(data.bitCount, 131072);
 assert.equal(data.fftSize, 32768);
 assert.equal(data.windows, 63);
-for (const estimate of Object.values(data.spectra)) assert.equal(estimate.db.length, 1025);
+for (const estimate of Object.values(data.spectra)) {
+  assert.equal(estimate.relativePower.length, 501);
+  assert(estimate.relativePower.every(value => value >= 0 && value <= 1));
+}
 assert(data.spectra.nrz.mean > 0.49 && data.spectra.nrz.mean < 0.51);
 assert(data.spectra.rz.mean > 0.24 && data.spectra.rz.mean < 0.26);
 assert(Math.abs(data.spectra.amiNrz.mean) < 0.01);
 assert(Math.abs(data.spectra.manchester.mean) < 0.01);
-assert(data.spectra.nrz.db[0] > data.spectra.amiNrz.db[0] + 15);
+assert(data.spectra.nrz.relativePower[0] > data.spectra.amiNrz.relativePower[0] + .4);
 const bits = lineCodes('111000000000');
 assert.equal(bits.hdb.filter(cell => cell.marker === 'V').length, 2);
 """
