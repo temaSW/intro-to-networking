@@ -1,8 +1,13 @@
-import {LINE_SPECTRA} from './line-spectrum-data.js';
+import {LINE_SPECTRA} from './line-spectrum-data.js?v=20260929-1';
 
 const titles = {
   nrz: 'NRZ', rz: 'RZ', amiNrz: 'ЧПИ NRZ', amiRz: 'ЧПИ RZ',
   hdb: 'HDB-3', manchester: 'Manchester',
+};
+const captions = {
+  'nrz,rz': 'Первый нуль: NRZ — около 1, RZ — около 2',
+  'amiNrz,amiRz': 'Чередование знака убирает область около нуля',
+  'hdb,manchester': 'Максимумы расположены в разных частотных областях',
 };
 
 function spectrumSvg(keys) {
@@ -19,17 +24,17 @@ function spectrumSvg(keys) {
       `${point ? 'L' : 'M'}${x(point * LINE_SPECTRA.maxFrequency / (estimate.relativePower.length - 1)).toFixed(1)},${y(Math.sqrt(power)).toFixed(1)}`).join(' ');
     return `<path d="${path}" class="line-spectrum-curve line-spectrum-curve-${index + 1}"/>`;
   }).join('');
-  const clock = keys.includes('rz') ? `<line x1="${x(1)}" x2="${x(1)}" y1="${top}" y2="${bottom}" class="line-spectrum-clock"/><text x="${x(1) + 8}" y="${top + 21}" class="line-spectrum-clock-label">такт RZ</text>` : '';
-  return `<svg viewBox="0 0 820 310" role="img" aria-label="Линейные спектры амплитуды ${keys.map(key => titles[key]).join(' и ')}: частота от нуля до 2,5 битовых скоростей, амплитуда каждого кода от нуля до 100 процентов собственного максимума"><text x="${left}" y="24" class="line-spectrum-axis-title">Амплитуда, %</text>${horizontal}${vertical}${curves}${clock}<text x="433" y="303" text-anchor="middle" class="line-spectrum-axis-title">Частота / битовая скорость</text></svg>`;
+  const firstNulls = keys.includes('rz') ? `<circle cx="${x(1)}" cy="${bottom}" r="5" class="line-spectrum-null-1"/><text x="${x(1)}" y="${bottom - 15}" text-anchor="middle" class="line-spectrum-null-text-1">нуль NRZ</text><circle cx="${x(2)}" cy="${bottom}" r="5" class="line-spectrum-null-2"/><text x="${x(2)}" y="${bottom - 15}" text-anchor="middle" class="line-spectrum-null-text-2">нуль RZ</text>` : '';
+  return `<svg viewBox="0 0 820 310" role="img" aria-label="Линейные спектры амплитуды ${keys.map(key => titles[key]).join(' и ')}: частота от нуля до 2,5 битовых скоростей, амплитуда каждого кода от нуля до 100 процентов собственного максимума"><text x="${left}" y="24" class="line-spectrum-axis-title">Амплитуда, %</text>${horizontal}${vertical}${curves}${firstNulls}<text x="433" y="303" text-anchor="middle" class="line-spectrum-axis-title">Частота / битовая скорость</text></svg>`;
 }
 
 for (const root of document.querySelectorAll('[data-line-spectrum]')) {
   const keys = root.dataset.lineSpectrum.split(',').map(key => key.trim());
   const legend = keys.map((key, index) => `<span><i class="line-spectrum-swatch line-spectrum-swatch-${index + 1}" aria-hidden="true"></i>${titles[key]}</span>`).join('');
   const separateLines = keys.includes('rz')
-    ? '<p class="line-spectrum-lines">Отдельно от плавных кривых: у обоих кодов есть постоянная составляющая при частоте 0; пунктир отмечает тактовую линию RZ.</p>'
+    ? '<p class="line-spectrum-lines">У обоих кодов есть отдельная линия при частоте 0 (DC), у RZ также есть тактовая линия при 1. На плавных кривых эти узкие линии не показаны.</p>'
     : '';
-  root.innerHTML = `<figure class="line-spectrum-comparison"><figcaption>Спектральная амплитуда · линейная шкала</figcaption><div class="line-spectrum-legend">${legend}</div><div class="line-spectrum-scroll">${spectrumSvg(keys)}</div>${separateLines}</figure>`;
+  root.innerHTML = `<figure class="line-spectrum-comparison"><figcaption>${captions[keys.join(',')]}</figcaption><div class="line-spectrum-legend">${legend}</div><div class="line-spectrum-scroll">${spectrumSvg(keys)}</div>${separateLines}</figure>`;
 }
 
 for (const root of document.querySelectorAll('[data-line-spectrum-method]')) {

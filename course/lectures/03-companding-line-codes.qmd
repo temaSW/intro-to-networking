@@ -3,7 +3,7 @@ title: "Лекция 03. Компандирование и линейные ко
 subtitle: "От аналогового отсчёта до сигнала основной полосы"
 format:
   html:
-    css: ../styles/companding-line.css
+    css: ../styles/companding-line.css?v=20260929-1
 ---
 
 `Аналоговый сигнал → дискретизация → квантование → кодирование отсчётов → поток битов → сигнал в линии`.
@@ -178,5 +178,5 @@ format:
 Этот вопрос ведёт к [модуляции](04-physical-resource.qmd): как перенести информацию в подходящую для канала полосу.
 
 <script type="module" src="../interactives/companding-line-ui.js"></script>
-<script type="module" src="../interactives/line-spectrum-ui.js"></script>
+<script type="module" src="../interactives/line-spectrum-ui.js?v=20260929-1"></script>
 <script src="../interactives/image-lightbox.js" defer></script>

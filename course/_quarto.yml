@@ -3,6 +3,7 @@ project:
   output-dir: _site
   resources:
     - interactives/*.js
+    - styles/companding-line.css
 
 website:
   title: "ОПИСиС"
