@@ -3,39 +3,35 @@ import {compand, uniformPcm, lineCodes, SEGMENTS} from './companding-line-model.
 const esc = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 function segmentChart(active, sample) {
-  // Schematic horizontal spacing follows the textbook so the small segments remain visible.
+  // The model uses G.711 input units; the textbook plots input / Δ₀ with Δ₀ = 2 units.
   const boundaries = [0, 32, 64, 128, 256, 512, 1024, 2048, 4096];
-  const offsets = [0, 44, 84, 129, 180, 238, 306, 383, 450];
-  const centerX = 480, centerY = 260;
-  const side = sample < 0 ? -1 : 1, magnitude = Math.abs(sample);
-  const x = (sign, offset) => centerX + sign * offset;
-  const y = (sign, level) => centerY - sign * 1.6 * level;
-  const offsetAt = value => {
-    const i = Math.max(0, Math.min(7, boundaries.findLastIndex(edge => value >= edge)));
-    return offsets[i] + (value - boundaries[i]) / (boundaries[i + 1] - boundaries[i]) * (offsets[i + 1] - offsets[i]);
-  };
+  const offsets = [0, 59, 116, 191, 279, 379, 486, 604, 732];
+  const left = 92, bottom = 349;
+  const x = offset => left + offset;
+  const y = level => bottom - level / 16 * 35;
+  const magnitude = Math.abs(sample);
+  const segment = Math.max(0, Math.min(7, boundaries.findLastIndex(edge => magnitude >= edge)));
+  const offsetAt = offsets[segment] + (magnitude - boundaries[segment]) /
+    (boundaries[segment + 1] - boundaries[segment]) * (offsets[segment + 1] - offsets[segment]);
   const level = active * 16 + (magnitude - SEGMENTS[active].base) / SEGMENTS[active].step;
-  const markerX = x(side, offsetAt(magnitude)), markerY = y(side, level);
-  const branches = [-1, 1].map(sign => {
-    const guides = boundaries.slice(1).map((value, i) => {
-      const xx = x(sign, offsets[i + 1]), yy = y(sign, (i + 1) * 16);
-      return `<path class="segment-guide" d="M ${centerX} ${yy} H ${xx} V ${centerY}"/>`;
-    }).join('');
-    const ticks = [5, 6, 7].map(i => Array.from({length: 15}, (_, j) => {
-      const xx = x(sign, offsets[i] + (j + 1) * (offsets[i + 1] - offsets[i]) / 16);
-      return `<line class="segment-tick" x1="${xx}" y1="${centerY - 5}" x2="${xx}" y2="${centerY + 5}"/>`;
-    }).join('')).join('');
-    const curve = offsets.map((offset, i) => `${x(sign, offset)},${y(sign, i * 16)}`).join(' ');
-    const labels = boundaries.slice(1).map((value, i) =>
-      `<text x="${x(sign, offsets[i + 1])}" y="${centerY + 24}" text-anchor="middle">${sign < 0 ? '−' : ''}${value}</text>`).join('');
-    const levels = boundaries.slice(1).map((_, i) =>
-      `<text x="${centerX + (sign < 0 ? 12 : -12)}" y="${y(sign, (i + 1) * 16) + 4}" text-anchor="${sign < 0 ? 'start' : 'end'}">${sign < 0 ? '−' : ''}${(i + 1) * 16}</text>`).join('');
-    const segments = SEGMENTS.map((_, i) =>
-      `<text class="segment-number" x="${x(sign, (offsets[i] + offsets[i + 1]) / 2)}" y="${y(sign, (i + .5) * 16) + (sign < 0 ? 16 : -8)}" text-anchor="middle">${i}</text>`).join('');
-    return `${guides}${ticks}<polyline class="segment-curve" points="${curve}"/>${labels}${levels}${segments}`;
+  const markerX = x(offsetAt), markerY = y(level);
+  const guides = boundaries.slice(1).map((_, i) => {
+    const xx = x(offsets[i + 1]), yy = y((i + 1) * 16);
+    return `<path class="segment-guide" d="M ${left} ${yy} H ${xx} V ${bottom}"/>`;
   }).join('');
-  const activeLine = `<line class="segment-active" x1="${x(side, offsets[active])}" y1="${y(side, active * 16)}" x2="${x(side, offsets[active + 1])}" y2="${y(side, (active + 1) * 16)}"/>`;
-  return `<svg viewBox="0 0 960 530" role="img" aria-label="Сегментная A-характеристика G.711: ближе к нулю шаг квантования меньше"><line class="segment-axis" x1="16" y1="${centerY}" x2="944" y2="${centerY}"/><line class="segment-axis" x1="${centerX}" y1="22" x2="${centerX}" y2="502"/>${branches}${activeLine}<path class="sample-guide" d="M ${markerX} ${centerY} V ${markerY} H ${centerX}"/><circle class="sample-point" cx="${markerX}" cy="${markerY}" r="6"/><text x="${centerX + 12}" y="20">Кодовая позиция</text><text x="944" y="${centerY - 10}" text-anchor="end">Амплитуда, ед.</text><text x="${centerX}" y="${centerY + 24}" text-anchor="middle">0</text></svg>`;
+  const ticks = [5, 6, 7].map(i => Array.from({length: 15}, (_, j) => {
+    const xx = x(offsets[i] + (j + 1) * (offsets[i + 1] - offsets[i]) / 16);
+    return `<line class="segment-tick" x1="${xx}" y1="${bottom - 5}" x2="${xx}" y2="${bottom + 5}"/>`;
+  }).join('')).join('');
+  const curve = offsets.map((offset, i) => `${x(offset)},${y(i * 16)}`).join(' ');
+  const labels = boundaries.slice(1).map((value, i) =>
+    `<text x="${x(offsets[i + 1])}" y="${bottom + 24}" text-anchor="middle">${value / 2}</text>`).join('');
+  const levels = boundaries.slice(1).map((_, i) =>
+    `<text x="${left - 12}" y="${y((i + 1) * 16) + 4}" text-anchor="end">${(i + 1) * 16}</text>`).join('');
+  const segments = SEGMENTS.map((_, i) =>
+    `<text class="segment-number" x="${x((offsets[i] + offsets[i + 1]) / 2)}" y="${y((i + .5) * 16) - 9}" text-anchor="middle">${i}</text>`).join('');
+  const activeLine = `<line class="segment-active" x1="${x(offsets[active])}" y1="${y(active * 16)}" x2="${x(offsets[active + 1])}" y2="${y((active + 1) * 16)}"/>`;
+  return `<svg viewBox="0 0 900 420" role="img" aria-label="Положительная ветвь A-характеристики G.711, как в пособии: вход от 0 до 2048 в единицах Δ₀, выход от 0 до 128 кодовых позиций"><line class="segment-axis" x1="${left}" y1="${bottom}" x2="850" y2="${bottom}"/><line class="segment-axis" x1="${left}" y1="${bottom}" x2="${left}" y2="43"/>${guides}${ticks}<polyline class="segment-curve" points="${curve}"/>${activeLine}<path class="sample-guide" d="M ${markerX} ${bottom} V ${markerY} H ${left}"/><circle class="sample-point" cx="${markerX}" cy="${markerY}" r="6"/>${labels}${levels}${segments}<text x="${left}" y="28">Выход / Δ₀ · кодовая позиция</text><text x="850" y="402" text-anchor="end">Вход / Δ₀ (Δ₀ = 2 ед. отсчёта)</text><text x="${left - 12}" y="${bottom + 5}" text-anchor="end">0</text></svg>`;
 }
 
 const chainRoot = document.querySelector('[data-pcm-chain]');

@@ -3,7 +3,7 @@ title: "Лекция 03. Компандирование и линейные ко
 subtitle: "От аналогового отсчёта до сигнала основной полосы"
 format:
   html:
-    css: ../styles/companding-line.css?v=20260929-2
+    css: ../styles/companding-line.css?v=20260929-3
 ---
 
 `Аналоговый сигнал → отсчёты → кодовые слова → поток битов → сигнал в линии`
@@ -32,6 +32,8 @@ format:
 | +3060 | 3056; 4 (0,13 %) | 3008; 52 (1,70 %) |
 
 > Где точность выросла и какой ценой? Как по таблице распознать неравномерную шкалу?
+
+На графике ниже показана **положительная ветвь характеристики из пособия**: по горизонтали отложено $S_{\text{вх}}/\Delta_0$ от 0 до 2048, по вертикали — кодовая позиция от 0 до 128. Здесь $\Delta_0=2$ условным единицам отсчёта, поэтому граница 2048 на рисунке соответствует +4096 в модели G.711. Отрицательная ветвь зеркальна, её знак передаётся отдельным битом. Обозначение «A=87,6/13» относится к 13 прямолинейным участкам полной симметричной характеристики; в восьмибитном слове по-прежнему 3 бита номера сегмента и 4 бита позиции.
 
 <div class="companding-line-widget" data-companding-widget></div>
 
@@ -121,6 +123,6 @@ format:
 
 <p class="line-spectrum-method" data-line-spectrum-method></p>
 
-<script type="module" src="../interactives/companding-line-ui.js"></script>
+<script type="module" src="../interactives/companding-line-ui.js?v=20260929-3"></script>
 <script type="module" src="../interactives/line-spectrum-ui.js?v=20260929-2"></script>
 <script src="../interactives/image-lightbox.js" defer></script>

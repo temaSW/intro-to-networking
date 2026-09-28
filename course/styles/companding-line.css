@@ -17,7 +17,7 @@
 .pcm-chain-detail { margin: .8rem 0 0; min-height: 3em; }
 .companding-presets { display: flex; flex-wrap: wrap; gap: .5rem; margin: .75rem 0; }
 .segment-chart { overflow-x: auto; }
-.segment-chart svg { display: block; width: 100%; min-width: 800px; max-width: 960px; margin: .7rem auto; }
+.segment-chart svg { display: block; width: 100%; min-width: 760px; max-width: 960px; margin: .7rem auto; }
 .segment-chart .segment-axis { stroke: var(--bs-body-color); stroke-width: 1.5; }
 .segment-chart .segment-guide { fill: none; stroke: var(--bs-secondary-color); stroke-width: 1; stroke-dasharray: 5 5; }
 .segment-chart .segment-tick { stroke: var(--bs-body-color); stroke-width: 1; }
@@ -26,7 +26,8 @@
 .segment-chart .sample-guide { fill: none; stroke: var(--bs-primary); stroke-width: 1.5; stroke-dasharray: 4 3; }
 .segment-chart .sample-point { fill: var(--bs-primary); stroke: var(--bs-body-bg); stroke-width: 2; }
 .segment-chart .segment-number { font-weight: 700; }
-.segment-chart text, .line-wave-scroll text { fill: var(--bs-body-color); font-size: 12px; }
+.segment-chart text { fill: var(--bs-body-color); font-size: 16px; }
+.line-wave-scroll text { fill: var(--bs-body-color); font-size: 12px; }
 .line-wave-scroll { overflow-x: auto; margin-top: .8rem; }
 .line-wave-scroll svg { display: block; height: auto; max-width: none; }
 .line-wave-scroll .grid { stroke: var(--bs-border-color); stroke-width: 1; }
