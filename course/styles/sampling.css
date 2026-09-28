@@ -11,7 +11,7 @@
 .ks-axis { stroke: var(--ink); stroke-width: 1.5; }
 .ks-original { fill: none; stroke: var(--accent); stroke-width: 3; }
 .ks-apparent { fill: none; stroke: var(--focus); stroke-width: 2.5; stroke-dasharray: 8 5; }
-.ks-sample { fill: var(--ink); stroke: var(--surface); stroke-width: 2; }
+.ks-sample { stroke: var(--ink); stroke-width: 3.5; }
 .ks-center { fill: var(--accent); opacity: .55; }
 .ks-neighbor { fill: var(--focus); opacity: .38; }
 .ks-overlap { fill: #b72648; opacity: .85; }
@@ -21,7 +21,7 @@
 .ks-legend i { display: inline-block; width: 1.25rem; height: .45rem; flex: none; }
 .ks-original-key { border-top: 3px solid var(--accent); }
 .ks-apparent-key { border-top: 3px dashed var(--focus); }
-.ks-sample-key { width: .65rem !important; height: .65rem !important; border-radius: 50%; background: var(--ink); }
+.ks-sample-key { width: .65rem !important; height: .85rem !important; border-left: 3px solid var(--ink); margin-left: .25rem; }
 .ks-center-key { background: var(--accent); opacity: .65; }
 .ks-neighbor-key { background: var(--focus); opacity: .6; }
 .ks-overlap-key { background: #b72648; }
