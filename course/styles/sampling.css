@@ -1,0 +1,30 @@
+.ks-widget { margin: 1.2rem 0 1.8rem; padding: clamp(.8rem, 2vw, 1.3rem); border: 1px solid var(--line); border-radius: .6rem; background: var(--surface-alt); color: var(--ink); }
+.ks-controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-bottom: .8rem; }
+.ks-controls label { display: grid; gap: .3rem; font-weight: 650; }
+.ks-controls output { color: var(--accent); font-variant-numeric: tabular-nums; }
+.ks-controls input { width: 100%; margin: .3rem 0; accent-color: var(--accent); }
+.ks-chart { padding: .25rem; border: 1px solid var(--line); border-radius: .35rem; background: var(--surface); }
+.ks-chart svg { display: block; width: 100%; height: auto; color: var(--ink); }
+.ks-chart svg text { fill: var(--ink); font-size: 14px; }
+.ks-paper { fill: var(--surface); }
+.ks-grid { stroke: var(--line); stroke-width: 1; }
+.ks-axis { stroke: var(--ink); stroke-width: 1.5; }
+.ks-original { fill: none; stroke: var(--accent); stroke-width: 3; }
+.ks-apparent { fill: none; stroke: var(--focus); stroke-width: 2.5; stroke-dasharray: 8 5; }
+.ks-sample { fill: var(--ink); stroke: var(--surface); stroke-width: 2; }
+.ks-center { fill: var(--accent); opacity: .55; }
+.ks-neighbor { fill: var(--focus); opacity: .38; }
+.ks-overlap { fill: #b72648; opacity: .85; }
+.ks-nyquist { stroke: var(--ink); stroke-width: 2; stroke-dasharray: 6 4; }
+.ks-legend { display: flex; flex-wrap: wrap; gap: .3rem 1.2rem; margin: .65rem 0; font-size: .9rem; }
+.ks-legend span { display: inline-flex; align-items: center; gap: .4rem; }
+.ks-legend i { display: inline-block; width: 1.25rem; height: .45rem; flex: none; }
+.ks-original-key { border-top: 3px solid var(--accent); }
+.ks-apparent-key { border-top: 3px dashed var(--focus); }
+.ks-sample-key { width: .65rem !important; height: .65rem !important; border-radius: 50%; background: var(--ink); }
+.ks-center-key { background: var(--accent); opacity: .65; }
+.ks-neighbor-key { background: var(--focus); opacity: .6; }
+.ks-overlap-key { background: #b72648; }
+.ks-nyquist-key { border-top: 2px dashed var(--ink); }
+.ks-result { margin: .6rem 0 0; min-height: 2.5em; font-weight: 600; }
+@media (max-width: 40rem) { .ks-controls { grid-template-columns: 1fr; gap: .6rem; } .ks-result { min-height: 0; } }
