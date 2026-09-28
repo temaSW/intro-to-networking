@@ -2,34 +2,40 @@ import {compand, lineCodes, SEGMENTS} from './companding-line-model.js';
 
 const esc = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-function segmentChart(active, magnitude) {
-  // As in the textbook, the small segments are drawn wider than a linear axis would allow.
+function segmentChart(active, sample) {
+  // Schematic horizontal spacing follows the textbook so the small segments remain visible.
   const boundaries = [0, 16, 32, 64, 128, 256, 512, 1024, 2048];
-  const xPoints = [90, 126, 165, 211, 270, 339, 421, 531, 704];
-  const bottom = 330, y = level => bottom - 2.1 * level;
-  const xAt = value => {
+  const offsets = [0, 44, 84, 129, 180, 238, 306, 383, 450];
+  const centerX = 480, centerY = 260;
+  const side = sample < 0 ? -1 : 1, magnitude = Math.abs(sample);
+  const x = (sign, offset) => centerX + sign * offset;
+  const y = (sign, level) => centerY - sign * 1.6 * level;
+  const offsetAt = value => {
     const i = Math.max(0, Math.min(7, boundaries.findLastIndex(edge => value >= edge)));
-    return xPoints[i] + (value - boundaries[i]) / (boundaries[i + 1] - boundaries[i]) * (xPoints[i + 1] - xPoints[i]);
+    return offsets[i] + (value - boundaries[i]) / (boundaries[i + 1] - boundaries[i]) * (offsets[i + 1] - offsets[i]);
   };
   const level = active * 16 + (magnitude - SEGMENTS[active].base) / SEGMENTS[active].step;
-  const markerX = xAt(magnitude), markerY = y(level);
-  const guides = boundaries.slice(1).map((value, i) => {
-    const xx = xPoints[i + 1], yy = y((i + 1) * 16);
-    return `<path class="segment-guide" d="M 90 ${yy} H ${xx} V ${bottom}"/>`;
-  }).join('');
-  const ticks = SEGMENTS.slice(5).map((_, index) => {
-    const i = index + 5;
-    return Array.from({length: 15}, (_, j) => {
-      const xx = xPoints[i] + (j + 1) * (xPoints[i + 1] - xPoints[i]) / 16;
-      return `<line class="segment-tick" x1="${xx}" y1="${bottom}" x2="${xx}" y2="${bottom - 6}"/>`;
+  const markerX = x(side, offsetAt(magnitude)), markerY = y(side, level);
+  const branches = [-1, 1].map(sign => {
+    const guides = boundaries.slice(1).map((value, i) => {
+      const xx = x(sign, offsets[i + 1]), yy = y(sign, (i + 1) * 16);
+      return `<path class="segment-guide" d="M ${centerX} ${yy} H ${xx} V ${centerY}"/>`;
     }).join('');
+    const ticks = [5, 6, 7].map(i => Array.from({length: 15}, (_, j) => {
+      const xx = x(sign, offsets[i] + (j + 1) * (offsets[i + 1] - offsets[i]) / 16);
+      return `<line class="segment-tick" x1="${xx}" y1="${centerY - 5}" x2="${xx}" y2="${centerY + 5}"/>`;
+    }).join('')).join('');
+    const curve = offsets.map((offset, i) => `${x(sign, offset)},${y(sign, i * 16)}`).join(' ');
+    const labels = boundaries.slice(1).map((value, i) =>
+      `<text x="${x(sign, offsets[i + 1])}" y="${centerY + 24}" text-anchor="middle">${sign < 0 ? '−' : ''}${value}</text>`).join('');
+    const levels = boundaries.slice(1).map((_, i) =>
+      `<text x="${centerX + (sign < 0 ? 12 : -12)}" y="${y(sign, (i + 1) * 16) + 4}" text-anchor="${sign < 0 ? 'start' : 'end'}">${sign < 0 ? '−' : ''}${(i + 1) * 16}</text>`).join('');
+    const segments = SEGMENTS.map((_, i) =>
+      `<text class="segment-number" x="${x(sign, (offsets[i] + offsets[i + 1]) / 2)}" y="${y(sign, (i + .5) * 16) + (sign < 0 ? 16 : -8)}" text-anchor="middle">${i}</text>`).join('');
+    return `${guides}${ticks}<polyline class="segment-curve" points="${curve}"/>${labels}${levels}${segments}`;
   }).join('');
-  const curve = xPoints.map((xx, i) => `${xx},${y(i * 16)}`).join(' ');
-  const activeLine = `<line class="segment-active" x1="${xPoints[active]}" y1="${y(active * 16)}" x2="${xPoints[active + 1]}" y2="${y((active + 1) * 16)}"/>`;
-  const labels = boundaries.map((value, i) => `<text x="${xPoints[i]}" y="${bottom + 23}" text-anchor="middle">${value}</text>`).join('');
-  const levels = boundaries.map((_, i) => `<text x="72" y="${y(i * 16) + 4}" text-anchor="end">${i * 16}</text>`).join('');
-  const segments = SEGMENTS.map((_, i) => `<text x="25" y="${y((i + .5) * 16) + 4}" text-anchor="middle">${i}</text>`).join('');
-  return `<svg viewBox="0 0 760 395" role="img" aria-label="A-характеристика 87,6/13: восемь сегментов положительной полярности, каждый на 16 выходных позиций; входной шаг увеличивается к большим амплитудам"><text x="25" y="43" text-anchor="middle">N</text><text x="53" y="37">Sвых / Δ₀</text>${guides}${ticks}<line class="segment-axis" x1="90" y1="${bottom}" x2="728" y2="${bottom}"/><line class="segment-axis" x1="90" y1="${bottom}" x2="90" y2="47"/><polyline class="segment-curve" points="${curve}"/>${activeLine}<path class="sample-guide" d="M ${markerX} ${bottom} V ${markerY} H 90"/><circle class="sample-point" cx="${markerX}" cy="${markerY}" r="6"/>${labels}${levels}${segments}<text x="704" y="381" text-anchor="end">Sвх / Δ₀</text></svg>`;
+  const activeLine = `<line class="segment-active" x1="${x(side, offsets[active])}" y1="${y(side, active * 16)}" x2="${x(side, offsets[active + 1])}" y2="${y(side, (active + 1) * 16)}"/>`;
+  return `<svg viewBox="0 0 960 530" role="img" aria-label="A-характеристика 87,6/13 с положительной и отрицательной ветвями; на каждой восемь сегментов по 16 выходных позиций"><line class="segment-axis" x1="16" y1="${centerY}" x2="944" y2="${centerY}"/><line class="segment-axis" x1="${centerX}" y1="22" x2="${centerX}" y2="502"/>${branches}${activeLine}<path class="sample-guide" d="M ${markerX} ${centerY} V ${markerY} H ${centerX}"/><circle class="sample-point" cx="${markerX}" cy="${markerY}" r="6"/><text x="${centerX + 12}" y="20">Sвых / Δ₀</text><text x="944" y="${centerY - 10}" text-anchor="end">Sвх / Δ₀</text><text x="${centerX}" y="${centerY + 24}" text-anchor="middle">0</text></svg>`;
 }
 
 function waveSvg(model, rows) {
@@ -60,7 +66,7 @@ if (compRoot) {
   const render=()=>{
     const c=compand(input.value);
     output.value=`${c.value >= 0 ? '+' : '−'}${Math.abs(c.value)} Δ₀`;
-    result.innerHTML=`<div class="segment-chart">${segmentChart(c.segment, Math.abs(c.value))}</div><p><strong>${esc(c.word[0])} ${esc(c.word.slice(1,4))} ${esc(c.word.slice(4))}</strong> · сегмент ${c.segment}, U<sub>эт,${c.segment}</sub>=${c.base}Δ₀, Δ<sub>${c.segment}</sub>=${c.step}Δ₀, позиция ${c.position}.</p>`;
+    result.innerHTML=`<div class="segment-chart">${segmentChart(c.segment, c.value)}</div><p><strong>${esc(c.word[0])} ${esc(c.word.slice(1,4))} ${esc(c.word.slice(4))}</strong> · сегмент ${c.segment}, U<sub>эт,${c.segment}</sub>=${c.base}Δ₀, Δ<sub>${c.segment}</sub>=${c.step}Δ₀, позиция ${c.position}.</p>`;
   };
   input.addEventListener('input',render);render();
 }
