@@ -66,7 +66,8 @@ if (compRoot) {
   const render=()=>{
     const c=compand(input.value);
     output.value=`${c.value >= 0 ? '+' : '−'}${Math.abs(c.value)} Δ₀`;
-    result.innerHTML=`<div class="segment-chart">${segmentChart(c.segment, c.value)}</div><p><strong>${esc(c.word[0])} ${esc(c.word.slice(1,4))} ${esc(c.word.slice(4))}</strong> · сегмент ${c.segment}, U<sub>эт,${c.segment}</sub>=${c.base}Δ₀, Δ<sub>${c.segment}</sub>=${c.step}Δ₀, позиция ${c.position}.</p>`;
+    const branchBase = c.value < 0 && c.base > 0 ? `−${c.base}` : c.base;
+    result.innerHTML=`<div class="segment-chart">${segmentChart(c.segment, c.value)}</div><p><strong>${esc(c.word[0])} ${esc(c.word.slice(1,4))} ${esc(c.word.slice(4))}</strong> · сегмент ${c.segment}, U<sub>эт,${c.segment}</sub>=${branchBase}Δ₀, Δ<sub>${c.segment}</sub>=${c.step}Δ₀, позиция ${c.position}.</p>`;
   };
   input.addEventListener('input',render);render();
 }
