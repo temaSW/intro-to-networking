@@ -1,0 +1,18 @@
+.companding-line-widget { border: 1px solid var(--bs-border-color); border-radius: .6rem; padding: 1rem; margin: 1.2rem 0; background: var(--bs-body-bg); }
+.companding-line-widget label { display: flex; flex-wrap: wrap; align-items: center; gap: .65rem; font-weight: 650; }
+.companding-line-widget input { max-width: 100%; min-width: 12rem; padding: .35rem .55rem; color: var(--bs-body-color); background: var(--bs-body-bg); border: 1px solid var(--bs-border-color); border-radius: .3rem; }
+.companding-line-widget [type=text] { width: 30rem; font-family: ui-monospace, Consolas, monospace; }
+.segment-chart svg { display: block; width: 100%; max-width: 760px; margin: .7rem auto; }
+.segment-chart rect { fill: color-mix(in srgb, var(--bs-primary) 11%, transparent); stroke: var(--bs-border-color); }
+.segment-chart rect.active { fill: color-mix(in srgb, var(--bs-primary) 42%, transparent); }
+.segment-chart line { stroke: var(--bs-body-color); }
+.segment-chart text, .line-wave-scroll text { fill: var(--bs-body-color); font-size: 12px; }
+.line-wave-scroll { overflow-x: auto; margin-top: .8rem; }
+.line-wave-scroll svg { display: block; height: auto; max-width: none; }
+.line-wave-scroll .grid { stroke: var(--bs-border-color); stroke-width: 1; }
+.line-wave-scroll .zero { stroke: var(--bs-secondary-color); stroke-dasharray: 3 3; stroke-width: 1; }
+.line-wave-scroll .marker { fill: var(--bs-danger); font-weight: 700; }
+.line-legend { font-size: .9rem; }
+.lecture-route { display: grid; grid-template-columns: repeat(auto-fit,minmax(10rem,1fr)); gap: .35rem; padding: 0; list-style: none; }
+.lecture-route li { border: 1px solid var(--bs-border-color); border-radius: .3rem; padding: .4rem .6rem; }
+@media (max-width: 600px) { .companding-line-widget { padding: .7rem; } .lecture-route { grid-template-columns: 1fr 1fr; } }
