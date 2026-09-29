@@ -137,6 +137,10 @@ main .zoomable-image { cursor: zoom-in; }
 .access-figure-mimo { width: 100%; max-width: 45rem; justify-self: center; }
 .access-figure img { display: block; width: 100%; height: auto; background: #fff; }
 .access-figure figcaption, .access-caption { color: var(--muted); font-size: .9rem; margin-top: .6rem; }
+.multiplex-figures { display: grid; gap: 1.2rem; margin-block: 1.4rem; }
+.multiplex-figure { margin: 0; padding: 1rem; background: var(--surface); border: 1px solid var(--line); border-radius: .5rem; }
+.multiplex-figure img { display: block; width: 100%; height: auto; }
+.multiplex-figure figcaption { color: var(--muted); font-size: .9rem; margin-top: .6rem; }
 .bottleneck-widget .bottleneck-summary { background: var(--surface); border: 1px solid var(--line); padding: .8rem 1rem; margin: .8rem 0; font-weight: 600; }
 .bottleneck-widget .bottleneck-segments { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .7rem; }
 .bottleneck-widget .bottleneck-segment { display: grid; gap: .35rem; background: var(--surface); border: 1px solid var(--line); padding: .8rem; }
@@ -218,6 +222,8 @@ main .zoomable-image { cursor: zoom-in; }
   .access-figure { overflow-x: auto; }
   .access-figure img { min-width: 42rem; }
   .access-figure-mimo img { min-width: 32rem; }
+  .multiplex-figure { overflow-x: auto; }
+  .multiplex-figure img { min-width: 36rem; }
   .constellation-figures { grid-template-columns: 1fr; }
   .constellation-figures figure:last-child { grid-column: auto; }
   .bottleneck-widget .bottleneck-segments { grid-template-columns: 1fr; }
