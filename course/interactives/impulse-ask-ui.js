@@ -42,16 +42,23 @@ function timePlot(name, signal, bitRateKbps) {
 }
 
 function translationPlots(carrierKhz, cutoffKhz) {
-  const {baseband, translated, passed, rejected} = translatedToneSpectrum(carrierKhz, cutoffKhz);
+  const {baseband, translated, passed, rejected, timeMs, basebandTime, translatedTime, passedTime} = translatedToneSpectrum(carrierKhz, cutoffKhz);
   const points = lines => lines.map(line => [line.frequencyKhz, line.amplitude]);
+  const timePlot = (title, values) => plot(title, timeMs.map((t, i) => [t, values[i]]), {
+    xMax:.2, yMin:-2.3, yMax:2.3, xLabel:"Время, мс", yLabel:"Амплитуда",
+    ticks:[0,.05,.1,.15,.2], tickLabel:value=>value.toFixed(2).replace(".", ","),
+  });
+  const stage = (time, spectrum) => `<div class="ia-translation-card">${time}${spectrum}</div>`;
   const common = {xMax:125, yMin:0, yMax:.55, xLabel:"Частота, кГц", yLabel:"Амплитуда", ticks:[0,25,50,75,100,125], stems:true};
-  return plot("Исходный спектр", points(baseband), {
+  return stage(timePlot("Исходный сигнал во времени", basebandTime), plot("Исходный спектр", points(baseband), {
     xMax:25, yMin:0, yMax:1.1, xLabel:"Частота, кГц", yLabel:"Амплитуда", ticks:[0,5,10,15,20,25], stems:true,
-  }) + plot("После переноса на несущую", points(translated), common) +
-    plot("После фильтра низких частот", points(passed), {
+  })) + stage(timePlot("После переноса: сигнал во времени", translatedTime),
+    plot("После переноса: спектр", points(translated), common)) +
+    stage(timePlot("После фильтра: сигнал во времени", passedTime),
+    plot("После фильтра: спектр", points(passed), {
       ...common, cutoff:cutoffKhz, rejected:points(rejected),
       note:"Сплошные линии проходят через фильтр, пунктирные отсекаются.",
-    });
+    }));
 }
 
 function mount(root) {
