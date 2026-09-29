@@ -16,15 +16,11 @@ toc: false
 
 <div class="impulse-ask" data-impulse-ask="fourier" data-low="0" data-duty="0.25" data-harmonics="19"></div>
 
-## 4. Как узнать манипуляцию по времени и спектру?
-
-<div class="impulse-ask" data-impulse-ask="modulation" data-rate="10"></div>
-
-## 5. Что произойдёт при росте битовой скорости?
+## 4. Что произойдёт при росте битовой скорости?
 
 <div class="impulse-ask" data-impulse-ask="modulation" data-rate="5"></div>
 
-## 6. Как несущая переносит спектр и какие составляющие отсекает фильтр?
+## 5. Как несущая переносит спектр и какие составляющие отсекает фильтр?
 
 <div class="impulse-ask" data-impulse-ask="translation" data-carrier="70" data-cutoff="80"></div>
 
