@@ -128,3 +128,16 @@ assert(at(fsk, 82) > at(fsk, 100) * 2);
 assert(at(fsk, 118) > at(fsk, 100) * 2);
 assert(at(ask, 100) > at(psk, 100) * 5);
 """)
+
+
+def test_translation_and_filter_boundaries():
+    run_js("""
+const at70 = m.translatedToneSpectrum(70, 80);
+assert.deepEqual(at70.translated.map(line => line.frequencyKhz), [50, 58, 65, 75, 82, 90]);
+assert.deepEqual(at70.passed.map(line => line.frequencyKhz), [50, 58, 65, 75]);
+assert.deepEqual(at70.rejected.map(line => line.frequencyKhz), [82, 90]);
+assert.equal(at70.translated.find(line => line.frequencyKhz === 65).amplitude, .5);
+const at90 = m.translatedToneSpectrum(90, 80);
+assert.deepEqual(at90.passed.map(line => line.frequencyKhz), [70, 78]);
+assert.deepEqual(m.translatedToneSpectrum(70, 90).passed.map(line => line.frequencyKhz), [50, 58, 65, 75, 82, 90]);
+""")

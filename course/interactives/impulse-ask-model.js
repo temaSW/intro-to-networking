@@ -188,3 +188,23 @@ export function squareFourier(harmonics, frequencyKhz = 2) {
   const result = periodicPulseFourier(harmonics, -1, .5, frequencyKhz);
   return {...result, lines: result.lines.slice(1).filter(line => line.amplitude > 1e-10)};
 }
+
+// Multiplication by cos(2πfct) creates a pair at fc ± f for each baseband tone.
+export function translatedToneSpectrum(carrierKhz, cutoffKhz) {
+  if (!(carrierKhz >= 40 && carrierKhz <= 100 && cutoffKhz >= 40 && cutoffKhz <= 125))
+    throw new Error("Translation parameters out of range");
+  const baseband = [
+    {frequencyKhz: 5, amplitude: 1},
+    {frequencyKhz: 12, amplitude: .7},
+    {frequencyKhz: 20, amplitude: .45},
+  ];
+  const translated = baseband.flatMap(({frequencyKhz, amplitude}) => [
+    {frequencyKhz: carrierKhz - frequencyKhz, amplitude: amplitude / 2},
+    {frequencyKhz: carrierKhz + frequencyKhz, amplitude: amplitude / 2},
+  ]).sort((a, b) => a.frequencyKhz - b.frequencyKhz);
+  return {
+    baseband, translated,
+    passed: translated.filter(line => line.frequencyKhz <= cutoffKhz),
+    rejected: translated.filter(line => line.frequencyKhz > cutoffKhz),
+  };
+}
