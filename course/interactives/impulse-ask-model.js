@@ -202,9 +202,17 @@ export function translatedToneSpectrum(carrierKhz, cutoffKhz) {
     {frequencyKhz: carrierKhz - frequencyKhz, amplitude: amplitude / 2},
     {frequencyKhz: carrierKhz + frequencyKhz, amplitude: amplitude / 2},
   ]).sort((a, b) => a.frequencyKhz - b.frequencyKhz);
+  const passed = translated.filter(line => line.frequencyKhz <= cutoffKhz);
+  const timeMs = Array.from({length: 641}, (_, i) => i / SAMPLE_RATE_KHZ);
+  const synthesize = lines => timeMs.map(t => lines.reduce((sum, line) =>
+    sum + line.amplitude * Math.cos(2 * Math.PI * line.frequencyKhz * t), 0));
   return {
     baseband, translated,
-    passed: translated.filter(line => line.frequencyKhz <= cutoffKhz),
+    passed,
     rejected: translated.filter(line => line.frequencyKhz > cutoffKhz),
+    timeMs,
+    basebandTime: synthesize(baseband),
+    translatedTime: synthesize(translated),
+    passedTime: synthesize(passed),
   };
 }

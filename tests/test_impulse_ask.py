@@ -140,4 +140,12 @@ assert.equal(at70.translated.find(line => line.frequencyKhz === 65).amplitude, .
 const at90 = m.translatedToneSpectrum(90, 80);
 assert.deepEqual(at90.passed.map(line => line.frequencyKhz), [70, 78]);
 assert.deepEqual(m.translatedToneSpectrum(70, 90).passed.map(line => line.frequencyKhz), [50, 58, 65, 75, 82, 90]);
+assert.equal(at70.timeMs.length, 641);
+for (const i of [0, 71, 320, 640]) {
+  const carrier = Math.cos(2 * Math.PI * 70 * at70.timeMs[i]);
+  assert(Math.abs(at70.translatedTime[i] - at70.basebandTime[i] * carrier) < 1e-12);
+  const rejected = at70.rejected.reduce((sum, line) =>
+    sum + line.amplitude * Math.cos(2 * Math.PI * line.frequencyKhz * at70.timeMs[i]), 0);
+  assert(Math.abs(at70.translatedTime[i] - at70.passedTime[i] - rejected) < 1e-12);
+}
 """)
