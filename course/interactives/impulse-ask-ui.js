@@ -1,6 +1,6 @@
 import {SAMPLE_RATE_KHZ, averagedPowerSpectrum, practiceSignals, periodicPulseFourier, translatedToneSpectrum} from "./impulse-ask-model.js";
 
-function plot(title, points, {xMax, yMin, yMax, xLabel, yLabel, ticks, stems = false, marks = [], tickOffset = 0, tickLabel, note = "", reference = [], referenceStems = [], average = null, bitGuides = [], cutoff = null, rejected = []}) {
+function plot(title, points, {xMax, yMin, yMax, xLabel, yLabel, ticks, stems = false, marks = [], tickOffset = 0, tickLabel, note = "", reference = [], average = null, bitGuides = [], cutoff = null, rejected = []}) {
   const l = 60, r = 940, t = 26, b = 274;
   const x = value => l + value / xMax * (r-l);
   const y = value => b - (value-yMin) / (yMax-yMin) * (b-t);
@@ -9,13 +9,12 @@ function plot(title, points, {xMax, yMin, yMax, xLabel, yLabel, ticks, stems = f
   const shade = bitGuides.map((bit,i) => `<rect x="${x(i*xMax/bitGuides.length)}" y="${t}" width="${(r-l)/bitGuides.length}" height="${b-t}" class="ia-bit-shade ${bit ? "ia-bit-one" : ""}"/><text x="${x((i+.5)*xMax/bitGuides.length)}" y="19" text-anchor="middle">${bit}</text>`).join("");
   const guide = average === null ? "" : `<line x1="${l}" x2="${r}" y1="${y(average)}" y2="${y(average)}" class="ia-average"/><text x="${r-8}" y="${y(average)-7}" text-anchor="end">DC = ${average.toFixed(2).replace(".",",")}</text>`;
   const background = reference.length ? `<path d="${path(reference)}" class="ia-reference"/>` : "";
-  const comparison = referenceStems.map(([f,a]) => `<line x1="${x(f)}" x2="${x(f)}" y1="${b}" y2="${y(a)}" class="ia-reference-stem"/>`).join("");
   const stopband = cutoff === null ? "" : `<rect x="${x(cutoff)}" y="${t}" width="${r-x(cutoff)}" height="${b-t}" class="ia-stopband"/><line x1="${x(cutoff)}" x2="${x(cutoff)}" y1="${t}" y2="${b}" class="ia-cutoff"/><text x="${x(cutoff)-7}" y="47" text-anchor="end">fср = ${cutoff} кГц</text>`;
   const removed = rejected.map(([f,a]) => `<line x1="${x(f)}" x2="${x(f)}" y1="${b}" y2="${y(a)}" class="ia-rejected-stem"/>`).join("");
   const trace = stems ? points.map(([f,a]) => `<line x1="${x(f)}" x2="${x(f)}" y1="${b}" y2="${y(a)}" class="ia-stem ${f === 0 ? "ia-dc-stem" : ""}"/>`).join("")
     : `<path d="${path(points)}" class="ia-line"/>`;
   const markers = marks.map(([f,label]) => `<line x1="${x(f)}" x2="${x(f)}" y1="${t}" y2="${b}" class="ia-marker"/><text x="${x(f)+6}" y="47">${label}</text>`).join("");
-  return `<figure class="ia-figure"><figcaption>${title}</figcaption><svg viewBox="0 0 970 330" role="img" aria-label="${title}: ${xLabel}, ${yLabel}"><rect x="${l}" y="${t}" width="${r-l}" height="${b-t}" class="ia-paper"/>${shade}${grid}${stopband}<line x1="${l}" x2="${r}" y1="${b}" y2="${b}" class="ia-axis"/>${background}${comparison}${guide}${removed}${trace}${markers}<text x="500" y="326" text-anchor="middle">${xLabel}</text><text x="14" y="150" text-anchor="middle" transform="rotate(-90 14 150)">${yLabel}</text></svg>${note ? `<p class="ia-plot-note">${note}</p>` : ""}</figure>`;
+  return `<figure class="ia-figure"><figcaption>${title}</figcaption><svg viewBox="0 0 970 330" role="img" aria-label="${title}: ${xLabel}, ${yLabel}"><rect x="${l}" y="${t}" width="${r-l}" height="${b-t}" class="ia-paper"/>${shade}${grid}${stopband}<line x1="${l}" x2="${r}" y1="${b}" y2="${b}" class="ia-axis"/>${background}${guide}${removed}${trace}${markers}<text x="500" y="326" text-anchor="middle">${xLabel}</text><text x="14" y="150" text-anchor="middle" transform="rotate(-90 14 150)">${yLabel}</text></svg>${note ? `<p class="ia-plot-note">${note}</p>` : ""}</figure>`;
 }
 
 function spectrumPlot(name, estimate) {
@@ -45,10 +44,10 @@ function timePlot(name, signal, bitRateKbps) {
 function translationPlots(carrierKhz, cutoffKhz) {
   const {baseband, passed, rejected, recovered, timeMs, basebandTime, translatedTime, passedTime, recoveredTime} = translatedToneSpectrum(carrierKhz, cutoffKhz);
   const points = lines => lines.map(line => [line.frequencyKhz, line.amplitude]);
-  const timePlot = (title, values, reference = []) => plot(title, timeMs.map((t, i) => [t, values[i]]), {
+  const timePlot = (title, values, reference = [], note = "") => plot(title, timeMs.map((t, i) => [t, values[i]]), {
     xMax:.2, yMin:-2.3, yMax:2.3, xLabel:"Время, мс", yLabel:"Амплитуда",
     ticks:[0,.05,.1,.15,.2], tickLabel:value=>value.toFixed(2).replace(".", ","),
-    reference:reference.map((value, i) => [timeMs[i], value]),
+    reference:reference.map((value, i) => [timeMs[i], value]), note,
   });
   const stage = (time, spectrum) => `<div class="ia-translation-card">${time}${spectrum}</div>`;
   const common = {xMax:125, yMin:0, yMax:.55, xLabel:"Частота, кГц", yLabel:"Амплитуда", ticks:[0,25,50,75,100,125], stems:true};
@@ -58,11 +57,12 @@ function translationPlots(carrierKhz, cutoffKhz) {
     plot("На несущей после фильтра: спектр", points(passed), {
       ...common, cutoff:cutoffKhz, rejected:points(rejected),
       note:"Фильтр пропускает сплошные составляющие; пунктир показывает отсечённые.",
-    })) + stage(timePlot("После переноса на ноль и ФНЧ: сигнал во времени", recoveredTime, basebandTime),
+    })) + stage(timePlot("После переноса на ноль и ФНЧ: сигнал во времени", recoveredTime, basebandTime,
+      "Пунктир — исходный сигнал для сравнения."),
     plot("После переноса на ноль и ФНЧ: спектр", points(recovered), {
       xMax:25, yMin:0, yMax:1.1, xLabel:"Частота, кГц", yLabel:"Амплитуда",
-      ticks:[0,5,10,15,20,25], stems:true, referenceStems:points(baseband),
-      note:"Умножение на 2 cos(2πfct) и ФНЧ 25 кГц. Пунктир — исходный сигнал для сравнения.",
+      ticks:[0,5,10,15,20,25], stems:true,
+      note:"Умножение на 2 cos(2πfct) и ФНЧ 25 кГц.",
     }));
 }
 
