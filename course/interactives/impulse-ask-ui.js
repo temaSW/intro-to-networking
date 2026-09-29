@@ -1,6 +1,6 @@
-import {SAMPLE_RATE_KHZ, averagedPowerSpectrum, practiceSignals, periodicPulseFourier} from "./impulse-ask-model.js";
+import {SAMPLE_RATE_KHZ, averagedPowerSpectrum, practiceSignals, periodicPulseFourier, translatedToneSpectrum} from "./impulse-ask-model.js";
 
-function plot(title, points, {xMax, yMin, yMax, xLabel, yLabel, ticks, stems = false, marks = [], tickOffset = 0, tickLabel, note = "", reference = [], average = null, bitGuides = []}) {
+function plot(title, points, {xMax, yMin, yMax, xLabel, yLabel, ticks, stems = false, marks = [], tickOffset = 0, tickLabel, note = "", reference = [], average = null, bitGuides = [], cutoff = null, rejected = []}) {
   const l = 60, r = 940, t = 26, b = 274;
   const x = value => l + value / xMax * (r-l);
   const y = value => b - (value-yMin) / (yMax-yMin) * (b-t);
@@ -9,10 +9,12 @@ function plot(title, points, {xMax, yMin, yMax, xLabel, yLabel, ticks, stems = f
   const shade = bitGuides.map((bit,i) => `<rect x="${x(i*xMax/bitGuides.length)}" y="${t}" width="${(r-l)/bitGuides.length}" height="${b-t}" class="ia-bit-shade ${bit ? "ia-bit-one" : ""}"/><text x="${x((i+.5)*xMax/bitGuides.length)}" y="19" text-anchor="middle">${bit}</text>`).join("");
   const guide = average === null ? "" : `<line x1="${l}" x2="${r}" y1="${y(average)}" y2="${y(average)}" class="ia-average"/><text x="${r-8}" y="${y(average)-7}" text-anchor="end">DC = ${average.toFixed(2).replace(".",",")}</text>`;
   const background = reference.length ? `<path d="${path(reference)}" class="ia-reference"/>` : "";
+  const stopband = cutoff === null ? "" : `<rect x="${x(cutoff)}" y="${t}" width="${r-x(cutoff)}" height="${b-t}" class="ia-stopband"/><line x1="${x(cutoff)}" x2="${x(cutoff)}" y1="${t}" y2="${b}" class="ia-cutoff"/><text x="${x(cutoff)-7}" y="47" text-anchor="end">fср = ${cutoff} кГц</text>`;
+  const removed = rejected.map(([f,a]) => `<line x1="${x(f)}" x2="${x(f)}" y1="${b}" y2="${y(a)}" class="ia-rejected-stem"/>`).join("");
   const trace = stems ? points.map(([f,a]) => `<line x1="${x(f)}" x2="${x(f)}" y1="${b}" y2="${y(a)}" class="ia-stem ${f === 0 ? "ia-dc-stem" : ""}"/>`).join("")
     : `<path d="${path(points)}" class="ia-line"/>`;
   const markers = marks.map(([f,label]) => `<line x1="${x(f)}" x2="${x(f)}" y1="${t}" y2="${b}" class="ia-marker"/><text x="${x(f)+6}" y="47">${label}</text>`).join("");
-  return `<figure class="ia-figure"><figcaption>${title}</figcaption><svg viewBox="0 0 970 330" role="img" aria-label="${title}: ${xLabel}, ${yLabel}"><rect x="${l}" y="${t}" width="${r-l}" height="${b-t}" class="ia-paper"/>${shade}${grid}<line x1="${l}" x2="${r}" y1="${b}" y2="${b}" class="ia-axis"/>${background}${guide}${trace}${markers}<text x="500" y="326" text-anchor="middle">${xLabel}</text><text x="14" y="150" text-anchor="middle" transform="rotate(-90 14 150)">${yLabel}</text></svg>${note ? `<p class="ia-plot-note">${note}</p>` : ""}</figure>`;
+  return `<figure class="ia-figure"><figcaption>${title}</figcaption><svg viewBox="0 0 970 330" role="img" aria-label="${title}: ${xLabel}, ${yLabel}"><rect x="${l}" y="${t}" width="${r-l}" height="${b-t}" class="ia-paper"/>${shade}${grid}${stopband}<line x1="${l}" x2="${r}" y1="${b}" y2="${b}" class="ia-axis"/>${background}${guide}${removed}${trace}${markers}<text x="500" y="326" text-anchor="middle">${xLabel}</text><text x="14" y="150" text-anchor="middle" transform="rotate(-90 14 150)">${yLabel}</text></svg>${note ? `<p class="ia-plot-note">${note}</p>` : ""}</figure>`;
 }
 
 function spectrumPlot(name, estimate) {
@@ -39,12 +41,27 @@ function timePlot(name, signal, bitRateKbps) {
   });
 }
 
+function translationPlots(carrierKhz, cutoffKhz) {
+  const {baseband, translated, passed, rejected} = translatedToneSpectrum(carrierKhz, cutoffKhz);
+  const points = lines => lines.map(line => [line.frequencyKhz, line.amplitude]);
+  const common = {xMax:125, yMin:0, yMax:.55, xLabel:"Частота, кГц", yLabel:"Амплитуда", ticks:[0,25,50,75,100,125], stems:true};
+  return plot("Исходный спектр", points(baseband), {
+    xMax:25, yMin:0, yMax:1.1, xLabel:"Частота, кГц", yLabel:"Амплитуда", ticks:[0,5,10,15,20,25], stems:true,
+  }) + plot("После переноса на несущую", points(translated), common) +
+    plot("После фильтра низких частот", points(passed), {
+      ...common, cutoff:cutoffKhz, rejected:points(rejected),
+      note:"Сплошные линии проходят через фильтр, пунктирные отсекаются.",
+    });
+}
+
 function mount(root) {
   root.innerHTML = `<section class="ia-section"><div class="ia-controls"><label>Нижний уровень L <select name="low"><option value="-1">−1</option><option value="0">0</option></select></label><label>Доля высокого уровня D <select name="duty"><option value="0.25">25%</option><option value="0.5">50%</option><option value="0.75">75%</option></select></label><label>Гармоники до N <select name="harmonics"><option value="1">1</option><option value="3">3</option><option value="5">5</option><option value="9">9</option><option value="19">19</option></select></label></div><div class="ia-fourier-plots"></div></section>
-  <section class="ia-section"><div class="ia-controls"><label>Битовая скорость <input name="bitRate" type="range" min="5" max="25" step="5" value="10"><output data-rate>10 кбит/с</output></label></div><div class="ia-spectrum-plots"></div></section>`;
-  if (root.dataset.impulseAsk === "fourier") root.querySelectorAll(".ia-section")[1].remove();
-  if (root.dataset.impulseAsk === "modulation") root.querySelectorAll(".ia-section")[0].remove();
-  for (const name of ["low", "duty", "harmonics", "bitRate"]) {
+  <section class="ia-section"><div class="ia-controls"><label>Битовая скорость <input name="bitRate" type="range" min="5" max="25" step="5" value="10"><output data-rate>10 кбит/с</output></label></div><div class="ia-spectrum-plots"></div></section>
+  <section class="ia-section"><div class="ia-controls"><label>Частота несущей <input name="carrier" type="range" min="40" max="100" step="5" value="70"><output data-carrier></output></label><label>Граница фильтра низких частот <input name="cutoff" type="range" min="40" max="125" step="5" value="80"><output data-cutoff></output></label></div><div class="ia-translation-plots"></div></section>`;
+  const sections = root.querySelectorAll(".ia-section");
+  const visible = {fourier:0, modulation:1, translation:2}[root.dataset.impulseAsk];
+  sections.forEach((section, index) => { if (index !== visible) section.remove(); });
+  for (const name of ["low", "duty", "harmonics", "bitRate", "carrier", "cutoff"]) {
     const input = root.querySelector(`[name="${name}"]`);
     if (input && root.dataset[name] !== undefined) input.value = root.dataset[name];
   }
@@ -72,11 +89,22 @@ function mount(root) {
     root.querySelector(".ia-spectrum-plots").innerHTML = spectra.map(([name,estimate])=>
       `<div class="ia-modulation-card">${timePlot(name,signals[name],rate)}${spectrumPlot(name,estimate)}</div>`).join("");
   }
+  function drawTranslation() {
+    const carrier = Number(root.querySelector('[name="carrier"]').value);
+    const cutoff = Number(root.querySelector('[name="cutoff"]').value);
+    root.querySelector("[data-carrier]").textContent = `${carrier} кГц`;
+    root.querySelector("[data-cutoff]").textContent = `${cutoff} кГц`;
+    root.querySelector(".ia-translation-plots").innerHTML = translationPlots(carrier, cutoff);
+  }
   root.addEventListener("change", event => {
     if (["harmonics","low","duty"].includes(event.target.name)) drawFourier();
   });
-  root.addEventListener("input", event => { if (event.target.name === "bitRate") drawSpectra(); });
+  root.addEventListener("input", event => {
+    if (event.target.name === "bitRate") drawSpectra();
+    if (["carrier", "cutoff"].includes(event.target.name)) drawTranslation();
+  });
   if (root.querySelector(".ia-fourier-plots")) drawFourier();
   if (root.querySelector(".ia-spectrum-plots")) drawSpectra();
+  if (root.querySelector(".ia-translation-plots")) drawTranslation();
 }
 for (const root of document.querySelectorAll("[data-impulse-ask]")) mount(root);
