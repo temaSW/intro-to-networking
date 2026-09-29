@@ -164,6 +164,15 @@ main .zoomable-image { cursor: zoom-in; }
 
 /* Spectrum practice uses the same surfaces and colors as lecture interactives. */
 .impulse-ask { margin: 1.3rem 0 2rem; color: var(--ink); }
+.ia-variant, .ia-task-step { margin: .8rem 0; padding: .8rem 1rem; border: 1px solid var(--line); border-radius: .45rem; background: var(--surface-alt); }
+.ia-variant label { display: flex; align-items: center; gap: .7rem; font-weight: 700; }
+.ia-variant select, .ia-controls select { min-height: 2.6rem; padding: .25rem .5rem; border: 1px solid var(--line); border-radius: .3rem; font-size: 1rem; }
+.ia-variant-values { display: grid; grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr)); gap: .55rem; margin-top: .8rem; }
+.ia-variant-values > div { display: grid; gap: .1rem; padding: .55rem .7rem; background: var(--surface); border: 1px solid var(--line); border-radius: .3rem; }
+.ia-variant-values span { color: var(--muted); }
+.ia-variant-values strong { font-size: 1.1rem; }
+.ia-task-step p { margin: 0; }
+.ia-task-step strong { color: var(--accent); }
 .ia-formula { max-width: 100%; overflow-x: auto; }
 .ia-section { margin: 1.3rem 0; padding: clamp(.85rem, 2vw, 1.4rem); background: var(--surface-alt); border: 1px solid var(--line); border-radius: .6rem; }
 .ia-heading { display: flex; align-items: start; gap: .9rem; }
@@ -175,6 +184,15 @@ main .zoomable-image { cursor: zoom-in; }
 .ia-controls select, .ia-controls input { color: var(--ink); background: var(--surface); accent-color: var(--accent); }
 .ia-controls input[type="range"] { width: min(18rem, 65vw); }
 .ia-controls output { min-width: 5.5rem; color: var(--muted); }
+.ia-check { min-height: 2.8rem; padding: .55rem 1rem; border: 1px solid var(--accent); border-radius: .35rem; background: var(--accent); color: white; font-weight: 700; cursor: pointer; }
+.ia-check:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.ia-result { display: grid; gap: .75rem; margin-top: 1rem; }
+.ia-result[hidden] { display: none; }
+.ia-readout { margin: 0; font-weight: 700; }
+.ia-line-table-wrap { max-width: 100%; overflow-x: auto; }
+.ia-line-table { width: 100%; border-collapse: collapse; background: var(--surface); }
+.ia-line-table caption { text-align: left; font-weight: 700; padding: .6rem 0; }
+.ia-line-table th, .ia-line-table td { padding: .45rem .65rem; border: 1px solid var(--line); text-align: left; }
 .ia-fourier-plots, .ia-spectrum-plots, .ia-translation-plots { display: grid; grid-template-columns: 1fr; gap: .75rem; }
 .ia-modulation-card { display: grid; gap: .7rem; padding: .75rem; border: 1px solid var(--line); border-radius: .45rem; background: var(--surface); }
 .ia-translation-card { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; min-width: 0; }
@@ -195,6 +213,7 @@ main .zoomable-image { cursor: zoom-in; }
 .ia-stem { stroke: var(--accent); stroke-width: 3; vector-effect: non-scaling-stroke; }
 .ia-stem.ia-dc-stem { stroke: var(--focus); stroke-width: 5; }
 .ia-stopband { fill: var(--line); opacity: .35; }
+.ia-outside-band { fill: var(--line); opacity: .45; }
 .ia-cutoff { stroke: var(--focus); stroke-width: 2; stroke-dasharray: 6 5; }
 .ia-rejected-stem { stroke: var(--muted); stroke-width: 3; stroke-dasharray: 5 4; vector-effect: non-scaling-stroke; }
 .ia-marker { stroke: var(--focus); stroke-width: 1.5; stroke-dasharray: 6 5; }

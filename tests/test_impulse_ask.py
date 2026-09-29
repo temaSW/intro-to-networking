@@ -157,3 +157,61 @@ for (const i of [0, 71, 320, 640]) {
   assert(Math.abs(allPassed.recoveredTime[i] - allPassed.basebandTime[i]) < 1e-12);
 }
 """)
+
+
+def test_practice_variants_cover_translation_outcomes():
+    run_js("""
+const variants = m.PRACTICE_VARIANTS;
+assert.equal(variants.length, 8);
+assert.deepEqual(variants.map(({low,duty,rate1,rate2,channelBand,carrier,cutoff}) =>
+  [low,duty,rate1,rate2,channelBand,carrier,cutoff]), [
+  [-1,.5,5,15,12,55,75], [0,.25,10,20,16,70,70],
+  [-1,.25,5,20,15,80,85], [0,.75,10,25,22,65,80],
+  [-1,.75,15,25,18,90,80], [0,.5,5,25,20,75,60],
+  [-1,.5,10,15,13,100,95], [0,.25,5,10,8,45,65],
+]);
+const expected = [
+  {lines:[35,43,50,60,67,75], passed:[35,43,50,60,67,75], recovered:[1,.7,.45]},
+  {lines:[50,58,65,75,82,90], passed:[50,58,65], recovered:[.5,.35,.225]},
+  {lines:[60,68,75,85,92,100], passed:[60,68,75,85], recovered:[1,.35,.225]},
+  {lines:[45,53,60,70,77,85], passed:[45,53,60,70,77], recovered:[1,.7,.225]},
+  {lines:[70,78,85,95,102,110], passed:[70,78], recovered:[0,.35,.225]},
+  {lines:[55,63,70,80,87,95], passed:[55], recovered:[0,0,.225]},
+  {lines:[80,88,95,105,112,120], passed:[80,88,95], recovered:[.5,.35,.225]},
+  {lines:[25,33,40,50,57,65], passed:[25,33,40,50,57,65], recovered:[1,.7,.45]},
+];
+const signatures = new Set();
+const types = new Set();
+variants.forEach((v, i) => {
+  assert([-1,0].includes(v.low));
+  assert([.25,.5,.75].includes(v.duty));
+  assert(Number.isInteger(v.rate1) && Number.isInteger(v.rate2));
+  assert(v.rate1 >= 5 && v.rate1 < v.rate2 && v.rate2 <= 25);
+  assert(v.channelBand > 0 && v.channelBand <= 25);
+  assert(v.carrier >= 40 && v.carrier <= 100 && v.carrier % 5 === 0);
+  assert(v.cutoff >= 40 && v.cutoff <= 125 && v.cutoff % 5 === 0);
+  assert(m.validateSampling(v.carrier, v.rate2));
+  const result = m.translatedToneSpectrum(v.carrier, v.cutoff);
+  assert.deepEqual(result.translated.map(x => x.frequencyKhz), expected[i].lines);
+  assert.deepEqual(result.passed.map(x => x.frequencyKhz), expected[i].passed);
+  assert.deepEqual(result.rejected.map(x => x.frequencyKhz),
+    expected[i].lines.filter(f => !expected[i].passed.includes(f)));
+  assert.deepEqual(result.recovered.map(x => x.amplitude), expected[i].recovered);
+  for (const tone of result.baseband) {
+    const pair = result.translated.filter(x => Math.abs(x.frequencyKhz - v.carrier) === tone.frequencyKhz);
+    assert.deepEqual(pair.map(x => x.frequencyKhz).sort((a,b) => a-b),
+      [v.carrier - tone.frequencyKhz, v.carrier + tone.frequencyKhz]);
+    assert(pair.every(x => x.amplitude === tone.amplitude / 2));
+  }
+  signatures.add(JSON.stringify(v));
+  const ratios = result.recovered.map((x, j) => x.amplitude / result.baseband[j].amplitude);
+  if (ratios.every(x => x === 1)) types.add('full');
+  if (ratios.every(x => x === .5)) types.add('uniform-scale');
+  if (new Set(ratios).size > 1) types.add('distorted');
+  if (ratios.includes(0)) types.add('lost-tone');
+  if (result.baseband.some(t => result.passed.filter(x => Math.abs(x.frequencyKhz-v.carrier) === t.frequencyKhz).length === 1)) types.add('single-sideband');
+  if (result.baseband.some(t => result.passed.filter(x => Math.abs(x.frequencyKhz-v.carrier) === t.frequencyKhz).length === 2)) types.add('both-sidebands');
+});
+assert.equal(signatures.size, 8);
+assert.deepEqual([...types].sort(), ['both-sidebands','distorted','full','lost-tone','single-sideband','uniform-scale']);
+""")

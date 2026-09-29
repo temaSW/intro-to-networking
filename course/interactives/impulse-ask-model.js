@@ -189,6 +189,19 @@ export function squareFourier(harmonics, frequencyKhz = 2) {
   return {...result, lines: result.lines.slice(1).filter(line => line.amplitude > 1e-10)};
 }
 
+// Task data only: selecting a variant never changes the experiment controls.
+// Cutoffs cover full, uniform half, unequal, and missing-tone recovery.
+export const PRACTICE_VARIANTS = Object.freeze([
+  {low: -1, duty: .5, rate1: 5, rate2: 15, channelBand: 12, carrier: 55, cutoff: 75},
+  {low: 0, duty: .25, rate1: 10, rate2: 20, channelBand: 16, carrier: 70, cutoff: 70},
+  {low: -1, duty: .25, rate1: 5, rate2: 20, channelBand: 15, carrier: 80, cutoff: 85},
+  {low: 0, duty: .75, rate1: 10, rate2: 25, channelBand: 22, carrier: 65, cutoff: 80},
+  {low: -1, duty: .75, rate1: 15, rate2: 25, channelBand: 18, carrier: 90, cutoff: 80},
+  {low: 0, duty: .5, rate1: 5, rate2: 25, channelBand: 20, carrier: 75, cutoff: 60},
+  {low: -1, duty: .5, rate1: 10, rate2: 15, channelBand: 13, carrier: 100, cutoff: 95},
+  {low: 0, duty: .25, rate1: 5, rate2: 10, channelBand: 8, carrier: 45, cutoff: 65},
+].map(variant => Object.freeze(variant)));
+
 // Multiplication by cos(2πfct) creates a pair at fc ± f for each baseband tone.
 export function translatedToneSpectrum(carrierKhz, cutoffKhz) {
   if (!(carrierKhz >= 40 && carrierKhz <= 100 && cutoffKhz >= 40 && cutoffKhz <= 125))
