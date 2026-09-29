@@ -137,9 +137,13 @@ assert.deepEqual(at70.translated.map(line => line.frequencyKhz), [50, 58, 65, 75
 assert.deepEqual(at70.passed.map(line => line.frequencyKhz), [50, 58, 65, 75]);
 assert.deepEqual(at70.rejected.map(line => line.frequencyKhz), [82, 90]);
 assert.equal(at70.translated.find(line => line.frequencyKhz === 65).amplitude, .5);
+assert.deepEqual(at70.recovered.map(line => line.amplitude), [1, .35, .225]);
 const at90 = m.translatedToneSpectrum(90, 80);
 assert.deepEqual(at90.passed.map(line => line.frequencyKhz), [70, 78]);
-assert.deepEqual(m.translatedToneSpectrum(70, 90).passed.map(line => line.frequencyKhz), [50, 58, 65, 75, 82, 90]);
+assert.deepEqual(at90.recovered.map(line => line.amplitude), [0, .35, .225]);
+const allPassed = m.translatedToneSpectrum(70, 90);
+assert.deepEqual(allPassed.passed.map(line => line.frequencyKhz), [50, 58, 65, 75, 82, 90]);
+assert.deepEqual(allPassed.recovered.map(line => line.amplitude), [1, .7, .45]);
 assert.equal(at70.timeMs.length, 641);
 for (const i of [0, 71, 320, 640]) {
   const carrier = Math.cos(2 * Math.PI * 70 * at70.timeMs[i]);
@@ -147,5 +151,9 @@ for (const i of [0, 71, 320, 640]) {
   const rejected = at70.rejected.reduce((sum, line) =>
     sum + line.amplitude * Math.cos(2 * Math.PI * line.frequencyKhz * at70.timeMs[i]), 0);
   assert(Math.abs(at70.translatedTime[i] - at70.passedTime[i] - rejected) < 1e-12);
+  const high = at70.passed.reduce((sum, line) => sum +
+    line.amplitude * Math.cos(2 * Math.PI * (line.frequencyKhz + 70) * at70.timeMs[i]), 0);
+  assert(Math.abs(2 * at70.passedTime[i] * carrier - at70.recoveredTime[i] - high) < 1e-12);
+  assert(Math.abs(allPassed.recoveredTime[i] - allPassed.basebandTime[i]) < 1e-12);
 }
 """)

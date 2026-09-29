@@ -203,6 +203,13 @@ export function translatedToneSpectrum(carrierKhz, cutoffKhz) {
     {frequencyKhz: carrierKhz + frequencyKhz, amplitude: amplitude / 2},
   ]).sort((a, b) => a.frequencyKhz - b.frequencyKhz);
   const passed = translated.filter(line => line.frequencyKhz <= cutoffKhz);
+  // Coherent mixing with 2cos(2πfct) moves each surviving sideband to |f-fc|.
+  // A 25 kHz receiver low-pass removes the simultaneous components near 2fc.
+  const recovered = baseband.map(tone => ({
+    frequencyKhz: tone.frequencyKhz,
+    amplitude: passed.filter(line => Math.abs(line.frequencyKhz - carrierKhz) === tone.frequencyKhz)
+      .reduce((sum, line) => sum + line.amplitude, 0),
+  }));
   const timeMs = Array.from({length: 641}, (_, i) => i / SAMPLE_RATE_KHZ);
   const synthesize = lines => timeMs.map(t => lines.reduce((sum, line) =>
     sum + line.amplitude * Math.cos(2 * Math.PI * line.frequencyKhz * t), 0));
@@ -210,9 +217,11 @@ export function translatedToneSpectrum(carrierKhz, cutoffKhz) {
     baseband, translated,
     passed,
     rejected: translated.filter(line => line.frequencyKhz > cutoffKhz),
+    recovered,
     timeMs,
     basebandTime: synthesize(baseband),
     translatedTime: synthesize(translated),
     passedTime: synthesize(passed),
+    recoveredTime: synthesize(recovered),
   };
 }
