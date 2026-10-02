@@ -3,6 +3,8 @@ project:
   output-dir: _site
   resources:
     - interactives/*.js
+    - interactives/audio-channel-coding/**
+    - assets/audio-channel-coding/**
     - styles/companding-line.css
     - styles/scrambler.css
 
