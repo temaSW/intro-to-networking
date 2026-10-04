@@ -2,10 +2,6 @@
 title: "Лекция 00. Введение"
 subtitle: "Путь данных и участники создания сети"
 description: "Вопросы к сквозному пути файла через мобильную сеть."
-format:
-  html:
-    filters: [../_extensions/closeread/closeread.lua]
-    css: [../_extensions/closeread/closeread.css]
 ---
 
 Смартфон отправляет файл на удалённый сервер через мобильную сеть.
@@ -21,45 +17,35 @@ flowchart LR
 
 Схема раскрывается после обсуждения. Границы функций не обязательно совпадают с границами устройств.
 
-::::{.cr-section .course-closeread .path-closeread layout="overlay-center"}
 
-:::{.route-step focus-on="cr-data-path" data-stage="question"}
 #### От смартфона к серверу
 
 Какие функции скрыты между ними?
-:::
 
-:::{.route-step focus-on="cr-data-path" data-stage="access"}
+На первом участке передаётся файл, пакет, последовательность битов или физический сигнал?
+
 #### Участок доступа
 
 Где биты становятся радиосигналом?
-:::
 
-:::{.route-step focus-on="cr-data-path" data-stage="access-node"}
 #### Узел доступа
 
 Что он принимает и куда передаёт?
-:::
 
-:::{.route-step focus-on="cr-data-path" data-stage="transport"}
 #### Общий путь
 
 Где объединяются потоки абонентов?
-:::
 
-:::{.route-step focus-on="cr-data-path" data-stage="destination"}
 #### Сеть назначения
 
 Как данные находят сервер?
-:::
 
-:::{.route-step focus-on="cr-data-path" data-stage="all"}
 #### Вся цепь
 
 Где меняется представление данных, а где — маршрут?
-:::
 
-:::{#cr-data-path}
+Если вместо мобильного доступа использовать Wi‑Fi, какие части пути сохранятся?
+
 <div class="path-scene" data-route-map data-stage="question" aria-label="Путь данных от смартфона до сервера">
   <div class="scene-overline">Отправка файла <span>01 — 06</span></div>
   <ol class="path-scene-nodes">
@@ -73,11 +59,7 @@ flowchart LR
   <div class="path-scene-track" aria-hidden="true"><span></span></div>
   <div class="scene-step-indicator" aria-hidden="true"><span data-scene-step>00</span> / 05</div>
 </div>
-:::
 
-::::
-
-<script src="../interactives/closeread-scenes.js?v=20261005-1" defer></script>
 
 ## Что передаётся?
 
@@ -92,6 +74,9 @@ flowchart LR
 
 ## Если пользователей много
 
+
+#### Сколько ресурса нужно?
+
 Сто смартфонов одновременно отправляют файлы через общий участок.
 
 > Что именно нужно разделить между ними: время, частоту, пространство, ёмкость выходного канала? Чем мультиплексирование потоков отличается от множественного доступа пользователей?
@@ -104,9 +89,17 @@ flowchart LR
 
 Сначала укажите предполагаемый ограничивающий участок. Затем измените число пользователей и ёмкость сегментов модели.
 
-<div class="lecture-interactive" data-bottleneck-interactive></div>
+#### Где возникнет узкое место?
 
 [Открыть модель отдельно](00-bottleneck.qmd). Модель описывает общие сегменты в целом, без алгоритмов распределения радиоресурса.
+
+<div class="interactive-scene">
+<div class="scene-overline">Общий ресурс</div>
+<div class="scene-model">
+<div class="lecture-interactive" data-bottleneck-interactive></div>
+</div>
+</div>
+
 
 ## Кто создаёт работающую сеть?
 

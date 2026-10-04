@@ -3,9 +3,7 @@ title: "Лекция 03. Компандирование и линейные ко
 subtitle: "От аналогового отсчёта до сигнала основной полосы"
 format:
   html:
-    filters: [../_extensions/closeread/closeread.lua]
     css:
-      - ../_extensions/closeread/closeread.css
       - ../styles/companding-line.css?v=20261005-1
       - ../styles/scrambler.css?v=20260929-2
 ---
@@ -14,51 +12,41 @@ format:
 
 > Где в этой цепочке выбирают моменты измерения, где заменяют амплитуду уровнем, а где появляются биты? Какую задачу решает импульсно-кодовая модуляция (ИКМ)?
 
-::::{.cr-section .course-closeread .process-closeread layout="overlay-center"}
 
-:::{.process-step focus-on="cr-pcm-path" data-stage="question"}
 #### От сигнала к битам
 
 Где в цепочке появляются биты?
-:::
 
-:::{.process-step focus-on="cr-pcm-path" data-stage="sample"}
 #### Отсчёт
 
 Когда измеряем амплитуду?
-:::
 
-:::{.process-step focus-on="cr-pcm-path" data-stage="compress"}
 #### Компрессор
 
 Зачем меняют шкалу до квантования?
-:::
 
-:::{.process-step focus-on="cr-pcm-path" data-stage="quantize"}
+**Компандирование:** сжатие шкалы перед квантованием и обратное расширение при восстановлении.
+
 #### Квантователь
 
 Что происходит между соседними уровнями?
-:::
 
-:::{.process-step focus-on="cr-pcm-path" data-stage="code"}
+При **равномерном квантовании** шаг амплитуды $\Delta$ постоянен. При **неравномерном** шаг зависит от амплитуды.
+
 #### Кодовое слово
 
 Как выбранный уровень становится битами?
-:::
 
-:::{.process-step focus-on="cr-pcm-path" data-stage="line"}
 #### Линия
 
 Как передать эти биты физическим сигналом?
-:::
 
-:::{.process-step focus-on="cr-pcm-path" data-stage="all"}
+**Линейное кодирование** задаёт уровни и переходы сигнала в линии.
+
 #### Вся цепь
 
 На каком шаге возникает необратимая ошибка?
-:::
 
-:::{#cr-pcm-path}
 <div class="path-scene" data-pcm-scene data-stage="question" aria-label="От аналогового сигнала через отсчёт, компрессор, квантователь и кодовое слово к сигналу в линии">
   <div class="scene-overline">Преобразование сигнала <span>01 — 06</span></div>
   <ol class="path-scene-nodes">
@@ -72,13 +60,12 @@ format:
   <div class="path-scene-track" aria-hidden="true"><span></span></div>
   <div class="scene-step-indicator" aria-hidden="true"><span data-scene-step>00</span> / 06</div>
 </div>
-:::
 
-::::
-
-<script src="../interactives/closeread-scenes.js?v=20261005-1" defer></script>
 
 ## Слабый и сильный отсчёты
+
+
+#### Слабый и сильный отсчёты
 
 При **равномерном квантовании** шаг амплитуды $\Delta$ постоянен. Отсчёты: $2\Delta$ и $20\Delta$; абсолютная ошибка в обоих случаях: $0{,}5\Delta$.
 
@@ -88,13 +75,13 @@ format:
 
 > Как перераспределение уровней изменит ошибки слабого и сильного отсчётов?
 
-### Пример: А-характеристика ИКМ
+#### А-характеристика ИКМ
 
 Сравните две восьмибитные шкалы на диапазоне от −2048 до +2048 $\Delta_0$, где $\Delta_0$ — минимальный шаг модели. Отсчёты: **+10** и **+1530** $\Delta_0$.
 
 > Предскажите, у какого отсчёта уменьшится ошибка при переходе к А-характеристике. Проверьте на модели.
 
-<div class="companding-line-widget" data-companding-widget></div>
+#### Проверяем результат
 
 <details><summary>Параметры сегментной модели</summary>
 
@@ -119,7 +106,18 @@ format:
 
 > Как при неизменной длине кодового слова получить разные шаги квантования? Что изменится при переходе от малого отсчёта к большому?
 
+<div class="interactive-scene">
+<div class="scene-overline">Квантование отсчёта</div>
+<div class="scene-model">
+<div class="companding-line-widget" data-companding-widget></div>
+</div>
+</div>
+
+
 ## Как передать полученные биты?
+
+
+#### Как приёмник найдёт границы битов?
 
 Кодирование отсчёта задаёт его цифровое значение. **Линейное кодирование** задаёт уровни и переходы физического сигнала в линии.
 
@@ -127,11 +125,22 @@ format:
 
 > Как приёмник определит границы битов? Что произойдёт при длинной серии одинаковых битов? Нужна ли линии передача постоянной составляющей?
 
-<div class="companding-line-widget" data-line-widget></div>
+#### Измените последовательность
 
 Временную диаграмму можно менять. Спектры ниже рассчитаны для исходного блока.
 
+<div class="interactive-scene">
+<div class="scene-overline">Биты → сигнал в линии</div>
+<div class="scene-model">
+<div class="companding-line-widget" data-line-widget></div>
+</div>
+</div>
+
+
 ### Длительность импульса
+
+
+#### NRZ и RZ
 
 **NRZ** (*non-return-to-zero*, без возврата к нулю): уровень единицы занимает весь битовый интервал. **RZ** (*return-to-zero*, с возвратом к нулю): импульс единицы возвращается к нулю в середине интервала.
 
@@ -145,11 +154,22 @@ format:
 
 </details>
 
-<div data-line-spectrum="nrz,rz"></div>
+#### Проверяем гипотезу
 
 > Сравните гармоники около $f=R_b$ и линию DC. Какие особенности временных диаграмм с ними связаны?
 
+<div class="interactive-scene">
+<div class="scene-overline">NRZ и RZ</div>
+<div class="scene-model">
+<div data-line-spectrum="nrz,rz"></div>
+</div>
+</div>
+
+
 ### Знак импульса
+
+
+#### Чередование полярности
 
 **ЧПИ** — чередование полярности импульсов (англ. *alternate mark inversion*, AMI): очередные единицы имеют попеременно положительный и отрицательный знак, нули остаются нулями.
 
@@ -157,11 +177,22 @@ format:
 
 Сравните ЧПИ NRZ и ЧПИ RZ при тех же входных битах. Чередование знаков продолжается на границе повторяемых блоков.
 
-<div data-line-spectrum="amiNrz,amiRz"></div>
+#### Проверяем гипотезу
 
 > Что произошло с линией DC? Есть ли переходы во время девяти нулей?
 
+<div class="interactive-scene">
+<div class="scene-overline">Чередование полярности</div>
+<div class="scene-model">
+<div data-line-spectrum="amiNrz,amiRz"></div>
+</div>
+</div>
+
+
 ### Длинная серия нулей
+
+
+#### HDB-3 и Manchester
 
 **HDB-3** (*high-density bipolar of order 3*, биполярный код высокой плотности) заменяет каждую группу из четырёх нулей шаблоном `000V` или `B00V`. Импульс `V` (*violation*) нарушает чередование знаков ЧПИ; `B` (*balancing*) служит балансировке.
 
@@ -187,11 +218,22 @@ format:
 
 Сравните HDB-3 и манчестерский код на том же повторяемом блоке:
 
-<div data-line-spectrum="hdb,manchester"></div>
+#### Проверяем гипотезу
 
 > Где находятся наиболее заметные гармоники? Какой вывод можно перенести на непериодический поток, а какой требует проверки?
 
+<div class="interactive-scene">
+<div class="scene-overline">HDB-3 и Manchester</div>
+<div class="scene-model">
+<div data-line-spectrum="hdb,manchester"></div>
+</div>
+</div>
+
+
 ## От линейных кодов к скремблированию
+
+
+#### Скремблирование
 
 Линейные коды меняют форму сигнала. Что можно сделать с битовой последовательностью *до* её отображения в сигнал?
 
@@ -201,9 +243,17 @@ format:
 
 > Сравните число переходов и длину максимальной серии на входе и выходе. Как приёмник восстановит входные биты?
 
-<div class="scrambler-widget" data-scrambler-widget></div>
+#### Проверяем гипотезу
 
 > Выберите «Вход = маска». Можно ли обещать переходы для *любой* входной последовательности? Сравните это свойство со вставками HDB-3.
+
+<div class="interactive-scene">
+<div class="scene-overline">Скремблирование</div>
+<div class="scene-model">
+<div class="scrambler-widget" data-scrambler-widget></div>
+</div>
+</div>
+
 
 ## Если полоса канала удалена от нуля
 

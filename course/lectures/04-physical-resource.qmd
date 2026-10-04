@@ -1,10 +1,6 @@
 ---
 title: "Лекция 04. Физический ресурс и полезная скорость"
 subtitle: "От состояний сигнала к ресурсу пользователя"
-format:
-  html:
-    filters: [../_extensions/closeread/closeread.lua]
-    css: [../_extensions/closeread/closeread.css]
 ---
 
 Смартфон передаёт данные по общему радиоканалу. Качество приёма и число активных пользователей меняются.
@@ -15,62 +11,63 @@ format:
 
 > Посмотрите на три способа передачи одной и той же последовательности битов. Что у несущей меняется между соседними битами?
 
-::::{.cr-section .course-closeread .keying-closeread layout="overlay-center"}
 
-:::{.keying-step focus-on="cr-keying" data-stage="all"}
 #### Три способа передать бит
 
 Что меняется у несущей?
-:::
 
-:::{.keying-step focus-on="cr-keying" data-stage="ask"}
 #### Амплитуда · ASK
 
-Где сигнал становится сильнее?
-:::
+**ASK** (*amplitude-shift keying*) — амплитудная манипуляция.
 
-:::{.keying-step focus-on="cr-keying" data-stage="fsk"}
+Где сигнал становится сильнее?
+
 #### Частота · FSK
 
-Где колебаний за битовый интервал больше?
-:::
+**FSK** (*frequency-shift keying*) — частотная манипуляция.
 
-:::{.keying-step focus-on="cr-keying" data-stage="psk"}
+Где колебаний за битовый интервал больше?
+
 #### Фаза · PSK
 
-Где меняется положение колебания?
-:::
+**PSK** (*phase-shift keying*) — фазовая манипуляция.
 
-:::{.keying-step focus-on="cr-keying" data-stage="all"}
+Где меняется положение колебания?
+
 #### Три параметра
 
 Сравните ответы с исходной гипотезой.
-:::
 
-:::{#cr-keying}
+$T_b$ — длительность бита, $f_c$ — несущая частота.
+
 <div class="keying-scene" data-keying-figure data-stage="all" role="img" aria-label="Три способа передать одну последовательность битов: ASK, FSK, PSK">
   <div class="scene-overline">Одна последовательность битов <span>ASK / FSK / PSK</span></div>
   <div class="keying-overview"><img src="../assets/lecture-04/keying-comparison.svg" alt="Три ряда сигналов и их спектров"></div>
-  <div class="keying-detail" aria-hidden="true">
-<div class="keying-panel keying-wave"><img src="../assets/lecture-04/keying-comparison.svg" alt=""><span>Сигнал во времени</span></div>
-<div class="keying-panel keying-spectrum"><img src="../assets/lecture-04/keying-comparison.svg" alt=""><span>Спектр</span></div>
+  <div class="keying-detail">
+<picture class="keying-slide" data-keying="ask"><source media="(max-width: 760px)" srcset="../assets/lecture-04/keying-ask-mobile.svg"><img src="../assets/lecture-04/keying-ask.svg" alt="ASK: амплитуда сигнала и его спектр"></picture>
+<picture class="keying-slide" data-keying="fsk"><source media="(max-width: 760px)" srcset="../assets/lecture-04/keying-fsk-mobile.svg"><img src="../assets/lecture-04/keying-fsk.svg" alt="FSK: частота сигнала и его спектр"></picture>
+<picture class="keying-slide" data-keying="psk"><source media="(max-width: 760px)" srcset="../assets/lecture-04/keying-psk-mobile.svg"><img src="../assets/lecture-04/keying-psk.svg" alt="PSK: фаза сигнала и его спектр"></picture>
   </div>
   <div class="keying-mode" aria-hidden="true">ASK · FSK · PSK</div>
   <div class="scene-step-indicator" aria-hidden="true"><span data-scene-step>00</span> / 03</div>
 </div>
-:::
 
-::::
 
-<script src="../interactives/closeread-scenes.js?v=20261005-1" defer></script>
-
-**ASK** (*amplitude-shift keying*) — амплитудная манипуляция; **FSK** (*frequency-shift keying*) — частотная; **PSK** (*phase-shift keying*) — фазовая. $T_b$ — длительность бита, $f_c$ — несущая частота.
+#### Предскажите изменение спектра
 
 > Что произойдёт со спектром при сокращении $T_b$? Сначала предскажите результат, затем проверьте его на модели.
 
-<div class="lecture-interactive" data-lecture-interactive="spectrum"></div>
+#### Что показывает модель?
 
 Модель использует прямоугольные битовые импульсы; ось частоты отсчитывается от несущей. Реальный спектр также зависит от формирования импульсов и фильтрации.
+
+<div class="interactive-scene">
+<div class="scene-overline">Спектры манипуляции</div>
+<div class="scene-model">
+<div class="lecture-interactive" data-lecture-interactive="spectrum"></div>
+</div>
+</div>
+
 
 ## Сколько бит несёт состояние сигнала?
 
@@ -150,11 +147,22 @@ $$\eta\leq\frac{C}{B}=\log_2(1+\mathrm{SNR}),$$
 
 ![Спектральная эффективность и предел Шеннона](../assets/lecture-04/shannon-se.svg)
 
-<div class="lecture-interactive" data-lecture-interactive="constellation"></div>
+
+#### Больше бит на символ?
 
 > При фиксированном шуме сравните QPSK и 64-QAM. Почему выбор с большим числом бит на символ может оказаться неудачным?
 
+#### Что меняется при снижении SNR?
+
 > Как изменится различимость состояний при снижении SNR? Что ограничивает предел Шеннона и почему он не равен скорости конкретного пользователя?
+
+<div class="interactive-scene">
+<div class="scene-overline">Различимость состояний</div>
+<div class="scene-model">
+<div class="lecture-interactive" data-lecture-interactive="constellation"></div>
+</div>
+</div>
+
 
 ## Если потоков несколько
 
@@ -198,13 +206,24 @@ $$\mathrm{BER}=\frac{N_{\text{ошибочных битов}}}{N_{\text{пере
 
 ### Ошибки при разном качестве канала
 
+
+#### Как читать график?
+
 На графике: горизонталь — SNR в децибелах, вертикаль — BER информационных битов. Сплошные кривые получены с кодированием **LDPC** (*low-density parity-check*, код с разреженной проверочной матрицей), пунктирные — без него. Модель канала использует аддитивный белый гауссовский шум (**AWGN**, *additive white Gaussian noise*).
 
-<div class="lecture-interactive" data-lecture-interactive="ber"></div>
+#### Цена исправления ошибок
 
 > Сравните QPSK без кода и с $R_c=1/2$ при BER около $10^{-3}$. Как меняется необходимое SNR? Сколько ресурса приходится на один информационный бит?
 
 [Данные с LDPC](../data/lecture-04/nr-ber-awgn.csv) · [данные без кодирования](../data/lecture-04/uncoded-ber-awgn.csv).
+
+<div class="interactive-scene">
+<div class="scene-overline">Кодирование и ошибки</div>
+<div class="scene-model">
+<div class="lecture-interactive" data-lecture-interactive="ber"></div>
+</div>
+</div>
+
 
 ## Как меняется режим передачи?
 
