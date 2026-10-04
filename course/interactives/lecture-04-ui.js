@@ -21,7 +21,7 @@ function mountConstellation(root) {
     const result = simulateConstellation(order, snr, symbolCount, seed);
     root.querySelector('[name="snr-value"]').textContent = `${snr} дБ`;
     root.querySelector(".interactive-plot").innerHTML = constellationSvg(result);
-    root.querySelector(".interactive-metrics").innerHTML = `<p><strong>${Math.log2(order)}</strong> бит/символ</p><p>Ошибочных символов: <strong>${result.symbolErrors} / ${symbolCount}</strong></p><p>Ошибочных битов: <strong>${result.bitErrors} / ${result.transmittedBits}</strong></p><p class="interactive-note">Синие точки — переданные состояния; оранжевые — принятые, красные — ошибочно распознанные. Модель: квадратная QAM и гауссовский шум.</p>`;
+    root.querySelector(".interactive-metrics").innerHTML = `<p><strong>${Math.log2(order)}</strong> бит/символ</p><p>Ошибочных символов: <strong>${result.symbolErrors} / ${symbolCount}</strong></p><p>Ошибочных битов: <strong>${result.bitErrors} / ${result.transmittedBits}</strong></p><p class="interactive-note">Синие точки — переданные состояния; оранжевые — принятые, красные — ошибочно распознанные. Модель: квадратная QAM с разметкой Грея и гауссовский шум.</p>`;
   };
   root.addEventListener("input", draw);
   root.addEventListener("change", draw);
