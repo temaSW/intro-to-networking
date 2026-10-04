@@ -13,4 +13,4 @@ format:
 
 <div data-channel-playground></div>
 
-<script type="module" src="../interactives/channel-playground-ui.js"></script>
+<script type="module" src="../interactives/channel-playground-ui.js?v=20261005-lecture"></script>
