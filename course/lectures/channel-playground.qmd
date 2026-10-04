@@ -7,7 +7,9 @@ format:
 
 ## Что ограничивает дальность связи? Всегда ли усиление улучшает приём?
 
+::: {.column-page .course-interactive}
 <div class="lecture-interactive" data-channel-playground data-channel-mode="attenuation" data-channel-layout="lecture" data-channel-group="propagation"></div>
+:::
 
 ## Гарантирует ли восстановление формы импульсов правильность принятых битов?
 

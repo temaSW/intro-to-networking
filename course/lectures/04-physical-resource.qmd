@@ -9,7 +9,9 @@ subtitle: "От состояний сигнала к ресурсу пользо
 
 ## Как передать бит в полосе канала?
 
+::: {.column-page .course-visual}
 ![Амплитудная, частотная и фазовая манипуляция](../assets/lecture-04/keying-comparison.svg)
+:::
 
 **ASK** (*amplitude-shift keying*) — амплитудная манипуляция; **FSK** (*frequency-shift keying*) — частотная; **PSK** (*phase-shift keying*) — фазовая. $T_b$ — длительность бита, $f_c$ — несущая частота.
 
