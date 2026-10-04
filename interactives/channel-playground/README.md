@@ -1,0 +1,55 @@
+# Channel Playground
+
+Лекция: `course/lectures/channel-playground.qmd`.
+Общая модель отдельно: `course/lectures/channel-models.qmd`.
+Предметные модели: `course/interactives/channel-playground-model.js`.
+Независимый интерфейс: `course/interactives/channel-playground-ui.js`.
+Стили: `course/styles/channel-playground.css`.
+
+## Встраивание
+
+Подключите CSS и модуль интерфейса один раз на странице. Общая оболочка:
+
+```html
+<div data-channel-playground></div>
+```
+
+Отдельный режим без общей навигации:
+
+```html
+<div data-channel-playground data-channel-mode="multipath"></div>
+```
+
+Имена режимов: `attenuation`, `bandwidth`, `noise`, `multipath`, `coherence`,
+`shift`, `spread`, `media`. На одной странице можно разместить несколько
+независимых экземпляров; идентификаторы SVG не пересекаются.
+Лекционное встраивание убирает повторные заголовки, цепочку и поле гипотезы:
+вопрос и инструкция находятся в тексте лекции, объяснение остаётся скрытым.
+
+```html
+<div class="lecture-interactive" data-channel-playground
+     data-channel-mode="multipath" data-channel-layout="lecture"
+     data-channel-group="propagation"></div>
+```
+
+У контейнеров с одинаковым `data-channel-group` общие параметры канала.
+Изменение или сброс в одном блоке обновляет связанные блоки. Без атрибута
+группы экземпляры независимы. Это локальная связь моделей канала;
+общего фреймворка интерактивов нет.
+
+Для динамического контейнера экспортирована `mountChannelPlayground(root,
+{mode})`; результат позволяет получить копию состояния через `getState()`
+и переключить режим общего компонента через `setMode(name)`.
+`destroy()` отключает наблюдение за размером и очищает контейнер.
+
+Предсказания и параметры сохраняются в памяти экземпляра до перезагрузки;
+ничего не отправляется на сервер. «Сбросить параметры» сбрасывает общую модель,
+включая лучи, но сохраняет записанные гипотезы. Модуль не требует библиотек.
+
+## Проверка
+
+`python -m pytest tests/test_channel_playground.py`
+
+`python scripts/check.py`
+
+Описание допущений: `docs/channel-playground.md`.
