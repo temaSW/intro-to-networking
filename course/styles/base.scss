@@ -89,10 +89,19 @@ main.content code:not(.sourceCode) { color: var(--accent); background: var(--sur
 }
 .course-closeread .narrative-col .trigger { padding-block: 23svh; padding-inline: clamp(.75rem, 2vw, 1.5rem); }
 .course-closeread .narrative-col .narrative { padding: .85rem 1rem; }
-.course-closeread .narrative h3 { margin: 0 0 .3rem; font-size: 1.3rem; }
+.course-closeread .narrative :is(h3, h4) { margin: 0 0 .3rem; font-size: 1.3rem; font-weight: 700; }
 .course-closeread .narrative p { max-width: 40ch; line-height: 1.45; }
 .course-closeread .sticky-col-stack .sticky { width: min(100% - 2rem, 75rem); }
 .course-closeread #cr-data-path { align-self: start; margin: 23svh auto 0; opacity: 1; }
+.course-closeread #cr-keying { align-self: start; margin: 17svh auto 0; opacity: 1; }
+.keying-figure { position: relative; width: 100%; max-width: 60rem; background: #f7f8f6; border: 1px solid var(--line); border-radius: .45rem; overflow: hidden; box-shadow: 0 10px 35px #102e3312; }
+.keying-figure p { max-width: none !important; margin: 0; }
+.keying-figure img { display: block; width: 100%; height: auto; }
+.keying-focus { position: absolute; left: 1%; right: 1%; border: .2rem solid var(--accent); border-radius: .35rem; box-shadow: 0 0 0 120vh #102e3370; opacity: 0; pointer-events: none; transition: opacity .25s; }
+.keying-focus-ask { top: 13%; height: 26%; }
+.keying-focus-fsk { top: 41%; height: 26%; }
+.keying-focus-psk { top: 69%; height: 26%; }
+.keying-figure[data-stage="ask"] .keying-focus-ask, .keying-figure[data-stage="fsk"] .keying-focus-fsk, .keying-figure[data-stage="psk"] .keying-focus-psk { opacity: 1; }
 .route-map { background: var(--surface); border: 1px solid var(--line); border-radius: .55rem; padding: clamp(.65rem, 1.4vw, 1.15rem); box-shadow: 0 10px 35px #102e3312; }
 .route-map-stages { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: .55rem; list-style: none; margin: 0; padding: 0; }
 .route-map-stages li { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: .25rem; min-height: 9rem; padding: .75rem; border: 1px solid var(--line); border-radius: .4rem; background: var(--surface-alt); transition: opacity .3s, transform .3s, border-color .3s, background-color .3s; }
@@ -114,6 +123,7 @@ main.content code:not(.sourceCode) { color: var(--accent); background: var(--sur
 }
 @media (max-width: 575.98px) {
   .course-closeread #cr-data-path { width: min(100% - 1.5rem, 25rem); align-self: start; margin: 5rem auto 0; }
+  .course-closeread #cr-keying { width: min(100% - 1.5rem, 28rem); align-self: start; margin: 5rem auto 0; }
   .course-closeread .narrative-col .trigger { padding-block: 34svh; }
   .course-closeread .narrative-col .narrative { max-width: min(100%, 25rem); transform: translateY(22svh); border: 1px solid var(--line); box-shadow: 0 5px 20px #102e3324; }
   .route-map-stages strong { font-size: .82rem; }

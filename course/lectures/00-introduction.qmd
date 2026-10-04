@@ -2,6 +2,10 @@
 title: "Лекция 00. Введение"
 subtitle: "Путь данных и участники создания сети"
 description: "Вопросы к сквозному пути файла через мобильную сеть."
+format:
+  html:
+    filters: [../_extensions/closeread/closeread.lua]
+    css: [../_extensions/closeread/closeread.css]
 ---
 
 Смартфон отправляет файл на удалённый сервер через мобильную сеть.
@@ -13,18 +17,65 @@ flowchart LR
 
 > Какие участки и узлы нужны между смартфоном и сервером? Что меняется на каждом участке?
 
-<details><summary>Подсказка: возможные функции на пути</summary>
+### Проверяем гипотезы о пути
 
-```{mermaid}
-flowchart LR
-  U[Смартфон] --> R[Радиодоступ] --> A[Объединение потоков] --> T[Передача через промежуточные узлы] --> D[Сеть назначения] --> S[Сервер]
-```
+Сопоставьте предложенные узлы с функциями на схеме. Границы функций не обязательно совпадают с границами устройств.
 
-Схема показывает функции; их границы не обязаны совпадать с границами устройств.
+::::{.cr-section .course-closeread layout="sidebar-right"}
 
-</details>
+:::{.route-step focus-on="cr-data-path" data-stage="all"}
+#### Весь путь
 
-[Проследить путь данных по шагам](00-data-path.qmd).
+Где данные впервые превращаются в сигнал? Где несколько потоков могут идти по общему участку?
+:::
+
+:::{.route-step focus-on="cr-data-path" data-stage="access"}
+#### Участок доступа
+
+На первом участке биты представляются физическим сигналом. Этот ресурс делят несколько абонентов.
+:::
+
+:::{.route-step focus-on="cr-data-path" data-stage="access-node"}
+#### Узел доступа
+
+Узел принимает передачу с радиоканала и направляет данные дальше. Что меняется: содержание данных, их физическое представление или маршрут?
+:::
+
+:::{.route-step focus-on="cr-data-path" data-stage="transport"}
+#### Общий путь
+
+Потоки разных абонентов объединяются и проходят промежуточные узлы. Где на этом пути может возникнуть ограничение по скорости?
+:::
+
+:::{.route-step focus-on="cr-data-path" data-stage="destination"}
+#### Сеть назначения
+
+Данные достигают сети, где находится сервер. По каким сведениям промежуточные узлы выбирают дальнейший путь?
+:::
+
+:::{.route-step focus-on="cr-data-path" data-stage="all"}
+#### Снова вся система
+
+Какие переходы меняют физическое представление данных, а какие — их маршрут? Теперь вернитесь к своей исходной гипотезе.
+:::
+
+:::{#cr-data-path}
+<div class="route-map" data-route-map data-stage="all" aria-label="Путь данных: абонент, участок доступа, узел доступа, транспорт, сеть назначения, сервер">
+  <ol class="route-map-stages">
+    <li data-route-stage="subscriber"><span class="route-map-number">01</span><strong>Абонент</strong><small>Пользовательские данные</small></li>
+    <li data-route-stage="access"><span class="route-map-number">02</span><strong>Участок доступа</strong><small>Физический сигнал</small></li>
+    <li data-route-stage="access-node"><span class="route-map-number">03</span><strong>Узел доступа</strong><small>Приём и передача</small></li>
+    <li data-route-stage="transport"><span class="route-map-number">04</span><strong>Транспорт</strong><small>Объединение потоков</small></li>
+    <li data-route-stage="destination"><span class="route-map-number">05</span><strong>Сеть назначения</strong><small>Путь к серверу</small></li>
+    <li data-route-stage="server"><span class="route-map-number">06</span><strong>Сервер</strong><small>Получение данных</small></li>
+  </ol>
+  <div class="route-map-token" aria-hidden="true" hidden>Данные →</div>
+</div>
+:::
+
+::::
+
+<script src="../interactives/closeread-scenes.js" defer></script>
 
 ## Что передаётся?
 

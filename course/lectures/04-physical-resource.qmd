@@ -1,6 +1,10 @@
 ---
 title: "Лекция 04. Физический ресурс и полезная скорость"
 subtitle: "От состояний сигнала к ресурсу пользователя"
+format:
+  html:
+    filters: [../_extensions/closeread/closeread.lua]
+    css: [../_extensions/closeread/closeread.css]
 ---
 
 Смартфон передаёт данные по общему радиоканалу. Качество приёма и число активных пользователей меняются.
@@ -9,13 +13,56 @@ subtitle: "От состояний сигнала к ресурсу пользо
 
 ## Как передать бит в полосе канала?
 
-::: {.column-page .course-visual}
-![Амплитудная, частотная и фазовая манипуляция](../assets/lecture-04/keying-comparison.svg)
+> Посмотрите на три способа передачи одной и той же последовательности битов. Что у несущей меняется между соседними битами?
+
+::::{.cr-section .course-closeread .keying-closeread layout="sidebar-right"}
+
+:::{.keying-step focus-on="cr-keying" data-stage="all"}
+#### Одна последовательность, три сигнала
+
+Сравните строки на рисунке: биты одинаковые. В каждом случае меняется один параметр несущей.
 :::
+
+:::{.keying-step focus-on="cr-keying" data-stage="ask"}
+#### Амплитуда · ASK
+
+Сравните высоту колебаний для 0 и 1. Частота и фаза при этом сохраняются?
+:::
+
+:::{.keying-step focus-on="cr-keying" data-stage="fsk"}
+#### Частота · FSK
+
+Теперь сравните число колебаний за один битовый интервал. Что остаётся примерно постоянным?
+:::
+
+:::{.keying-step focus-on="cr-keying" data-stage="psk"}
+#### Фаза · PSK
+
+Найдите места, где колебание меняет фазу. Чем этот переход отличается от изменения амплитуды или частоты?
+:::
+
+:::{.keying-step focus-on="cr-keying" data-stage="all"}
+#### Сопоставьте три способа
+
+Какой параметр несущей кодирует бит в каждом случае? Сравните свой ответ с исходной гипотезой.
+:::
+
+:::{#cr-keying}
+<div class="keying-figure" data-keying-figure data-stage="all">
+  <img src="../assets/lecture-04/keying-comparison.svg" alt="Три ряда сравнения ASK, FSK и PSK для одной последовательности битов">
+  <span class="keying-focus keying-focus-ask" aria-hidden="true"></span>
+  <span class="keying-focus keying-focus-fsk" aria-hidden="true"></span>
+  <span class="keying-focus keying-focus-psk" aria-hidden="true"></span>
+</div>
+:::
+
+::::
+
+<script src="../interactives/closeread-scenes.js" defer></script>
 
 **ASK** (*amplitude-shift keying*) — амплитудная манипуляция; **FSK** (*frequency-shift keying*) — частотная; **PSK** (*phase-shift keying*) — фазовая. $T_b$ — длительность бита, $f_c$ — несущая частота.
 
-> Какой параметр несущей различается между битами в каждом случае? Что произойдёт со спектром при сокращении $T_b$?
+> Что произойдёт со спектром при сокращении $T_b$? Сначала предскажите результат, затем проверьте его на модели.
 
 <div class="lecture-interactive" data-lecture-interactive="spectrum"></div>
 
