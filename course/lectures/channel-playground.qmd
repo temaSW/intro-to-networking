@@ -5,78 +5,124 @@ format:
     css: ../styles/channel-playground.css
 ---
 
-В предыдущей лекции состояния сигнала представляли биты. Теперь между передатчиком и приёмником — реальная среда: кабель, оптическое волокно или пространство распространения радиоволн.
+<details><summary>Контекст и обозначения</summary>
 
-> Передаётся одна и та же последовательность битов. Что должен знать приёмник о канале, чтобы различить состояния принятого сигнала?
+В предыдущей лекции состояния сигнала представляли биты. Теперь между передатчиком и приёмником — реальная среда: кабель, оптическое волокно или пространство распространения радиоволн.
 
 Здесь $s(t)$ — переданный сигнал, $r(t)$ — принятый, $t$ — время. **Канал передачи** включает среду распространения и устройства, через которые проходит сигнал.
 
-## Что ограничивает дальность связи? Всегда ли усиление улучшает приём?
+</details>
+
+## Что ограничивает дальность связи? Какой диапазон сигнала допустим на входе приёмника?
+
+<details><summary>Понятия и обозначения</summary>
 
 Передатчик и приёмник остаются прежними, расстояние между ними увеличивается. **Чувствительность приёмника** — минимальная входная мощность, при которой обеспечивается заданное качество приёма; запас — превышение принятой мощности над этим уровнем.
 
+**Динамический диапазон приёмника** — интервал между чувствительностью и верхней допустимой границей входного сигнала.
+
 дБ — децибел, единица логарифмического отношения; дБм — уровень мощности относительно одного милливатта. **Коэффициент шума** (NF, *noise figure*) характеризует ухудшение отношения сигнал/шум устройством.
 
+Мощность передатчика — 10 дБм, дополнительные потери — 2 дБ/км. Для каскада с собственным шумом NF = 6 дБ. Передача по мощности ×4 соответствует 6,02 дБ; по амплитуде — ×2.
+
+</details>
+
 ::: {.column-page .course-interactive}
-<div class="lecture-interactive" data-channel-playground data-channel-mode="attenuation" data-channel-layout="lecture" data-channel-group="propagation"></div>
+<div class="lecture-interactive" data-channel-playground data-channel-mode="attenuation" data-channel-layout="lecture"></div>
 :::
 
 ## Гарантирует ли восстановление формы импульсов правильность принятых битов?
+
+<details><summary>Понятия и обозначения</summary>
 
 Уровень сигнала достаточен для приёма. Следующий вопрос — успевают ли импульсы установиться за время одного символа. **Регенератор** принимает решения о символах и формирует по ним новые импульсы.
 
 $B$ — полоса канала, $R_s$ — символьная скорость; ксимв/с — тысяча символов в секунду. $H(f)$ — комплексная частотная характеристика канала на частоте $f$, $|H(f)|$ — её модуль.
 
-<div class="lecture-interactive" data-channel-playground data-channel-mode="bandwidth" data-channel-layout="lecture" data-channel-group="propagation"></div>
+Символьная скорость — 8 ксимв/с.
+
+</details>
+
+<div class="lecture-interactive" data-channel-playground data-channel-mode="bandwidth" data-channel-layout="lecture"></div>
 
 ## Чем различаются шум и внешняя помеха?
+
+<details><summary>Понятия и обозначения</summary>
 
 На входе приёмника присутствует также добавленный сигнал: собственный шум аппаратуры или излучение другого передатчика. Одна и та же переданная последовательность даёт разные отсчёты в моменты решений.
 
 **Двоичная фазовая манипуляция** (BPSK, *binary phase-shift keying*) использует два состояния фазы. $I$ и $Q$ — синфазная и квадратурная координаты комплексной огибающей. SNR (*signal-to-noise ratio*) — отношение сигнал/шум; в этом опыте параметр задан как $E_s/N_0$, где $E_s$ — энергия символа, $N_0$ — спектральная плотность мощности шума.
 
-<div class="lecture-interactive" data-channel-playground data-channel-mode="noise" data-channel-layout="lecture" data-channel-group="propagation"></div>
+Внешняя помеха — треугольный сигнал в синфазной координате, 0,17 цикла на символ.
+
+</details>
+
+<div class="lecture-interactive" data-channel-playground data-channel-mode="noise" data-channel-layout="lecture"></div>
 
 ## Всегда ли дополнительный путь усиливает сигнал?
 
+<details><summary>Понятия и обозначения</summary>
+
 В помещении радиосигнал достигает приёмника непосредственно и после отражений. **Многолучёвость** — распространение сигнала по нескольким путям с разными задержками, амплитудами и фазами.
 
-<div class="lecture-interactive" data-channel-playground data-channel-mode="multipath" data-channel-layout="lecture" data-channel-group="propagation"></div>
+Частота сигнала — 1 МГц (мегагерц). Амплитуда прямого пути принята за единицу; мкс — микросекунда.
+
+</details>
+
+<div class="lecture-interactive" data-channel-playground data-channel-mode="multipath" data-channel-layout="lecture"></div>
 
 ## Как разброс задержек связан с полосой когерентности?
+
+<details><summary>Понятия и обозначения</summary>
 
 Через тот же канал передаются две близкие частоты $f_1$ и $f_2$. **Полоса когерентности** $B_c$ — частотный интервал, в пределах которого характеристики канала существенно не различаются.
 
 $\sigma_\tau$ — среднеквадратический разброс задержек путей, $B_s$ — полоса сигнала. Как соотнести свойства канала со спектром передаваемого сигнала?
 
-<div class="lecture-interactive" data-channel-playground data-channel-mode="coherence" data-channel-layout="lecture" data-channel-group="propagation"></div>
+$f_1 = 0{,}8$ МГц, $B_s = 0{,}2$ МГц; относительная амплитуда отражённого пути — 0,7.
+
+</details>
+
+<div class="lecture-interactive" data-channel-playground data-channel-mode="coherence" data-channel-layout="lecture"></div>
 
 ## Можно ли по смещению спектра отличить движение от рассогласования генераторов?
 
+<details><summary>Понятия и обозначения</summary>
+
 Приёмник движется относительно передатчика; их опорные генераторы независимы. **Доплеровский сдвиг** — изменение наблюдаемой частоты из-за относительного движения. $f_c$ — несущая частота, $\Delta f$ — смещение принятого спектра относительно неё.
 
-<div class="lecture-interactive" data-channel-playground data-channel-mode="shift" data-channel-layout="lecture" data-channel-group="propagation"></div>
+Движение направлено навстречу прямому лучу. ГГц — гигагерц, Гц — герц.
+
+</details>
+
+<div class="lecture-interactive" data-channel-playground data-channel-mode="shift" data-channel-layout="lecture"></div>
 
 ## Что определяет скорость изменения канала во времени?
+
+<details><summary>Понятия и обозначения</summary>
 
 При движении отражённые сигналы приходят с разных направлений. Теперь интересует состояние канала на протяжении фрагмента передачи длительностью $T$.
 
 **Время когерентности** $T_c$ — временной интервал, в пределах которого характеристики канала существенно не меняются. $B_D$ — доплеровский разброс частот путей; $h(t)$ — комплексный коэффициент канала, Re и Im — его действительная и мнимая части.
 
-<div class="lecture-interactive" data-channel-playground data-channel-mode="spread" data-channel-layout="lecture" data-channel-group="propagation"></div>
-
-## Какие искажения характерны для кабеля, волокна и радиоканала?
-
-Одна линия связи может содержать участки в разных средах. **Дисперсия** — различие задержек частотных составляющих или мод распространения. Какие из рассмотренных понятий нужны для описания каждого участка?
-
-<details><summary>Чем различаются физические причины этих искажений?</summary>
-
-<div class="lecture-interactive" data-channel-playground data-channel-mode="media" data-channel-layout="lecture" data-channel-group="propagation"></div>
+Несущая — 2,4 ГГц; отражённый путь имеет амплитуду 0,7 и задержку 0,5 мкс. Направление движения к прямому лучу — 0°; мс — миллисекунда.
 
 </details>
 
-## Откуда приёмник узнаёт текущее состояние изменяющегося канала?
+<div class="lecture-interactive" data-channel-playground data-channel-mode="spread" data-channel-layout="lecture"></div>
 
-Полезные данные ещё неизвестны приёмнику, а параметры канала заранее не заданы. Какой сигнал мог бы стать опорой для их оценки? Как часто нужна новая оценка?
+## Какие искажения характерны для кабеля, волокна и радиоканала?
 
-<script type="module" src="../interactives/channel-playground-ui.js?v=20261005-render-fix"></script>
+<details><summary>Понятия и обозначения</summary>
+
+Одна линия связи может содержать участки в разных средах. **Дисперсия** — различие задержек частотных составляющих или мод распространения. Какие из рассмотренных понятий нужны для описания каждого участка?
+
+</details>
+
+<details><summary>Чем различаются физические причины этих искажений?</summary>
+
+<div class="lecture-interactive" data-channel-playground data-channel-mode="media" data-channel-layout="lecture"></div>
+
+</details>
+
+<script type="module" src="../interactives/channel-playground-ui.js?v=20261005-dynamic-range"></script>

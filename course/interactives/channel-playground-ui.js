@@ -1,4 +1,4 @@
-import * as model from './channel-playground-model.js';
+import * as model from './channel-playground-model.js?v=20261005-dynamic-range';
 
 const META = {
   attenuation: ['Затухание', 'Станет ли связь слабее при удвоении расстояния? Что изменит усиление?', 'Увеличьте расстояние, найдите границу работоспособности. Включите усилитель и измените его коэффициент шума.'],
@@ -50,6 +50,8 @@ export function mountChannelPlayground(root, options = {}) {
   const lecture = (options.layout || root.dataset.channelLayout) === 'lecture';
   const shared = options.sharedState;
   let mode = fixed || 'attenuation', p = shared?.parameters || model.defaults(), view = 'time', medium = 'radio';
+  const initialParameters = () => ({...model.defaults(), ...(lecture && mode === 'attenuation' ? {aid: 'ideal', gainDb: 0} : {})});
+  if (!shared) p = initialParameters();
   const prediction = {}, explanations = {};
   root.classList.add('channel-playground');
   if (lecture) root.classList.add('cp-lecture');
@@ -64,8 +66,21 @@ export function mountChannelPlayground(root, options = {}) {
   }
   function controls() {
     const motion = () => slider('carrierGHz', 'Несущая', .1, 6, .1, p.carrierGHz, 'ГГц') + slider('speed', 'Скорость', 0, 60, 1, p.speed, 'м/с') + slider('direction', 'Угол движения к прямому лучу', 0, 180, 5, p.direction, '°');
+    const amplifier = () => select('aid', 'Усилитель', [['none','Без усилителя'], ['ideal','Идеальный'], ['amplifier','С собственным шумом']], p.aid) + (p.aid !== 'none' ? slider('gainDb', 'Усиление по мощности', 0, 40, .01, p.gainDb, 'дБ') : '');
+    if (lecture) {
+      switch (mode) {
+        case 'attenuation': return slider('distance', 'Расстояние', .1, 20, .1, p.distance, 'км') + slider('gainDb', 'Коэффициент передачи', -10, 40, .01, p.gainDb, 'дБ') + select('aid', 'Входной каскад', [['ideal','Идеальный'], ['amplifier','С собственным шумом']], p.aid);
+        case 'bandwidth': return slider('bandwidth', 'Полоса канала', .1, 20, .1, p.bandwidth, 'кГц') + select('regeneration', 'Регенератор', [['off','Выключен'], ['on','Включён']], p.regeneration);
+        case 'noise': return select('disturbance', 'Добавленный сигнал', [['noise','Шум'], ['interference','Внешняя помеха']], p.disturbance) + (p.disturbance === 'noise' ? slider('snr', 'Отношение сигнал/шум Eₛ/N₀', -12, 24, 1, p.snr, 'дБ') : slider('interference', 'Амплитуда помехи / сигнала', 0, 3, .05, p.interference));
+        case 'multipath': return slider('path-0-amplitude', 'Амплитуда отражённого пути', 0, 1, .05, p.paths[0].amplitude) + slider('path-0-delay', 'Задержка отражённого пути', 0, 5, .025, p.paths[0].delay, 'мкс');
+        case 'coherence': return slider('f2', 'Частота f₂', 0, 4, .01, p.f2, 'МГц') + slider('path-0-delay', 'Задержка отражённого пути', 0, 5, .025, p.paths[0].delay, 'мкс');
+        case 'shift': return slider('speed', 'Скорость', 0, 60, 1, p.speed, 'м/с') + slider('carrierGHz', 'Несущая', .1, 6, .1, p.carrierGHz, 'ГГц') + slider('offset', 'Рассогласование генераторов', -500, 500, 5, p.offset, 'Гц');
+        case 'spread': return slider('speed', 'Скорость', 0, 60, 1, p.speed, 'м/с') + slider('path-0-angle', 'Направление отражённого пути', 0, 180, 5, p.paths[0].angle, '°') + slider('duration', 'Длительность фрагмента T', .1, 100, .1, p.duration, 'мс');
+        case 'media': return select('medium', 'Среда', Object.entries(MEDIA).map(([key, value]) => [key, value[0]]), medium);
+      }
+    }
     switch (mode) {
-      case 'attenuation': return slider('power', 'Мощность передатчика', 0, 40, 1, p.power, 'дБм') + slider('distance', 'Расстояние', .1, 20, .1, p.distance, 'км') + slider('loss', 'Дополнительные потери', 0, 5, .1, p.loss, 'дБ/км') + slider('sensitivity', 'Чувствительность приёмника', -90, -40, 1, p.sensitivity, 'дБм') + select('aid', 'Устройство на входе приёмника', [['none','Без усилителя'], ['amplifier','Усилитель ×4']], p.aid) + (p.aid==='amplifier' ? slider('noiseFigure', 'Коэффициент шума NF', 0, 15, .5, p.noiseFigure, 'дБ') : '');
+      case 'attenuation': return slider('power', 'Мощность передатчика', 0, 40, 1, p.power, 'дБм') + slider('distance', 'Расстояние', .1, 20, .1, p.distance, 'км') + slider('loss', 'Дополнительные потери', 0, 5, .1, p.loss, 'дБ/км') + slider('sensitivity', 'Чувствительность приёмника', -90, -40, 1, p.sensitivity, 'дБм') + amplifier() + (p.aid==='amplifier' ? slider('noiseFigure', 'Коэффициент шума NF', 0, 15, .5, p.noiseFigure, 'дБ') : '');
       case 'bandwidth': return slider('bandwidth', 'Полоса канала', .1, 20, .1, p.bandwidth, 'кГц') + slider('rate', 'Символьная скорость', 1, 20, .5, p.rate, 'ксимв/с') + select('regeneration', 'Регенератор после канала', [['off','Выключен'], ['on','Включён']], p.regeneration);
       case 'noise': return select('disturbance', 'Источник добавленного сигнала', [['noise','Шум'], ['interference','Внешняя помеха']], p.disturbance) + (p.disturbance === 'noise' ? slider('snr', 'SNR (энергия символа / N₀)', -12, 24, 1, p.snr, 'дБ') : slider('interference', 'Амплитуда помехи / сигнала', 0, 3, .05, p.interference) + slider('interferenceFrequency', 'Частота помехи в полосе I/Q', .01, .49, .01, p.interferenceFrequency, 'циклов/символ'));
       case 'multipath': return slider('carrier', 'Частота сигнала', .1, 3, .05, p.carrier, 'МГц') + pathControls();
@@ -76,12 +91,12 @@ export function mountChannelPlayground(root, options = {}) {
     }
   }
   function views() {
-    return ({attenuation: [['time','Форма'],['level','Уровни']], bandwidth: [['time','Импульсы'],['spectrum','Полоса H(f)']], noise: [['time','Во времени'],['constellation','Созвездие']], multipath: [['time','Копии и сумма'],['frequency','H(f)']], coherence: [['frequency','H(f) и маркеры'],['delay','Профиль задержек']], shift: [['spectrum','Спектр']], spread: [['time','Канал во времени'],['spectrum','Сдвиги лучей']], media: []})[mode];
+    return ({attenuation: [['time','Форма']], bandwidth: [['time','Импульсы'],['spectrum','Полоса H(f)']], noise: [['time','Во времени'],['constellation','Созвездие']], multipath: [['time','Копии и сумма'],['frequency','H(f)']], coherence: [['frequency','H(f) и маркеры'],['delay','Профиль задержек']], shift: [['spectrum','Спектр']], spread: [['time','Канал во времени'],['spectrum','Сдвиги лучей']], media: []})[mode];
   }
   function shell() {
     const vv = views(); if (!vv.some(([v]) => v === view)) view = vv[0]?.[0] || '';
     const introduction = lecture ? '' : `<h2>${META[mode][0]}</h2><div class="cp-chain"><span>Передатчик · s(t)</span><b aria-hidden="true">→</b><span>${META[mode][0]}</span><b aria-hidden="true">→</b><span>Приёмник · r(t)</span></div><div class="cp-experiment"><strong>Предскажите</strong><p>${META[mode][1]}</p><textarea rows="2" placeholder="Моя гипотеза…" aria-label="Предсказание результата">${(prediction[mode] || '').replaceAll('&','&amp;').replaceAll('<','&lt;')}</textarea><p><strong>Проверьте:</strong> ${META[mode][2]}</p></div>`;
-    root.innerHTML = `${!fixed ? `<nav class="cp-modes" aria-label="Режимы канала">${Object.entries(META).map(([key, m], i) => `<button type="button" data-mode="${key}" aria-pressed="${mode===key}">${i+1}. ${m[0]}</button>`).join('')}</nav>` : ''}${introduction}<div class="cp-layout"><div class="cp-controls" role="group" aria-label="Параметры канала">${controls()}<button type="button" data-reset>${shared ? 'Сбросить общие параметры' : 'Сбросить параметры'}</button></div><section class="cp-observation" aria-label="Наблюдение"><div class="cp-views" aria-label="Представление">${vv.map(([key,label]) => `<button type="button" data-view="${key}" aria-pressed="${view===key}">${label}</button>`).join('')}</div><div class="cp-results"></div></section></div>${!lecture ? `<details class="cp-explanation" ${explanations[mode] ? 'open' : ''}><summary>Подсказка к опыту</summary><div class="cp-explanation-body"></div></details>` : ''}`;
+    root.innerHTML = `${!fixed ? `<nav class="cp-modes" aria-label="Режимы канала">${Object.entries(META).map(([key, m], i) => `<button type="button" data-mode="${key}" aria-pressed="${mode===key}">${i+1}. ${m[0]}</button>`).join('')}</nav>` : ''}${introduction}<div class="cp-layout"><div class="cp-controls" role="group" aria-label="Параметры канала">${controls()}<button type="button" data-reset>${shared ? 'Сбросить общие параметры' : 'Сбросить параметры'}</button></div><section class="cp-observation" aria-label="Наблюдение"><div class="cp-views" aria-label="Представление">${(vv.length > 1 ? vv : []).map(([key,label]) => `<button type="button" data-view="${key}" aria-pressed="${view===key}">${label}</button>`).join('')}</div><div class="cp-results"></div></section></div>${!lecture ? `<details class="cp-explanation" ${explanations[mode] ? 'open' : ''}><summary>Подсказка к опыту</summary><div class="cp-explanation-body"></div></details>` : ''}`;
     root.querySelector('textarea')?.addEventListener('input', e => {prediction[mode] = e.target.value;});
     root.querySelector('.cp-explanation')?.addEventListener('toggle', e => {explanations[mode] = e.target.open;});
     root.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => {mode = b.dataset.mode; shell();}));
@@ -97,25 +112,25 @@ export function mountChannelPlayground(root, options = {}) {
     }));
     root.querySelector('[data-add]')?.addEventListener('click', () => {if (p.paths.length < 3) p.paths.push({amplitude: .5, delay: 1+p.paths.length, angle: 120+20*p.paths.length}); shell(); notifyPeers();});
     root.querySelectorAll('[data-remove]').forEach(b => b.addEventListener('click', () => {p.paths.splice(Number(b.dataset.remove),1); shell(); notifyPeers();}));
-    root.querySelector('[data-reset]').addEventListener('click', () => {p = model.defaults(); shell(); notifyPeers();});
+    root.querySelector('[data-reset]').addEventListener('click', () => {p = initialParameters(); shell(); notifyPeers();});
     render();
   }
   function render() {
     let metrics = '', charts = '', note = '', explanation = '', dataNote = '';
     if (mode === 'attenuation') {
       const a = model.attenuation(p);
-      metrics = metric('Передано', `${finite(p.power)} дБм`) + metric('Потери', `${finite(a.lossDb)} дБ`) + metric('Принято до устройства', `${finite(a.received)} дБм`) + metric('Запас до устройства', `${finite(a.margin)} дБ`);
-      const {time:t, tx, input, output, addedNoise, noiseDbm, outputLevel} = model.attenuationSignal(p);
-      if (p.aid==='amplifier') metrics += metric('Уровень после усилителя', `${finite(outputLevel)} дБм`) + metric('Собственный шум на выходе', Number.isFinite(noiseDbm) ? `${finite(noiseDbm)} дБм` : 'Нет · NF = 0 дБ');
-      if (view === 'level') charts = plot('Энергетический бюджет до устройства', [{x:[0,1], y:[p.power,a.received], label:'Уровень сигнала'}, {x:[0,1],y:[p.sensitivity,p.sensitivity],label:'Чувствительность',dash:true}],{xmax:1,ymin:-120,ymax:40,xlabel:'0 — передатчик; 1 — вход приёмника',ylabel:'дБм'});
-      else {
+      const {time:t, tx, input, output, receiver, receiverLimit, clipped, addedNoise, noiseDbm, outputLevel, voltageGain} = model.attenuationSignal(p);
+      metrics = metric('После среды', `${finite(a.received)} дБм`) + metric('Сигнал на входе приёмника', `${finite(outputLevel)} дБм`) + metric('Диапазон приёмника', `${p.sensitivity}…${p.receiverMaximum} дБм`) + metric('Ограниченные отсчёты', `${finite(100*clipped/t.length,1)} %`);
+      if (p.aid !== 'none') metrics += metric('Передача по мощности', `×${finite(voltageGain**2)} · ${finite(p.gainDb)} дБ`);
+      if (p.aid==='amplifier') metrics += metric('Собственный шум на выходе', Number.isFinite(noiseDbm) ? `${finite(noiseDbm)} дБм` : 'Нет');
+      {
         charts = plot('Переданные цифровые уровни', [{x:t,y:tx,label:'s(t)'}],{xmax:12,ymin:-1.5,ymax:1.5,xlabel:'Символы',ylabel:'Относительная амплитуда'});
-        const limit = Math.max(1.5, ...input.map(Math.abs), ...output.map(Math.abs));
-        charts += plot('Принятый сигнал', [{x:t,y:input,label:'После затухания'}, ...(p.aid==='amplifier' ? [{x:t,y:output,label:'После усилителя с собственным шумом'}] : [])],{xmax:12,ymin:-limit,ymax:limit,xlabel:'Символы',ylabel:'В единицах амплитуды порога'});
+        const limit = Math.max(1.5, Math.max(...output.map(Math.abs)) * 1.1);
+        charts += plot('Сигнал и границы входа приёмника', [{x:t,y:output,label:'Вход приёмника',dash:true},{x:t,y:receiver,label:'После входного ограничения'}, {x:[0,12],y:[receiverLimit,receiverLimit],label:'Граница диапазона',color:COLORS[2],dash:true}, {x:[0,12],y:[-receiverLimit,-receiverLimit],color:COLORS[2],dash:true}],{xmax:12,ymin:-limit,ymax:limit,xlabel:'Символы',ylabel:'В единицах амплитуды чувствительности'});
         if (p.aid==='amplifier') {const noiseLimit=Math.max(.001,...addedNoise.map(Math.abs))*1.1; charts += plot('Собственный шум усилителя · отдельный масштаб', [{x:t,y:addedNoise,label:'Добавленная компонента'}],{xmax:12,ymin:-noiseLimit,ymax:noiseLimit,xlabel:'Символы',ylabel:'В единицах амплитуды порога'});}
       }
       note = a.usable ? 'Запас неотрицательный: связь условно работоспособна.' : 'Запас отрицательный: работоспособность не гарантирована.';
-      explanation = 'Учебные потери: 40 дБ на 1 км + геометрическое расхождение 20 log₁₀(d / 1 км) + дополнительные потери на километр. Канал этого опыта не добавляет шума. Усилитель ×4 по амплитуде имеет усиление G = 16 по мощности и добавляет собственный шум Nа = G(F − 1)kT₀B, где F = 10^(NF/10). Опорная температура T₀ = 290 К, шумовая полоса B = 100 МГц, k — постоянная Больцмана; они фиксированы. Опорный тепловой шум используется для определения NF, но не добавляется к показанному идеальному входу. Поэтому здесь нельзя вычислять NF как отношение SNR бесшумного входа к SNR выхода. NF = 0 дБ — идеальный усилитель без собственного шума. Запас показан до усилителя; отдельный график шума имеет свой масштаб.';
+      explanation = 'Коэффициент передачи задан по мощности: G = 10^(g/10), по амплитуде — √G. ×4 по мощности соответствует 6,02 дБ и ×2 по амплитуде. Идеальный каскад не добавляет шума и остаётся линейным; ограничение амплитуды происходит на входе следующего приёмника. Его чувствительность −65 дБм, верхняя граница −25 дБм. При наличии собственного шума Nа = G(F − 1)kT₀B, F = 10^(NF/10), NF — коэффициент шума в децибелах, T₀ = 290 К, B = 100 МГц, k — постоянная Больцмана. Округлённые импульсы нормированы к единичной средней мощности; уровень сигнала показан до ограничения отдельно от шума.';
     } else if (mode === 'bandwidth') {
       const b = model.bandwidth(p);
       metrics = metric('B / Rₛ', finite(p.bandwidth/p.rate)) + metric('Остаток предыдущего уровня', `${finite(100*b.tail,1)} %`) + metric('Ошибочные решения', `${b.errors} / ${model.BITS.length}`);
@@ -136,7 +151,7 @@ export function mountChannelPlayground(root, options = {}) {
       } else {const points=n.points.slice(0,24), t=points.map((_,i)=>i), extent=Math.max(2,...points.flatMap(x=>[Math.abs(x.re),Math.abs(x.re-x.tx)]))*1.1;charts=plot('Отсчёты сигнала в моменты решений', [{x:t,y:points.map(x=>x.tx),label:'s: исходные уровни'},{x:t,y:points.map(x=>x.re),label:'r: I приёмника'},{x:t,y:points.map(x=>x.re-x.tx),label:'Добавленная компонента'}],{xmax:23,ymin:-extent,ymax:extent,xlabel:'Номер символа',ylabel:'Амплитуда'});}
       note = `Первые 24 бита: ${n.points.slice(0,24).map(x=>x.bit).join('')}; принято: ${n.points.slice(0,24).map(x=>x.decision).join('')}. Красные точки пересекли границу решения.`;
       dataNote = `Первые 24 бита: ${n.points.slice(0,24).map(x=>x.bit).join('')}; принято: ${n.points.slice(0,24).map(x=>x.decision).join('')}.`;
-      explanation = 'Показаны отсчёты комплексной огибающей BPSK. Шум — независимые гауссовы добавки в I и Q; SNR здесь задан как Eₛ/N₀. Внешняя помеха — один тон: его фаза последовательно вращается, поэтому точки имеют структуру. Случайный набор фиксирован, чтобы изменение одного параметра было сопоставимым. Число ошибок относится только к этому фрагменту и не является оценкой надёжности линии.';
+      explanation = 'Показаны отсчёты комплексной огибающей двоичной фазовой манипуляции (BPSK). Шум — независимые гауссовы добавки в синфазной I и квадратурной Q координатах; отношение сигнал/шум SNR здесь задано как Eₛ/N₀. Внешняя помеха — периодический треугольный сигнал в синфазной координате: точки располагаются на отрезках, а не окружностях. Число ошибок относится только к этому фрагменту.';
     } else if (mode==='multipath' || mode==='coherence') {
       const m=model.multipath(p), c=model.coherence(p), max=m.paths.reduce((v,x)=>v+x.amplitude,0);
       metrics = mode==='multipath' ? metric('Путей',m.paths.length) + metric('|H| на частоте сигнала',finite(model.response(m.paths,p.carrier).magnitude)) : metric('Среднеквадратический разброс задержек',`${finite(c.rms)} мкс`) + metric('Ориентир Bс ≈ 1/(5στ)',`${finite(c.bc)} МГц`) + metric('Bₛ / Bс',finite(c.ratio));

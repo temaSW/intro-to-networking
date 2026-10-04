@@ -56,21 +56,41 @@ assert(bare.addedNoise.every(x=>x===0));
 assert.equal(bare.addedNoiseWatts,0);
 const ideal=m.attenuationSignal({...weak,aid:'amplifier',noiseFigure:0});
 assert(ideal.addedNoise.every(x=>x===0));
-const expected=16*(10**(p.noiseFigure/10)-1)*1.380649e-23*290*100e6;
+const expected=4*(10**(p.noiseFigure/10)-1)*1.380649e-23*290*100e6;
 assert(Math.abs(amp.addedNoiseWatts/expected-1)<1e-12);
 const thresholdWatts=1e-3*10**(weak.sensitivity/10);
 const measured=amp.addedNoise.reduce((v,x)=>v+x*x,0)/amp.addedNoise.length*thresholdWatts;
 assert(Math.abs(measured/expected-1)<1e-12);
 for(let i=0;i<bare.input.length;i++) {
   close(bare.input[i],bare.tx[i]*10**((m.attenuation(weak).received-weak.sensitivity)/20));
-  close(ideal.output[i],4*bare.input[i]);
-  close(amp.output[i],4*bare.input[i]+amp.addedNoise[i]);
+  close(ideal.output[i],2*bare.input[i]);
+  close(amp.output[i],2*bare.input[i]+amp.addedNoise[i]);
 }
 const noisier=m.attenuationSignal({...weak,aid:'amplifier',noiseFigure:12});
 assert(noisier.addedNoiseWatts>amp.addedNoiseWatts);
 close(noisier.outputLevel,amp.outputLevel);
 // Changing the normalization threshold must not change physical noise power.
 close(m.attenuationSignal({...weak,aid:'amplifier',sensitivity:-90}).noiseDbm,amp.noiseDbm);
+""")
+
+
+def test_power_gain_and_receiver_overload_with_ideal_amplifier():
+    run_js("""
+const power = xs => xs.reduce((v,x)=>v+x*x,0)/xs.length;
+const unity = m.attenuationSignal({...p,aid:'ideal',gainDb:0});
+const four = m.attenuationSignal({...p,aid:'ideal'});
+close(power(four.output)/power(four.input),4);
+close(four.outputLevel-unity.outputLevel,10*Math.log10(4));
+close(power(four.tx),1);
+assert.equal(four.clipped,0);
+assert.deepEqual(four.receiver,four.output);
+const overloaded = m.attenuationSignal({...p,aid:'ideal',gainDb:40});
+assert(overloaded.clipped>0);
+assert(overloaded.addedNoise.every(x=>x===0));
+assert(overloaded.receiver.every(x=>Math.abs(x)<=overloaded.receiverLimit));
+assert(power(overloaded.receiver)<power(overloaded.output));
+close(power(overloaded.output)/power(overloaded.input),10000);
+close(overloaded.outputLevel-unity.outputLevel,40);
 """)
 
 
@@ -97,9 +117,13 @@ assert.deepEqual(noisy,m.noisySymbols({...p,snr:-12}));
 const variance = n => n.points.reduce((v,x)=>v+(x.re-x.tx)**2+x.im**2,0);
 assert(variance(noisy)>variance(clear));
 for(const point of m.noisySymbols({...p,disturbance:'interference',interference:1.7}).points) {
-  close(Math.hypot(point.re-point.tx,point.im),1.7);
+  assert(Math.abs(point.re-point.tx)<=1.7+1e-9);
+  close(point.im,0);
   assert.equal(point.error,point.decision!==point.bit);
 }
+const structured=m.noisySymbols({...p,disturbance:'interference',interference:1.7});
+assert(structured.errors>0);
+assert(new Set(structured.points.map(x=>(x.re-x.tx).toFixed(3))).size>10);
 """)
 
 

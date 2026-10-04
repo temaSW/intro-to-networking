@@ -6,6 +6,7 @@
 .channel-playground button[aria-pressed="true"] { background: var(--accent-soft, #176398); color: var(--accent, white); border-color: var(--accent, #176398); }
 .channel-playground :focus-visible { outline: 3px solid var(--focus, #d68625); outline-offset: 3px; }
 .cp-modes, .cp-views { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: 1rem; }
+.cp-views:empty { display: none; margin: 0; }
 .cp-chain { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .6rem; padding: 1rem; border: 1px solid var(--cp-border); border-radius: .6rem; }
 .cp-chain span { padding: .3rem .5rem; font-weight: 600; }
 .cp-experiment { background: var(--cp-panel); padding: 1rem; border-radius: .6rem; margin: 1rem 0; }
