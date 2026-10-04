@@ -2,7 +2,8 @@
 export const BITS = [1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1];
 export const MODES = ['attenuation', 'bandwidth', 'noise', 'multipath', 'coherence', 'shift', 'spread', 'media'];
 export function defaults() {
-  return {power: 10, distance: 2, loss: 2, sensitivity: -65, aid: 'none', noiseFigure: 6,
+  return {power: 10, distance: 2, loss: 2, sensitivity: -65, receiverMaximum: -25,
+    aid: 'none', gainDb: 10 * Math.log10(4), noiseFigure: 6,
     bandwidth: 4, rate: 8, regeneration: 'off', snr: 12, disturbance: 'noise',
     interference: .7, interferenceFrequency: .17, carrier: 1, f1: .8, f2: 1,
     signalBandwidth: .2, carrierGHz: 2.4, speed: 15, direction: 0, offset: 0,
@@ -17,10 +18,14 @@ export function attenuation(p) {
 export function attenuationSignal(p) {
   const a = attenuation(p), gain = 10 ** ((a.received - p.sensitivity) / 20);
   const time = Array.from({length: 240}, (_, i) => i / 20);
-  const tx = time.map(t => BITS[Math.min(11, Math.floor(t))] ? 1 : -1);
+  // Rounded pulse edges make receiver clipping visible; normalize mean signal power.
+  let pulse = 1;
+  const shaped = time.map(t => {pulse += .35 * ((BITS[Math.min(11, Math.floor(t))] ? 1 : -1) - pulse); return pulse;});
+  const rms = Math.sqrt(shaped.reduce((v,x) => v+x*x, 0) / shaped.length);
+  const tx = shaped.map(x => x / rms);
   const input = tx.map(x => x * gain); // This experiment's propagation channel is noiseless.
-  const amplified = p.aid === 'amplifier', voltageGain = amplified ? 4 : 1;
-  const noiseFactor = 10 ** (p.noiseFigure / 10);
+  const amplified = p.aid !== 'none', voltageGain = amplified ? 10 ** (p.gainDb / 20) : 1;
+  const noiseFactor = p.aid === 'ideal' ? 1 : 10 ** (p.noiseFigure / 10);
   // NF is specified against a reference thermal source, not the noiseless plotted input.
   // Only the amplifier's own added noise is included: Na = G (F-1) k T0 B.
   const referenceTemperature = 290, noiseBandwidth = 100e6;
@@ -31,7 +36,12 @@ export function attenuationSignal(p) {
   const realization = unitNoise(time.length, 4823);
   const addedNoise = realization.map(x => x * sigma);
   const output = input.map((x, i) => voltageGain * x + addedNoise[i]);
-  return {time, tx, input, output, addedNoise, addedNoiseWatts, referenceTemperature, noiseBandwidth,
+  // The ideal amplifier remains linear. Saturation belongs to the following receiver.
+  const receiverLimit = 10 ** ((p.receiverMaximum - p.sensitivity) / 20);
+  const receiver = output.map(x => Math.max(-receiverLimit, Math.min(receiverLimit, x)));
+  const clipped = output.filter(x => Math.abs(x) > receiverLimit).length;
+  return {time, tx, input, output, receiver, receiverLimit, clipped,
+    addedNoise, addedNoiseWatts, referenceTemperature, noiseBandwidth,
     noiseFactor, voltageGain, outputLevel: a.received + 20 * Math.log10(voltageGain),
     noiseDbm: addedNoiseWatts > 0 ? 10 * Math.log10(addedNoiseWatts / 1e-3) : -Infinity};
 }
@@ -77,8 +87,10 @@ export function noisySymbols(p, count = 96) {
   const points = Array.from({length: count}, (_, i) => {
     const bit = BITS[i % BITS.length], tx = bit ? 1 : -1;
     const phase = 2 * Math.PI * p.interferenceFrequency * i;
-    const re = tx + (p.disturbance === 'noise' ? sigma * gaussian() : p.interference * Math.cos(phase));
-    const im = p.disturbance === 'noise' ? sigma * gaussian() : p.interference * Math.sin(phase);
+    // Periodic triangular interference in one quadrature, not a rotating tone.
+    const triangular = 2 / Math.PI * Math.asin(Math.sin(phase));
+    const re = tx + (p.disturbance === 'noise' ? sigma * gaussian() : p.interference * triangular);
+    const im = p.disturbance === 'noise' ? sigma * gaussian() : 0;
     return {bit, tx, re, im, decision: re >= 0 ? 1 : 0, error: (re >= 0 ? 1 : 0) !== bit};
   });
   return {points, errors: points.filter(x => x.error).length};

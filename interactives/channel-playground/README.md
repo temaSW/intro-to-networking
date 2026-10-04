@@ -24,12 +24,12 @@
 `shift`, `spread`, `media`. На одной странице можно разместить несколько
 независимых экземпляров; идентификаторы SVG не пересекаются.
 Лекционное встраивание убирает повторные заголовки, цепочку и поле гипотезы:
-вопрос и инструкция находятся в тексте лекции, объяснение остаётся скрытым.
+вопрос находится в тексте лекции, контекст и определения закрыты по умолчанию.
+Лекционный интерфейс использует сокращённый набор регуляторов.
 
 ```html
 <div class="lecture-interactive" data-channel-playground
-     data-channel-mode="multipath" data-channel-layout="lecture"
-     data-channel-group="propagation"></div>
+     data-channel-mode="multipath" data-channel-layout="lecture"></div>
 ```
 
 У контейнеров с одинаковым `data-channel-group` общие параметры канала.
