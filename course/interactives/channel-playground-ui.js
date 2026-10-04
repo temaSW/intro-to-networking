@@ -11,6 +11,16 @@ const META = {
   media: ['Сравнение сред', 'Какие из наблюдавшихся эффектов будут важны в разных средах?', 'Выберите среду и сопоставьте причины искажений с её физикой.'],
 };
 const COLORS = ['#1479b8', '#d66720', '#8b62c5', '#168a69'];
+const LECTURE_HINTS = {
+  attenuation: 'Сопоставьте уровень до усилителя, уровень после него и график добавленного шума. Запас рассчитан до усилителя.',
+  bandwidth: 'Сравните отсчёты решений с исходными битами, затем отдельно рассмотрите форму новых импульсов.',
+  noise: 'Сравните структуру облака точек и положение границы решения. Число ошибок относится только к показанному фрагменту.',
+  multipath: 'Проверьте одновременно временную сумму копий и частотную характеристику при одной задержке.',
+  coherence: 'Сравните не только маркеры, но и весь интервал между ними. Оценка полосы когерентности условна.',
+  shift: 'По отдельности измените скорость, направление движения и рассогласование генераторов.',
+  spread: 'Рассмотрите отдельно модуль и фазу коэффициента канала. Оценка времени когерентности условна.',
+  media: 'Сопоставьте физические причины похожих искажений в разных средах.',
+};
 const finite = (v, digits = 2) => Number.isFinite(v) ? v.toLocaleString('ru-RU', {maximumFractionDigits: digits}) : '∞';
 const metric = (title, value) => `<div class="cp-metric"><span>${title}</span><strong>${value}</strong></div>`;
 function drawPlot(title, series, {xmin = 0, xmax = 1, ymin = -1, ymax = 1, xlabel = '', ylabel = '', markers = [], bands = [], square = false, width = 720} = {}) {
@@ -174,7 +184,7 @@ export function mountChannelPlayground(root, options = {}) {
     }
     const visibleNote = lecture ? dataNote : note;
     root.querySelector('.cp-results').innerHTML=`<div class="cp-metrics">${metrics}</div>${charts}${visibleNote ? `<p class="cp-note" role="status">${visibleNote}</p>` : ''}`;
-    root.querySelector('.cp-explanation-body').innerHTML=`${lecture ? `<p class="cp-note">${note}</p>` : ''}<p>${explanation}</p>`;
+    root.querySelector('.cp-explanation-body').innerHTML=`<p>${lecture ? LECTURE_HINTS[mode] : explanation}</p>`;
   }
   shell();
   shared?.listeners.set(root, () => {p = shared.parameters; shell();});
