@@ -1,14 +1,14 @@
 import * as model from './channel-playground-model.js';
 
 const META = {
-  attenuation: ['Затухание', 'Станет ли связь слабее при удвоении расстояния? Что изменит усиление?', 'Увеличьте расстояние, найдите границу работоспособности. Включите усилитель и измените его коэффициент шума.', 'Увеличить мощность или уменьшить потери; при выборе усилителя учитывать его собственный шум.'],
-  bandwidth: ['Ограниченная полоса', 'Восстановит ли регенератор исходные биты, если импульсы уже сливаются?', 'Сузьте полосу до 0,3 кГц и включите регенератор. Затем уменьшите скорость или расширьте полосу.', 'Согласовать символьную скорость с полосой. Регенерацию выполнять там, где символы ещё можно различить.'],
-  noise: ['Шум и помехи', 'Когда точка перейдёт через границу решения? Будет ли помеха выглядеть как шум?', 'Уменьшите SNR, затем переключитесь на внешнюю помеху и измените её частоту.', 'Повысить отношение сигнала к шуму; для внешней помехи искать источник, фильтрацию или другую частоту.'],
-  multipath: ['Многолучёвость', 'Всегда ли дополнительный луч делает сигнал сильнее?', 'Изменяйте задержку отражения. Сопоставьте сумму копий с провалами H(f).', 'Изменить расположение или частоту; способы борьбы с искажением будут обсуждаться позже.'],
-  coherence: ['Полоса когерентности', 'На каком расстоянии друг от друга частоты начинают испытывать разное действие канала?', 'Раздвигайте f₁ и f₂, сравнивайте усиление и фазу. Затем увеличьте задержки лучей.', 'Сравнить полосу сигнала с масштабом изменений канала по частоте.'],
-  shift: ['Уход частоты', 'Как изменится сдвиг при той же скорости и более высокой несущей?', 'Сравните 0,1 и 6 ГГц; затем остановите движение и добавьте рассогласование генераторов.', 'Различать движение и рассогласование генераторов как причины смещения спектра.'],
-  spread: ['Время когерентности', 'Будет ли канал меняться по амплитуде, если все лучи имеют одинаковый сдвиг?', 'Начните без отражений. Добавьте лучи с разными направлениями, увеличьте скорость и сравните T с Tс.', 'Сравнить длительность передачи с характерным временем изменения канала.'],
-  media: ['Сравнение сред', 'Какие из наблюдавшихся эффектов будут важны в разных средах?', 'Выберите среду и сопоставьте причины искажений с её физикой.', 'Выбирать среду и режим передачи с учётом главных ограничений конкретной линии.'],
+  attenuation: ['Затухание', 'Станет ли связь слабее при удвоении расстояния? Что изменит усиление?', 'Увеличьте расстояние, найдите границу работоспособности. Включите усилитель и измените его коэффициент шума.'],
+  bandwidth: ['Ограниченная полоса', 'Восстановит ли регенератор исходные биты, если импульсы уже сливаются?', 'Сузьте полосу до 0,3 кГц и включите регенератор. Затем уменьшите скорость или расширьте полосу.'],
+  noise: ['Шум и помехи', 'Когда точка перейдёт через границу решения? Будет ли помеха выглядеть как шум?', 'Уменьшите SNR, затем переключитесь на внешнюю помеху и измените её частоту.'],
+  multipath: ['Многолучёвость', 'Всегда ли дополнительный луч делает сигнал сильнее?', 'Изменяйте задержку отражения. Сопоставьте сумму копий с провалами H(f).'],
+  coherence: ['Полоса когерентности', 'На каком расстоянии друг от друга частоты начинают испытывать разное действие канала?', 'Раздвигайте f₁ и f₂, сравнивайте усиление и фазу. Затем увеличьте задержки лучей.'],
+  shift: ['Уход частоты', 'Как изменится сдвиг при той же скорости и более высокой несущей?', 'Сравните 0,1 и 6 ГГц; затем остановите движение и добавьте рассогласование генераторов.'],
+  spread: ['Время когерентности', 'Будет ли канал меняться по амплитуде, если все лучи имеют одинаковый сдвиг?', 'Начните без отражений. Добавьте лучи с разными направлениями, увеличьте скорость и сравните T с Tс.'],
+  media: ['Сравнение сред', 'Какие из наблюдавшихся эффектов будут важны в разных средах?', 'Выберите среду и сопоставьте причины искажений с её физикой.'],
 };
 const COLORS = ['#1479b8', '#d66720', '#8b62c5', '#168a69'];
 const finite = (v, digits = 2) => Number.isFinite(v) ? v.toLocaleString('ru-RU', {maximumFractionDigits: digits}) : '∞';
@@ -81,7 +81,7 @@ export function mountChannelPlayground(root, options = {}) {
   function shell() {
     const vv = views(); if (!vv.some(([v]) => v === view)) view = vv[0]?.[0] || '';
     const introduction = lecture ? '' : `<h2>${META[mode][0]}</h2><div class="cp-chain"><span>Передатчик · s(t)</span><b aria-hidden="true">→</b><span>${META[mode][0]}</span><b aria-hidden="true">→</b><span>Приёмник · r(t)</span></div><div class="cp-experiment"><strong>Предскажите</strong><p>${META[mode][1]}</p><textarea rows="2" placeholder="Моя гипотеза…" aria-label="Предсказание результата">${(prediction[mode] || '').replaceAll('&','&amp;').replaceAll('<','&lt;')}</textarea><p><strong>Проверьте:</strong> ${META[mode][2]}</p></div>`;
-    root.innerHTML = `${!fixed ? `<nav class="cp-modes" aria-label="Режимы канала">${Object.entries(META).map(([key, m], i) => `<button type="button" data-mode="${key}" aria-pressed="${mode===key}">${i+1}. ${m[0]}</button>`).join('')}</nav>` : ''}${introduction}<div class="cp-layout"><div class="cp-controls" role="group" aria-label="Параметры канала">${controls()}<button type="button" data-reset>${shared ? 'Сбросить общие параметры' : 'Сбросить параметры'}</button></div><section class="cp-observation" aria-label="Наблюдение"><div class="cp-views" aria-label="Представление">${vv.map(([key,label]) => `<button type="button" data-view="${key}" aria-pressed="${view===key}">${label}</button>`).join('')}</div><div class="cp-results"></div></section></div><details class="cp-explanation" ${explanations[mode] ? 'open' : ''}><summary>Объяснение и инженерская реакция</summary><div class="cp-explanation-body"></div></details>`;
+    root.innerHTML = `${!fixed ? `<nav class="cp-modes" aria-label="Режимы канала">${Object.entries(META).map(([key, m], i) => `<button type="button" data-mode="${key}" aria-pressed="${mode===key}">${i+1}. ${m[0]}</button>`).join('')}</nav>` : ''}${introduction}<div class="cp-layout"><div class="cp-controls" role="group" aria-label="Параметры канала">${controls()}<button type="button" data-reset>${shared ? 'Сбросить общие параметры' : 'Сбросить параметры'}</button></div><section class="cp-observation" aria-label="Наблюдение"><div class="cp-views" aria-label="Представление">${vv.map(([key,label]) => `<button type="button" data-view="${key}" aria-pressed="${view===key}">${label}</button>`).join('')}</div><div class="cp-results"></div></section></div><details class="cp-explanation" ${explanations[mode] ? 'open' : ''}><summary>Подсказка к опыту</summary><div class="cp-explanation-body"></div></details>`;
     root.querySelector('textarea')?.addEventListener('input', e => {prediction[mode] = e.target.value;});
     root.querySelector('details').addEventListener('toggle', e => {explanations[mode] = e.target.open;});
     root.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => {mode = b.dataset.mode; shell();}));
@@ -174,7 +174,7 @@ export function mountChannelPlayground(root, options = {}) {
     }
     const visibleNote = lecture ? dataNote : note;
     root.querySelector('.cp-results').innerHTML=`<div class="cp-metrics">${metrics}</div>${charts}${visibleNote ? `<p class="cp-note" role="status">${visibleNote}</p>` : ''}`;
-    root.querySelector('.cp-explanation-body').innerHTML=`${lecture ? `<p class="cp-note">${note}</p>` : ''}<p>${explanation}</p><p><strong>Инженерская реакция:</strong> ${META[mode][3]}</p>`;
+    root.querySelector('.cp-explanation-body').innerHTML=`${lecture ? `<p class="cp-note">${note}</p>` : ''}<p>${explanation}</p>`;
   }
   shell();
   shared?.listeners.set(root, () => {p = shared.parameters; shell();});
