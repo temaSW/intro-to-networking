@@ -172,6 +172,7 @@ def keying_figures() -> None:
         baseline = top + 112
         x0, x1 = 120, 570
         sx0, sx1 = 680, 1160
+        row_start = len(body)
         body += f'<text x="35" y="{top+24}" class="title">{label}</text>'
         for j, bit in enumerate(shown_bits):
             x = x0 + j * (x1-x0) / len(shown_bits)
@@ -179,6 +180,7 @@ def keying_figures() -> None:
         signal = keying_signal(mode, shown_bits, samples_per_bit)
         points = " ".join(f"{x0+i/(len(signal)-1)*(x1-x0):.1f},{baseline-65*v:.1f}" for i, v in enumerate(signal))
         body += f'<line x1="{x0}" y1="{baseline}" x2="{x1}" y2="{baseline}" class="axis"/><polyline points="{points}" fill="none" stroke="{ACCENT}" stroke-width="2"/>'
+        signal_end = len(body)
 
         db = welch_db(keying_signal(mode, long_bits, samples_per_bit), 8192)
         peak = max(db)
@@ -192,6 +194,12 @@ def keying_figures() -> None:
         # 0..8 cycles per bit: 1025 of the 4097 one-sided FFT bins.
         spectrum = " ".join(f"{sx0+i/1024*(sx1-sx0):.1f},{chart_top+min(60,max(0,peak-db[i]))/60*(chart_bottom-chart_top):.1f}" for i in range(1025))
         body += f'<polyline points="{spectrum}" fill="none" stroke="{ORANGE}" stroke-width="2"/><line x1="{sx0}" y1="{chart_bottom}" x2="{sx1}" y2="{chart_bottom}" class="axis"/>'
+        signal_row = body[row_start:signal_end].split('</text>', 1)[1]
+        spectrum_row = body[signal_end:]
+        desktop = f'<text x="35" y="32" class="title">{label}</text><text x="345" y="70" text-anchor="middle" class="label">Сигнал во времени · 01011010</text><text x="920" y="70" text-anchor="middle" class="label">Спектральная плотность, дБ</text><g transform="translate(0 {80-top})">{signal_row}{spectrum_row}</g><text x="345" y="315" text-anchor="middle" class="label">Время, битовые интервалы</text><text x="920" y="315" text-anchor="middle" class="label">Частота, циклов на битовый интервал</text>'
+        mobile = f'<text x="30" y="32" class="title">{label}</text><text x="320" y="70" text-anchor="middle" class="label">Сигнал во времени · 01011010</text><g transform="translate(-55 {70-top})">{signal_row}</g><text x="320" y="300" text-anchor="middle" class="label">Время, битовые интервалы</text><text x="320" y="345" text-anchor="middle" class="label">Спектральная плотность, дБ</text><g transform="translate(-590 {340-top})">{spectrum_row}</g><text x="320" y="580" text-anchor="middle" class="label">Частота, циклов на битовый интервал</text>'
+        for suffix, content, box in [('', desktop, '1200 340'), ('-mobile', mobile, '640 610')]:
+            (OUT / f'keying-{mode}{suffix}.svg').write_text(svg(content, label).replace('viewBox="0 0 900 500"', f'viewBox="0 0 {box}"'), encoding='utf-8')
     body += '<text x="920" y="846" text-anchor="middle" class="label">Частота, циклов на битовый интервал</text>'
     (OUT / "keying-comparison.svg").write_text(svg(body, "Амплитудная, частотная и фазовая манипуляция").replace('viewBox="0 0 900 500"', f'viewBox="0 0 {width} {height}"'), encoding="utf-8")
 
