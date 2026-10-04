@@ -15,6 +15,9 @@ export function attenuation(p) {
   return {lossDb, received, margin: received - p.sensitivity,
     usable: received >= p.sensitivity, amplitude: 10 ** ((received - p.power) / 20)};
 }
+export function samplePowerDbm(samples, referenceDbm, floor = -120) {
+  return samples.map(x => Math.max(floor, x === 0 ? floor : referenceDbm + 20 * Math.log10(Math.abs(x))));
+}
 export function attenuationSignal(p) {
   const a = attenuation(p), gain = 10 ** ((a.received - p.sensitivity) / 20);
   const time = Array.from({length: 240}, (_, i) => i / 20);
@@ -40,7 +43,11 @@ export function attenuationSignal(p) {
   const receiverLimit = 10 ** ((p.receiverMaximum - p.sensitivity) / 20);
   const receiver = output.map(x => Math.max(-receiverLimit, Math.min(receiverLimit, x)));
   const clipped = output.filter(x => Math.abs(x) > receiverLimit).length;
+  const inputPower = samplePowerDbm(input, p.sensitivity);
+  const outputPower = samplePowerDbm(output, p.sensitivity);
+  const receiverPower = samplePowerDbm(receiver, p.sensitivity);
   return {time, tx, input, output, receiver, receiverLimit, clipped,
+    inputPower, outputPower, receiverPower,
     addedNoise, addedNoiseWatts, referenceTemperature, noiseBandwidth,
     noiseFactor, voltageGain, outputLevel: a.received + 20 * Math.log10(voltageGain),
     noiseDbm: addedNoiseWatts > 0 ? 10 * Math.log10(addedNoiseWatts / 1e-3) : -Infinity};

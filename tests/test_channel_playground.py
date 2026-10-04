@@ -94,6 +94,31 @@ close(overloaded.outputLevel-unity.outputLevel,40);
 """)
 
 
+def test_attenuation_recovers_strong_signal_and_power_limit_is_at_peaks():
+    run_js("""
+const strong={...p,distance:.1,aid:'amplifier',gainDb:0,noiseFigure:0};
+const over=m.attenuationSignal(strong);
+assert(over.clipped>0);
+const safe=m.attenuationSignal({...strong,gainDb:-20});
+assert.equal(safe.clipped,0);
+close(over.outputLevel-safe.outputLevel,20);
+assert(safe.outputLevel>p.sensitivity);
+for(let i=0;i<over.time.length;i++) {
+  assert(over.receiverPower[i]<=p.receiverMaximum+1e-9);
+  if(Math.abs(over.output[i])>over.receiverLimit) {
+    close(over.receiverPower[i],p.receiverMaximum);
+    assert(over.outputPower[i]>p.receiverMaximum);
+  } else close(over.receiver[i],over.output[i]);
+}
+close(m.samplePowerDbm([1],-65)[0],-65);
+close(m.samplePowerDbm([100,-100],-65)[0],-25);
+assert.deepEqual(m.samplePowerDbm([100,-100],-65),[-25,-25]);
+const quieter=m.attenuationSignal({...strong,noiseFigure:3});
+const noisier=m.attenuationSignal({...strong,noiseFigure:12});
+assert(noisier.addedNoiseWatts>quieter.addedNoiseWatts);
+""")
+
+
 def test_isi_regeneration_restores_pulses_but_preserves_wrong_bits():
     run_js("""
 const weak=m.bandwidth({...p,bandwidth:.1,rate:20,regeneration:'on'});

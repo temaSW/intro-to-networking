@@ -1,4 +1,4 @@
-import * as model from './channel-playground-model.js?v=20261005-dynamic-range';
+import * as model from './channel-playground-model.js?v=20261005-power-scale';
 
 const META = {
   attenuation: ['Затухание', 'Станет ли связь слабее при удвоении расстояния? Что изменит усиление?', 'Увеличьте расстояние, найдите границу работоспособности. Включите усилитель и измените его коэффициент шума.'],
@@ -13,21 +13,21 @@ const META = {
 const COLORS = ['#1479b8', '#d66720', '#8b62c5', '#168a69'];
 const finite = (v, digits = 2) => Number.isFinite(v) ? v.toLocaleString('ru-RU', {maximumFractionDigits: digits}) : '∞';
 const metric = (title, value) => `<div class="cp-metric"><span>${title}</span><strong>${value}</strong></div>`;
-function drawPlot(title, series, {xmin = 0, xmax = 1, ymin = -1, ymax = 1, xlabel = '', ylabel = '', markers = [], bands = [], square = false, width = 720} = {}) {
+function drawPlot(title, series, {xmin = 0, xmax = 1, ymin = -1, ymax = 1, xlabel = '', ylabel = '', markers = [], bands = [], horizontalBands = [], yticks, square = false, width = 720} = {}) {
   const W = Math.max(320, Math.min(square ? 461 : 720, width)), H = square ? W - 11 : 245, L = 60, R = 15, T = 22, B = 42;
   const x = v => L + (v - xmin) / (xmax - xmin) * (W - L - R);
   const y = v => H - B - (v - ymin) / (ymax - ymin) * (H - T - B);
   const ticks = Array.from({length: 5}, (_, i) => {
-    const xx = xmin + (xmax - xmin) * i / 4, yy = ymin + (ymax - ymin) * i / 4;
-    return `<path class="cp-grid" d="M${x(xx)} ${T}V${H - B} M${L} ${y(yy)}H${W - R}"/><text x="${x(xx)}" y="${H - B + 19}" text-anchor="middle">${finite(xx)}</text><text x="${L - 8}" y="${y(yy) + 4}" text-anchor="end">${finite(yy)}</text>`;
-  }).join('');
+    const xx = xmin + (xmax - xmin) * i / 4;
+    return `<path class="cp-grid" d="M${x(xx)} ${T}V${H - B}"/><text x="${x(xx)}" y="${H - B + 19}" text-anchor="middle">${finite(xx)}</text>`;
+  }).join('') + (yticks || Array.from({length:5}, (_,i)=>ymin+(ymax-ymin)*i/4)).map(yy=>`<path class="cp-grid" d="M${L} ${y(yy)}H${W-R}"/><text x="${L-8}" y="${y(yy)+4}" text-anchor="end">${finite(yy)}</text>`).join('');
   const curves = series.map((s, index) => {
     const color = s.color || COLORS[index % COLORS.length];
     if (s.points) return s.points.map(p => `<circle cx="${x(p[0])}" cy="${y(p[1])}" r="${s.radius || 3}" fill="${color}" opacity=".8"/>`).join('');
     return `<polyline points="${s.x.map((v, i) => `${x(v).toFixed(2)},${y(s.y[i]).toFixed(2)}`).join(' ')}" fill="none" stroke="${color}" stroke-width="2" ${s.dash ? 'stroke-dasharray="5 4"' : ''}/>`;
   }).join('');
   const id = drawPlot.id++;
-  const svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${title}"><defs><clipPath id="cp-clip-${id}"><rect x="${L}" y="${T}" width="${W-L-R}" height="${H-T-B}"/></clipPath></defs>${ticks}<g clip-path="url(#cp-clip-${id})">${bands.map(b => `<rect x="${x(b[0])}" y="${T}" width="${x(b[1])-x(b[0])}" height="${H-T-B}" class="cp-band"/>`).join('')}${curves}${markers.map(m => `<path d="M${x(m.value)} ${T}V${H-B}" class="cp-marker"/><text x="${x(m.value)+4}" y="${T+13}">${m.label}</text>`).join('')}</g><text x="${W/2}" y="${H-3}" text-anchor="middle">${xlabel}</text><text x="${L}" y="14">${ylabel}</text></svg>`;
+  const svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${title}"><defs><clipPath id="cp-clip-${id}"><rect x="${L}" y="${T}" width="${W-L-R}" height="${H-T-B}"/></clipPath></defs>${ticks}<g clip-path="url(#cp-clip-${id})">${horizontalBands.map(b=>`<rect x="${L}" y="${y(b.high)}" width="${W-L-R}" height="${y(b.low)-y(b.high)}" class="${b.className}"/><text x="${W-R-5}" y="${y(b.high)+14}" text-anchor="end">${b.label}</text>`).join('')}${bands.map(b => `<rect x="${x(b[0])}" y="${T}" width="${x(b[1])-x(b[0])}" height="${H-T-B}" class="cp-band"/>`).join('')}${curves}${markers.map(m => `<path d="M${x(m.value)} ${T}V${H-B}" class="cp-marker"/><text x="${x(m.value)+4}" y="${T+13}">${m.label}</text>`).join('')}</g><text x="${W/2}" y="${H-3}" text-anchor="middle">${xlabel}</text><text x="${L}" y="14">${ylabel}</text></svg>`;
   return `<figure class="cp-plot ${square ? 'cp-square' : ''}"><figcaption>${title}</figcaption>${svg}<div class="cp-legend">${series.filter(s => s.label).map((s, i) => `<span><i style="background:${s.color || COLORS[i % COLORS.length]}"></i>${s.label}</span>`).join('')}</div></figure>`;
 }
 drawPlot.id = 0;
@@ -50,7 +50,7 @@ export function mountChannelPlayground(root, options = {}) {
   const lecture = (options.layout || root.dataset.channelLayout) === 'lecture';
   const shared = options.sharedState;
   let mode = fixed || 'attenuation', p = shared?.parameters || model.defaults(), view = 'time', medium = 'radio';
-  const initialParameters = () => ({...model.defaults(), ...(lecture && mode === 'attenuation' ? {aid: 'ideal', gainDb: 0} : {})});
+  const initialParameters = () => ({...model.defaults(), ...(lecture && mode === 'attenuation' ? {aid: 'amplifier', gainDb: 0, noiseFigure: 0} : {})});
   if (!shared) p = initialParameters();
   const prediction = {}, explanations = {};
   root.classList.add('channel-playground');
@@ -69,7 +69,7 @@ export function mountChannelPlayground(root, options = {}) {
     const amplifier = () => select('aid', 'Усилитель', [['none','Без усилителя'], ['ideal','Идеальный'], ['amplifier','С собственным шумом']], p.aid) + (p.aid !== 'none' ? slider('gainDb', 'Усиление по мощности', 0, 40, .01, p.gainDb, 'дБ') : '');
     if (lecture) {
       switch (mode) {
-        case 'attenuation': return slider('distance', 'Расстояние', .1, 20, .1, p.distance, 'км') + slider('gainDb', 'Коэффициент передачи', -10, 40, .01, p.gainDb, 'дБ') + select('aid', 'Входной каскад', [['ideal','Идеальный'], ['amplifier','С собственным шумом']], p.aid);
+        case 'attenuation': return slider('distance', 'Расстояние', .1, 20, .1, p.distance, 'км') + slider('gainDb', 'Коэффициент передачи', -30, 40, .01, p.gainDb, 'дБ') + slider('noiseFigure', 'Коэффициент шума (КШ)', 0, 15, .5, p.noiseFigure, 'дБ');
         case 'bandwidth': return slider('bandwidth', 'Полоса канала', .1, 20, .1, p.bandwidth, 'кГц') + select('regeneration', 'Регенератор', [['off','Выключен'], ['on','Включён']], p.regeneration);
         case 'noise': return select('disturbance', 'Добавленный сигнал', [['noise','Шум'], ['interference','Внешняя помеха']], p.disturbance) + (p.disturbance === 'noise' ? slider('snr', 'Отношение сигнал/шум Eₛ/N₀', -12, 24, 1, p.snr, 'дБ') : slider('interference', 'Амплитуда помехи / сигнала', 0, 3, .05, p.interference));
         case 'multipath': return slider('path-0-amplitude', 'Амплитуда отражённого пути', 0, 1, .05, p.paths[0].amplitude) + slider('path-0-delay', 'Задержка отражённого пути', 0, 5, .025, p.paths[0].delay, 'мкс');
@@ -119,15 +119,14 @@ export function mountChannelPlayground(root, options = {}) {
     let metrics = '', charts = '', note = '', explanation = '', dataNote = '';
     if (mode === 'attenuation') {
       const a = model.attenuation(p);
-      const {time:t, tx, input, output, receiver, receiverLimit, clipped, addedNoise, noiseDbm, outputLevel, voltageGain} = model.attenuationSignal(p);
+      const {time:t, output, receiver, receiverLimit, clipped, inputPower, outputPower, receiverPower, noiseDbm, outputLevel} = model.attenuationSignal(p);
       metrics = metric('После среды', `${finite(a.received)} дБм`) + metric('Сигнал на входе приёмника', `${finite(outputLevel)} дБм`) + metric('Диапазон приёмника', `${p.sensitivity}…${p.receiverMaximum} дБм`) + metric('Ограниченные отсчёты', `${finite(100*clipped/t.length,1)} %`);
-      if (p.aid !== 'none') metrics += metric('Передача по мощности', `×${finite(voltageGain**2)} · ${finite(p.gainDb)} дБ`);
       if (p.aid==='amplifier') metrics += metric('Собственный шум на выходе', Number.isFinite(noiseDbm) ? `${finite(noiseDbm)} дБм` : 'Нет');
       {
-        charts = plot('Переданные цифровые уровни', [{x:t,y:tx,label:'s(t)'}],{xmax:12,ymin:-1.5,ymax:1.5,xlabel:'Символы',ylabel:'Относительная амплитуда'});
-        const limit = Math.max(1.5, Math.max(...output.map(Math.abs)) * 1.1);
-        charts += plot('Сигнал и границы входа приёмника', [{x:t,y:output,label:'Вход приёмника',dash:true},{x:t,y:receiver,label:'После входного ограничения'}, {x:[0,12],y:[receiverLimit,receiverLimit],label:'Граница диапазона',color:COLORS[2],dash:true}, {x:[0,12],y:[-receiverLimit,-receiverLimit],color:COLORS[2],dash:true}],{xmax:12,ymin:-limit,ymax:limit,xlabel:'Символы',ylabel:'В единицах амплитуды чувствительности'});
-        if (p.aid==='amplifier') {const noiseLimit=Math.max(.001,...addedNoise.map(Math.abs))*1.1; charts += plot('Собственный шум усилителя · отдельный масштаб', [{x:t,y:addedNoise,label:'Добавленная компонента'}],{xmax:12,ymin:-noiseLimit,ymax:noiseLimit,xlabel:'Символы',ylabel:'В единицах амплитуды порога'});}
+        charts = plot('Мощность сигнала во времени', [{x:t,y:inputPower,label:'После среды',color:'#7a8994'}, {x:t,y:outputPower,label:'Вход приёмника',color:COLORS[0],dash:true}, {x:t,y:receiverPower,label:'После ограничения',color:COLORS[1]}],{xmax:12,ymin:-100,ymax:40,yticks:[-100,-65,-25,0,40],xlabel:'Номер символа',ylabel:'Мощность, дБм',horizontalBands:[{low:p.receiverMaximum,high:40,className:'cp-overload-band',label:'Перегрузка'}, {low:p.sensitivity,high:p.receiverMaximum,className:'cp-range-band',label:'Динамический диапазон'}, {low:-100,high:p.sensitivity,className:'cp-weak-band',label:'Ниже чувствительности'}]});
+        const millivolts = 1000 * Math.sqrt(50 * 1e-3 * 10 ** (p.sensitivity/10));
+        const upper = receiverLimit * millivolts, limit = upper * 1.25;
+        charts += plot('Форма сигнала на входе приёмника', [{x:t,y:output.map(x=>x*millivolts),label:'До ограничения',dash:true}, {x:t,y:receiver.map(x=>x*millivolts),label:'После ограничения'}, {x:[0,12],y:[upper,upper],label:'Максимальная амплитуда',color:COLORS[2],dash:true}, {x:[0,12],y:[-upper,-upper],color:COLORS[2],dash:true}],{xmax:12,ymin:-limit,ymax:limit,yticks:[-upper,0,upper],xlabel:'Номер символа',ylabel:'Напряжение, мВ'});
       }
       note = a.usable ? 'Запас неотрицательный: связь условно работоспособна.' : 'Запас отрицательный: работоспособность не гарантирована.';
       explanation = 'Коэффициент передачи задан по мощности: G = 10^(g/10), по амплитуде — √G. ×4 по мощности соответствует 6,02 дБ и ×2 по амплитуде. Идеальный каскад не добавляет шума и остаётся линейным; ограничение амплитуды происходит на входе следующего приёмника. Его чувствительность −65 дБм, верхняя граница −25 дБм. При наличии собственного шума Nа = G(F − 1)kT₀B, F = 10^(NF/10), NF — коэффициент шума в децибелах, T₀ = 290 К, B = 100 МГц, k — постоянная Больцмана. Округлённые импульсы нормированы к единичной средней мощности; уровень сигнала показан до ограничения отдельно от шума.';
