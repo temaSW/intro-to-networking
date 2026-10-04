@@ -19,63 +19,65 @@ flowchart LR
 
 ### Проверяем гипотезы о пути
 
-Сопоставьте предложенные узлы с функциями на схеме. Границы функций не обязательно совпадают с границами устройств.
+Схема раскрывается после обсуждения. Границы функций не обязательно совпадают с границами устройств.
 
-::::{.cr-section .course-closeread layout="sidebar-right"}
+::::{.cr-section .course-closeread .path-closeread layout="overlay-center"}
 
-:::{.route-step focus-on="cr-data-path" data-stage="all"}
-#### Весь путь
+:::{.route-step focus-on="cr-data-path" data-stage="question"}
+#### От смартфона к серверу
 
-Где данные впервые превращаются в сигнал? Где несколько потоков могут идти по общему участку?
+Какие функции скрыты между ними?
 :::
 
 :::{.route-step focus-on="cr-data-path" data-stage="access"}
 #### Участок доступа
 
-На первом участке биты представляются физическим сигналом. Этот ресурс делят несколько абонентов.
+Где биты становятся радиосигналом?
 :::
 
 :::{.route-step focus-on="cr-data-path" data-stage="access-node"}
 #### Узел доступа
 
-Узел принимает передачу с радиоканала и направляет данные дальше. Что меняется: содержание данных, их физическое представление или маршрут?
+Что он принимает и куда передаёт?
 :::
 
 :::{.route-step focus-on="cr-data-path" data-stage="transport"}
 #### Общий путь
 
-Потоки разных абонентов объединяются и проходят промежуточные узлы. Где на этом пути может возникнуть ограничение по скорости?
+Где объединяются потоки абонентов?
 :::
 
 :::{.route-step focus-on="cr-data-path" data-stage="destination"}
 #### Сеть назначения
 
-Данные достигают сети, где находится сервер. По каким сведениям промежуточные узлы выбирают дальнейший путь?
+Как данные находят сервер?
 :::
 
 :::{.route-step focus-on="cr-data-path" data-stage="all"}
-#### Снова вся система
+#### Вся цепь
 
-Какие переходы меняют физическое представление данных, а какие — их маршрут? Теперь вернитесь к своей исходной гипотезе.
+Где меняется представление данных, а где — маршрут?
 :::
 
 :::{#cr-data-path}
-<div class="route-map" data-route-map data-stage="all" aria-label="Путь данных: абонент, участок доступа, узел доступа, транспорт, сеть назначения, сервер">
-  <ol class="route-map-stages">
-    <li data-route-stage="subscriber"><span class="route-map-number">01</span><strong>Абонент</strong><small>Пользовательские данные</small></li>
-    <li data-route-stage="access"><span class="route-map-number">02</span><strong>Участок доступа</strong><small>Физический сигнал</small></li>
-    <li data-route-stage="access-node"><span class="route-map-number">03</span><strong>Узел доступа</strong><small>Приём и передача</small></li>
-    <li data-route-stage="transport"><span class="route-map-number">04</span><strong>Транспорт</strong><small>Объединение потоков</small></li>
-    <li data-route-stage="destination"><span class="route-map-number">05</span><strong>Сеть назначения</strong><small>Путь к серверу</small></li>
-    <li data-route-stage="server"><span class="route-map-number">06</span><strong>Сервер</strong><small>Получение данных</small></li>
+<div class="path-scene" data-route-map data-stage="question" aria-label="Путь данных от смартфона до сервера">
+  <div class="scene-overline">Отправка файла <span>01 — 06</span></div>
+  <ol class="path-scene-nodes">
+    <li data-route-stage="subscriber"><span class="path-node-index">01</span><strong>Смартфон</strong><span class="path-node-mask" aria-hidden="true">?</span></li>
+    <li data-route-stage="access"><span class="path-node-index">02</span><strong>Участок доступа</strong><span class="path-node-mask" aria-hidden="true">?</span></li>
+    <li data-route-stage="access-node"><span class="path-node-index">03</span><strong>Узел доступа</strong><span class="path-node-mask" aria-hidden="true">?</span></li>
+    <li data-route-stage="transport"><span class="path-node-index">04</span><strong>Транспорт</strong><span class="path-node-mask" aria-hidden="true">?</span></li>
+    <li data-route-stage="destination"><span class="path-node-index">05</span><strong>Сеть назначения</strong><span class="path-node-mask" aria-hidden="true">?</span></li>
+    <li data-route-stage="server"><span class="path-node-index">06</span><strong>Сервер</strong><span class="path-node-mask" aria-hidden="true">?</span></li>
   </ol>
-  <div class="route-map-token" aria-hidden="true" hidden>Данные →</div>
+  <div class="path-scene-track" aria-hidden="true"><span></span></div>
+  <div class="scene-step-indicator" aria-hidden="true"><span data-scene-step>00</span> / 05</div>
 </div>
 :::
 
 ::::
 
-<script src="../interactives/closeread-scenes.js" defer></script>
+<script src="../interactives/closeread-scenes.js?v=20261005-1" defer></script>
 
 ## Что передаётся?
 

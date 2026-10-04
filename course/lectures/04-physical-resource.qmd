@@ -15,50 +15,54 @@ format:
 
 > Посмотрите на три способа передачи одной и той же последовательности битов. Что у несущей меняется между соседними битами?
 
-::::{.cr-section .course-closeread .keying-closeread layout="sidebar-right"}
+::::{.cr-section .course-closeread .keying-closeread layout="overlay-center"}
 
 :::{.keying-step focus-on="cr-keying" data-stage="all"}
-#### Одна последовательность, три сигнала
+#### Три способа передать бит
 
-Сравните строки на рисунке: биты одинаковые. В каждом случае меняется один параметр несущей.
+Что меняется у несущей?
 :::
 
 :::{.keying-step focus-on="cr-keying" data-stage="ask"}
 #### Амплитуда · ASK
 
-Сравните высоту колебаний для 0 и 1. Частота и фаза при этом сохраняются?
+Где сигнал становится сильнее?
 :::
 
 :::{.keying-step focus-on="cr-keying" data-stage="fsk"}
 #### Частота · FSK
 
-Теперь сравните число колебаний за один битовый интервал. Что остаётся примерно постоянным?
+Где колебаний за битовый интервал больше?
 :::
 
 :::{.keying-step focus-on="cr-keying" data-stage="psk"}
 #### Фаза · PSK
 
-Найдите места, где колебание меняет фазу. Чем этот переход отличается от изменения амплитуды или частоты?
+Где меняется положение колебания?
 :::
 
 :::{.keying-step focus-on="cr-keying" data-stage="all"}
-#### Сопоставьте три способа
+#### Три параметра
 
-Какой параметр несущей кодирует бит в каждом случае? Сравните свой ответ с исходной гипотезой.
+Сравните ответы с исходной гипотезой.
 :::
 
 :::{#cr-keying}
-<div class="keying-figure" data-keying-figure data-stage="all">
-  <img src="../assets/lecture-04/keying-comparison.svg" alt="Три ряда сравнения ASK, FSK и PSK для одной последовательности битов">
-  <span class="keying-focus keying-focus-ask" aria-hidden="true"></span>
-  <span class="keying-focus keying-focus-fsk" aria-hidden="true"></span>
-  <span class="keying-focus keying-focus-psk" aria-hidden="true"></span>
+<div class="keying-scene" data-keying-figure data-stage="all" role="img" aria-label="Три способа передать одну последовательность битов: ASK, FSK, PSK">
+  <div class="scene-overline">Одна последовательность битов <span>ASK / FSK / PSK</span></div>
+  <div class="keying-overview"><img src="../assets/lecture-04/keying-comparison.svg" alt="Три ряда сигналов и их спектров"></div>
+  <div class="keying-detail" aria-hidden="true">
+<div class="keying-panel keying-wave"><img src="../assets/lecture-04/keying-comparison.svg" alt=""><span>Сигнал во времени</span></div>
+<div class="keying-panel keying-spectrum"><img src="../assets/lecture-04/keying-comparison.svg" alt=""><span>Спектр</span></div>
+  </div>
+  <div class="keying-mode" aria-hidden="true">ASK · FSK · PSK</div>
+  <div class="scene-step-indicator" aria-hidden="true"><span data-scene-step>00</span> / 03</div>
 </div>
 :::
 
 ::::
 
-<script src="../interactives/closeread-scenes.js" defer></script>
+<script src="../interactives/closeread-scenes.js?v=20261005-1" defer></script>
 
 **ASK** (*amplitude-shift keying*) — амплитудная манипуляция; **FSK** (*frequency-shift keying*) — частотная; **PSK** (*phase-shift keying*) — фазовая. $T_b$ — длительность бита, $f_c$ — несущая частота.
 
@@ -82,37 +86,46 @@ format:
 
 ### Как подписать точки битами? Код Грея
 
-Один и тот же набор точек можно подписать битами по-разному. В квадратной **16-QAM** символ содержит четыре бита: первые два задают уровень по оси $I$, последние два — по оси $Q$. На каждой оси уровни идут в порядке Грея `00`, `01`, `11`, `10`. Ниже подписаны все точки; черта в метке разделяет биты $I$ и $Q$.
+Один и тот же набор точек можно подписать битами по-разному. В квадратной **16-QAM** символ содержит четыре бита: первые два задают уровень по оси $I$, последние два — по оси $Q$. Нуль находится в пересечении осей, а уровни каждой координаты равны $-3$, $-1$, $+1$, $+3$. Слева направо и снизу вверх они подписаны в порядке Грея `00`, `01`, `11`, `10`. Ниже показаны все точки; черта в метке разделяет биты $I$ и $Q$.
 
 <figure class="gray-code-figure">
-<svg class="gray-code-strip" viewBox="0 0 700 470" role="img" aria-label="Полное созвездие 16-QAM с четырёхбитными метками Грея. Соседние точки 01|01 и 11|01 отличаются одним битом">
+<svg class="gray-code-strip" viewBox="0 0 700 550" role="img" aria-label="Полное созвездие 16-QAM с четырёхбитными метками Грея. Соседние точки 01|01 и 11|01 отличаются одним битом">
   <title>Код Грея на всех шестнадцати точках 16-QAM</title>
-  <rect width="700" height="470" fill="var(--surface)"/>
+  <rect width="700" height="550" fill="var(--surface)"/>
   <text x="105" y="35" class="gray-code-muted">Метка точки: I | Q</text>
-  <line x1="90" y1="420" x2="630" y2="420" class="gray-code-axis"/>
-  <path d="M630 420 l-10 -5 v10 z" class="gray-code-axis-arrow"/>
-  <line x1="90" y1="420" x2="90" y2="47" class="gray-code-axis"/>
-  <path d="M90 47 l-5 10 h10 z" class="gray-code-axis-arrow"/>
-  <text x="647" y="425" class="gray-code-muted">I</text>
-  <text x="81" y="42" class="gray-code-muted">Q</text>
-  <path d="M160 90 V375 M285 90 V375 M410 90 V375 M535 90 V375 M160 90 H535 M160 185 H535 M160 280 H535 M160 375 H535" fill="none" stroke="var(--line)" stroke-width="1" stroke-dasharray="4 5"/>
-  <line x1="285" y1="280" x2="410" y2="280" class="gray-code-highlight"/>
-  <text x="160" y="69" text-anchor="middle">00|10</text><circle cx="160" cy="90" r="5"/>
-  <text x="285" y="69" text-anchor="middle">01|10</text><circle cx="285" cy="90" r="5"/>
-  <text x="410" y="69" text-anchor="middle">11|10</text><circle cx="410" cy="90" r="5"/>
-  <text x="535" y="69" text-anchor="middle">10|10</text><circle cx="535" cy="90" r="5"/>
-  <text x="160" y="164" text-anchor="middle">00|11</text><circle cx="160" cy="185" r="5"/>
-  <text x="285" y="164" text-anchor="middle">01|11</text><circle cx="285" cy="185" r="5"/>
-  <text x="410" y="164" text-anchor="middle">11|11</text><circle cx="410" cy="185" r="5"/>
-  <text x="535" y="164" text-anchor="middle">10|11</text><circle cx="535" cy="185" r="5"/>
-  <text x="160" y="259" text-anchor="middle">00|01</text><circle cx="160" cy="280" r="5"/>
-  <text x="285" y="259" text-anchor="middle" class="gray-code-emphasis">01|01</text><circle cx="285" cy="280" r="7" class="gray-code-emphasis-point"/>
-  <text x="410" y="259" text-anchor="middle" class="gray-code-emphasis">11|01</text><circle cx="410" cy="280" r="7" class="gray-code-emphasis-point"/>
-  <text x="535" y="259" text-anchor="middle">10|01</text><circle cx="535" cy="280" r="5"/>
-  <text x="160" y="354" text-anchor="middle">00|00</text><circle cx="160" cy="375" r="5"/>
-  <text x="285" y="354" text-anchor="middle">01|00</text><circle cx="285" cy="375" r="5"/>
-  <text x="410" y="354" text-anchor="middle">11|00</text><circle cx="410" cy="375" r="5"/>
-  <text x="535" y="354" text-anchor="middle">10|00</text><circle cx="535" cy="375" r="5"/>
+  <path d="M160 85 V460 M285 85 V460 M410 85 V460 M535 85 V460 M160 85 H535 M160 210 H535 M160 335 H535 M160 460 H535" fill="none" stroke="var(--line)" stroke-width="1" stroke-dasharray="4 5"/>
+  <line x1="70" y1="272.5" x2="630" y2="272.5" class="gray-code-axis"/>
+  <path d="M630 272.5 l-10 -5 v10 z" class="gray-code-axis-arrow"/>
+  <line x1="347.5" y1="510" x2="347.5" y2="47" class="gray-code-axis"/>
+  <path d="M347.5 47 l-5 10 h10 z" class="gray-code-axis-arrow"/>
+  <text x="647" y="277" class="gray-code-muted">I</text>
+  <text x="359" y="42" class="gray-code-muted">Q</text>
+  <text x="337" y="292" text-anchor="end" class="gray-code-muted">0</text>
+  <text x="160" y="260" text-anchor="middle" class="gray-code-muted">−3</text>
+  <text x="285" y="260" text-anchor="middle" class="gray-code-muted">−1</text>
+  <text x="410" y="260" text-anchor="middle" class="gray-code-muted">+1</text>
+  <text x="535" y="260" text-anchor="middle" class="gray-code-muted">+3</text>
+  <text x="359" y="101" class="gray-code-muted">+3</text>
+  <text x="359" y="226" class="gray-code-muted">+1</text>
+  <text x="359" y="351" class="gray-code-muted">−1</text>
+  <text x="359" y="476" class="gray-code-muted">−3</text>
+  <line x1="285" y1="335" x2="410" y2="335" class="gray-code-highlight"/>
+  <text x="160" y="64" text-anchor="middle">00|10</text><circle cx="160" cy="85" r="5"/>
+  <text x="285" y="64" text-anchor="middle">01|10</text><circle cx="285" cy="85" r="5"/>
+  <text x="410" y="64" text-anchor="middle">11|10</text><circle cx="410" cy="85" r="5"/>
+  <text x="535" y="64" text-anchor="middle">10|10</text><circle cx="535" cy="85" r="5"/>
+  <text x="160" y="189" text-anchor="middle">00|11</text><circle cx="160" cy="210" r="5"/>
+  <text x="285" y="189" text-anchor="middle">01|11</text><circle cx="285" cy="210" r="5"/>
+  <text x="410" y="189" text-anchor="middle">11|11</text><circle cx="410" cy="210" r="5"/>
+  <text x="535" y="189" text-anchor="middle">10|11</text><circle cx="535" cy="210" r="5"/>
+  <text x="160" y="314" text-anchor="middle">00|01</text><circle cx="160" cy="335" r="5"/>
+  <text x="285" y="314" text-anchor="middle" class="gray-code-emphasis">01|01</text><circle cx="285" cy="335" r="7" class="gray-code-emphasis-point"/>
+  <text x="410" y="314" text-anchor="middle" class="gray-code-emphasis">11|01</text><circle cx="410" cy="335" r="7" class="gray-code-emphasis-point"/>
+  <text x="535" y="314" text-anchor="middle">10|01</text><circle cx="535" cy="335" r="5"/>
+  <text x="160" y="439" text-anchor="middle">00|00</text><circle cx="160" cy="460" r="5"/>
+  <text x="285" y="439" text-anchor="middle">01|00</text><circle cx="285" cy="460" r="5"/>
+  <text x="410" y="439" text-anchor="middle">11|00</text><circle cx="410" cy="460" r="5"/>
+  <text x="535" y="439" text-anchor="middle">10|00</text><circle cx="535" cy="460" r="5"/>
 </svg>
 <figcaption>Выделенные соседи <code>01|01</code> и <code>11|01</code> различаются одним битом.</figcaption>
 </figure>

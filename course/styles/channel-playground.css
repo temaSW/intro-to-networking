@@ -29,6 +29,7 @@
 .cp-metric span { font-size: .82rem; }
 .cp-metric strong { font-size: 1.08rem; margin-top: .3rem; }
 .cp-plot { margin: .8rem 0; border: 1px solid var(--cp-border); border-radius: .5rem; padding: .5rem; }
+.quarto-dark .channel-playground .cp-plot { --cp-border: #abc3c6; color: #17343b; background: #f8faf9; }
 .cp-plot figcaption { font-weight: 600; font-size: .95rem; }
 .cp-plot svg { display: block; width: 100%; overflow: hidden; }
 .cp-square svg { max-width: 500px; margin: auto; }

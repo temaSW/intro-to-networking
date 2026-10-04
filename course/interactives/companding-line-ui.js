@@ -34,32 +34,6 @@ function segmentChart(active, sample) {
   return `<svg viewBox="0 0 900 420" role="img" aria-label="Положительная ветвь A-характеристики ИКМ: вход от 0 до 2048 в единицах Δ₀, выход от 0 до 128 кодовых позиций"><line class="segment-axis" x1="${left}" y1="${bottom}" x2="850" y2="${bottom}"/><line class="segment-axis" x1="${left}" y1="${bottom}" x2="${left}" y2="43"/>${guides}${ticks}<polyline class="segment-curve" points="${curve}"/>${activeLine}<path class="sample-guide" d="M ${markerX} ${bottom} V ${markerY} H ${left}"/><circle class="sample-point" cx="${markerX}" cy="${markerY}" r="6"/>${labels}${levels}${segments}<text x="${left}" y="28">Выход / Δ₀ · кодовая позиция</text><text x="850" y="402" text-anchor="end">Вход / Δ₀</text><text x="${left - 12}" y="${bottom + 5}" text-anchor="end">0</text></svg>`;
 }
 
-const chainRoot = document.querySelector('[data-pcm-chain]');
-if (chainRoot) {
-  const steps = [
-    ['Отсчёт', 'После дискретизации мы получили амплитуду в выбранный момент времени. Её ещё нельзя передать конечным числом бит без квантования.'],
-    ['Компрессор', 'Преобразование растягивает область малых амплитуд в кодовой шкале. Один шаг следующего квантователя будет соответствовать разным шагам исходного сигнала.'],
-    ['Квантователь', 'Равномерный квантователь выбирает одну из 256 позиций в преобразованной шкале; на исходной шкале интервалы получаются неравномерными.'],
-    ['Кодовое слово', 'Выбранная позиция становится 8-битным словом: знак, сегмент и позиция внутри сегмента. После передачи приёмник находит соответствующий уровень.'],
-    ['Экспандер', 'Обратное нелинейное преобразование переводит выбранный уровень в исходную шкалу амплитуд. Потерянную при квантовании точность оно не восстанавливает.'],
-  ];
-  chainRoot.innerHTML = `<div class="pcm-chain-steps" role="group" aria-label="Этапы компандирования">${steps.map(([name], i) => `<button type="button" data-step="${i}" aria-expanded="false" aria-controls="pcm-chain-detail">${name}</button>`).join('<span aria-hidden="true">→</span>')}</div><p id="pcm-chain-detail" class="pcm-chain-detail" aria-live="polite" hidden></p>`;
-  const detail = chainRoot.querySelector('.pcm-chain-detail');
-  let active = null;
-  const select = index => {
-    active = active === index ? null : index;
-    chainRoot.querySelectorAll('button[data-step]').forEach((button, i) => {
-      button.setAttribute('aria-expanded', String(i === active));
-    });
-    detail.hidden = active === null;
-    detail.textContent = active === null ? '' : steps[active][1];
-  };
-  chainRoot.addEventListener('click', event => {
-    const button = event.target.closest('button[data-step]');
-    if (button) select(Number(button.dataset.step));
-  });
-}
-
 function waveSvg(model, rows) {
   const n = model.bits.length, cell = 31, left = 158, rowH = 69;
   const width = left + n * cell + 16, height = 43 + rows.length * rowH;

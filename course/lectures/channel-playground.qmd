@@ -2,7 +2,7 @@
 title: "Среда распространения и искажения"
 format:
   html:
-    css: ../styles/channel-playground.css
+    css: ../styles/channel-playground.css?v=20261005-1
 ---
 
 <details><summary>Контекст и обозначения</summary>

@@ -3,8 +3,10 @@ title: "Лекция 03. Компандирование и линейные ко
 subtitle: "От аналогового отсчёта до сигнала основной полосы"
 format:
   html:
+    filters: [../_extensions/closeread/closeread.lua]
     css:
-      - ../styles/companding-line.css?v=20260929-4
+      - ../_extensions/closeread/closeread.css
+      - ../styles/companding-line.css?v=20261005-1
       - ../styles/scrambler.css?v=20260929-2
 ---
 
@@ -12,7 +14,69 @@ format:
 
 > Где в этой цепочке выбирают моменты измерения, где заменяют амплитуду уровнем, а где появляются биты? Какую задачу решает импульсно-кодовая модуляция (ИКМ)?
 
-<div class="companding-line-widget" data-pcm-chain></div>
+::::{.cr-section .course-closeread .process-closeread layout="overlay-center"}
+
+:::{.process-step focus-on="cr-pcm-path" data-stage="question"}
+#### От сигнала к битам
+
+Где в цепочке появляются биты?
+:::
+
+:::{.process-step focus-on="cr-pcm-path" data-stage="sample"}
+#### Отсчёт
+
+Когда измеряем амплитуду?
+:::
+
+:::{.process-step focus-on="cr-pcm-path" data-stage="compress"}
+#### Компрессор
+
+Зачем меняют шкалу до квантования?
+:::
+
+:::{.process-step focus-on="cr-pcm-path" data-stage="quantize"}
+#### Квантователь
+
+Что происходит между соседними уровнями?
+:::
+
+:::{.process-step focus-on="cr-pcm-path" data-stage="code"}
+#### Кодовое слово
+
+Как выбранный уровень становится битами?
+:::
+
+:::{.process-step focus-on="cr-pcm-path" data-stage="line"}
+#### Линия
+
+Как передать эти биты физическим сигналом?
+:::
+
+:::{.process-step focus-on="cr-pcm-path" data-stage="all"}
+#### Вся цепь
+
+На каком шаге возникает необратимая ошибка?
+:::
+
+:::{#cr-pcm-path}
+<div class="path-scene" data-pcm-scene data-stage="question" aria-label="От аналогового сигнала через отсчёт, компрессор, квантователь и кодовое слово к сигналу в линии">
+  <div class="scene-overline">Преобразование сигнала <span>01 — 06</span></div>
+  <ol class="path-scene-nodes">
+    <li data-sequence-stage="signal"><span class="path-node-index">01</span><strong>Сигнал</strong><span class="path-node-mask" aria-hidden="true">?</span></li>
+    <li data-sequence-stage="sample"><span class="path-node-index">02</span><strong>Отсчёт</strong><span class="path-node-mask" aria-hidden="true">?</span></li>
+    <li data-sequence-stage="compress"><span class="path-node-index">03</span><strong>Компрессор</strong><span class="path-node-mask" aria-hidden="true">?</span></li>
+    <li data-sequence-stage="quantize"><span class="path-node-index">04</span><strong>Квантователь</strong><span class="path-node-mask" aria-hidden="true">?</span></li>
+    <li data-sequence-stage="code"><span class="path-node-index">05</span><strong>Кодовое слово</strong><span class="path-node-mask" aria-hidden="true">?</span></li>
+    <li data-sequence-stage="line"><span class="path-node-index">06</span><strong>Сигнал в линии</strong><span class="path-node-mask" aria-hidden="true">?</span></li>
+  </ol>
+  <div class="path-scene-track" aria-hidden="true"><span></span></div>
+  <div class="scene-step-indicator" aria-hidden="true"><span data-scene-step>00</span> / 06</div>
+</div>
+:::
+
+::::
+
+<script src="../interactives/closeread-scenes.js?v=20261005-1" defer></script>
 
 ## Слабый и сильный отсчёты
 
@@ -161,7 +225,7 @@ format:
 
 > Как передать полученный сигнал по такому каналу? Этот вопрос ведёт к [лекции 04](04-physical-resource.qmd).
 
-<script type="module" src="../interactives/companding-line-ui.js?v=20260929-5"></script>
+<script type="module" src="../interactives/companding-line-ui.js?v=20261005-1"></script>
 <script type="module" src="../interactives/line-spectrum-ui.js?v=20260929-5"></script>
 <script type="module" src="../interactives/scrambler-ui.js?v=20260929-2"></script>
 <script src="../interactives/image-lightbox.js" defer></script>
