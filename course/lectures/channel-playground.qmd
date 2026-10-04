@@ -43,4 +43,4 @@ format:
 
 ## Откуда приёмник узнаёт текущее состояние изменяющегося канала?
 
-<script type="module" src="../interactives/channel-playground-ui.js?v=20261005-content"></script>
+<script type="module" src="../interactives/channel-playground-ui.js?v=20261005-render-fix"></script>
