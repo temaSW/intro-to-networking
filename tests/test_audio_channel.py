@@ -15,8 +15,9 @@ import model as m
 
 
 def test_noise_power_definitions():
-    assert m.digital_variance(0) == .5
-    assert m.digital_variance(10) == pytest.approx(.05)
+    assert m.digital_variance(0) == 1
+    assert m.digital_variance(10) == pytest.approx(.1)
+    assert m.digital_variance(10) == m.analog_variance(np.array([1, -1]), 10)
     assert m.analog_variance(np.array([1, -1]), 10) == pytest.approx(.1)
     assert m.analog_variance(np.zeros(4), 0) == 0
     noise = m.channel(np.zeros(200000), .5)
@@ -52,9 +53,9 @@ def test_bpsk_mapping_and_high_snr():
 def test_uncoded_ber_at_zero_db():
     payload = m.pcm_to_bits(m.pcm_encode(m.synthesize()))
     _, metrics = m.transmit(payload, 0)
-    theory = .5 * math.erfc(1)  # Q(sqrt(2*Es/N0))
+    theory = .5 * math.erfc(math.sqrt(.5))  # Q(sqrt(P_signal/P_noise))
     assert metrics["post_ber"] == pytest.approx(theory, abs=.002)
-    assert .06 < metrics["channel_ber"] < .10
+    assert .14 < metrics["channel_ber"] < .18
 
 
 def test_seed_reproducibility():
@@ -64,6 +65,29 @@ def test_seed_reproducibility():
     assert np.array_equal(a, m.channel(source, .4, seed=17))
     assert not np.array_equal(a, m.channel(source, .4, seed=18))
     assert np.array_equal(m.channel(source, 0), source)
+
+
+def test_pcm_bit_errors_match_independent_audio_error_power():
+    reference_pcm = m.pcm_encode(m.synthesize())
+    bits = m.pcm_to_bits(reference_pcm)
+    decoded, _ = m.transmit(bits, 0, seed=m.SEED + 1)
+    received_pcm = m.bits_to_pcm(decoded)
+    reference = m.pcm_decode(reference_pcm).astype(np.float64)
+    received = m.pcm_decode(received_pcm).astype(np.float64)
+    # Binary symmetric bit errors imply attenuation plus a calculable PCM error power.
+    p = .5 * math.erfc(math.sqrt(.5))
+    expected_mse = 4 * p**2 * np.mean(reference**2) + 4*p*(1-p)*sum(4**j for j in range(8))/255**2
+    assert np.mean((received-reference)**2) == pytest.approx(expected_mse, rel=.05)
+    assert np.mean(received_pcm != reference_pcm) == pytest.approx(1-(1-p)**8, abs=.015)
+
+
+def test_sparse_digital_errors_leave_other_samples_unchanged():
+    reference_pcm = m.pcm_encode(m.synthesize())
+    decoded, _ = m.transmit(m.pcm_to_bits(reference_pcm), 12, seed=m.SEED + 1)
+    received_pcm = m.bits_to_pcm(decoded)
+    changed = received_pcm != reference_pcm
+    assert 0 < np.count_nonzero(changed) < 30
+    assert np.array_equal(m.pcm_decode(received_pcm)[~changed], m.pcm_decode(reference_pcm)[~changed])
 
 
 def test_sinusoid_loop_and_source_length():
@@ -138,7 +162,9 @@ def test_shipped_assets_match_manifest():
         samples = np.frombuffer(data, dtype="<i2")
         assert np.max(np.abs(samples.astype(np.int32))) < 32767
     point = next(p for p in manifest["points"] if p["snr_db"] == 0)
-    assert .06 < point["digital"]["post_ber"] < .1
+    assert .14 < point["digital"]["post_ber"] < .18
+    assert point["digital"]["damaged_samples"] > manifest["samples"] / 2
+    assert point["ldpc"]["damaged_samples"] == 0
     assert point["ldpc"]["post_ber"] <= 1e-4
     assert point["ldpc"]["fer"] <= .03
     # A correctly decoded bit stream must leave exactly the original PCM quantization.
@@ -147,6 +173,23 @@ def test_shipped_assets_match_manifest():
     index = manifest["points"].index(point)
     recovered = ldpc[index] / 32767 / manifest["playback_gain"]
     assert np.max(np.abs(recovered - raw_source)) < .0041
+
+
+def test_shipped_uncoded_audio_is_channel_decisions_not_added_audio_noise():
+    directory = ROOT / "course/assets/audio-channel-coding"
+    manifest = json.loads((directory / "manifest.json").read_text(encoding="utf-8"))
+    q = m.pcm_encode(m.synthesize())
+    bits = np.unpackbits(q)
+    symbols = np.where(bits == 0, 1.0, -1.0)
+    noise = np.random.Generator(np.random.PCG64(manifest["seed"] + 1)).standard_normal(len(bits))
+    pack = np.frombuffer((directory / "digital.pcm").read_bytes(), dtype="<i2").reshape(-1, len(q))
+    for index, point in enumerate(manifest["points"]):
+        y = symbols + noise / math.sqrt(10 ** (point["snr_db"] / 10))
+        received_q = np.packbits((y < 0).astype(np.uint8))
+        audio = received_q.astype(np.float32) / 127.5 - 1
+        expected = np.rint(audio * manifest["playback_gain"] * 32767).astype("<i2")
+        assert np.array_equal(pack[index], expected)
+        assert np.count_nonzero(received_q != q) == point["digital"]["damaged_samples"]
 
 
 def test_browser_pack_phase_and_waveform_helpers():

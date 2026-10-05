@@ -19,7 +19,7 @@ export class AudioChannelDemo {
           ${Object.entries(MODES).map(([key, text]) => `<label><input type="radio" name="mode" value="${key}" ${key === 'analog' ? 'checked' : ''}><span>${text}</span></label>`).join('')}
         </fieldset>
       </div>
-      <label class="acd-snr"><span>SNR <small>dB</small></span><output>0 dB</output><input type="range" min="-6" max="10" step="1" value="0" aria-label="SNR, dB"><span class="acd-range"><span>−6 · больше шума</span><span>+10 · меньше шума</span></span></label>
+      <label class="acd-snr"><span>SNR <small>dB</small></span><output>0 dB</output><input type="range" min="-6" max="16" step="1" value="0" aria-label="SNR, dB"><span class="acd-range"><span>−6 · больше шума</span><span>+16 · меньше шума</span></span></label>
       <p class="acd-definition"></p>
       <div class="acd-waves">
         <figure><figcaption><strong>Исходный сигнал</strong><span>Набор синусов</span></figcaption><canvas class="acd-original" role="img" aria-label="Волновая форма исходного аудио"></canvas></figure>
@@ -78,6 +78,9 @@ export class AudioChannelDemo {
     this.slider.min = m.points[0].snr_db;
     this.slider.max = m.points.at(-1).snr_db;
     this.slider.step = m.points.length > 1 ? m.points[1].snr_db - m.points[0].snr_db : 1;
+    const range = this.root.querySelector('.acd-range');
+    range.firstElementChild.textContent = `${m.points[0].snr_db} · больше шума`;
+    range.lastElementChild.textContent = `${m.points.at(-1).snr_db > 0 ? '+' : ''}${m.points.at(-1).snr_db} · меньше шума`;
     this.playButton.disabled = false;
     this.slider.disabled = false;
     this.root.querySelectorAll('input[type=radio]').forEach(radio => { radio.disabled = false; });
@@ -168,9 +171,7 @@ export class AudioChannelDemo {
     this.root.querySelector('output').textContent = `${point.snr_db} dB`;
     this.slider.setAttribute('aria-valuetext', `${point.snr_db} децибел`);
     this.root.querySelector('.acd-result-label').textContent = MODES[this.mode];
-    this.root.querySelector('.acd-definition').textContent = this.mode === 'analog'
-      ? 'Analog: отношение мощности исходного аудио к мощности добавленного шума.'
-      : 'Digital: Es/N₀ на один передаваемый символ BPSK; одинаковая дисперсия шума в обоих цифровых режимах.';
+    this.root.querySelector('.acd-definition').textContent = 'Во всех режимах SNR — отношение средней мощности передаваемого сигнала к мощности шума. При 0 dB эти мощности равны.';
     const chain = this.root.querySelector('.acd-chain');
     if (this.mode === 'analog') {
       chain.innerHTML = '<span>Аудио</span><b>→</b><span>+ AWGN</span><b>→</b><span>Аудио с шумом</span>';
@@ -194,6 +195,7 @@ export class AudioChannelDemo {
         [this.mode === 'ldpc' ? 'BER после LDPC' : 'BER после решения', percent(m.post_ber)],
         [this.mode === 'ldpc' ? 'FER после LDPC' : 'FER без FEC', percent(m.fer)],
         ['Ошибочные блоки', `${m.frame_errors} / ${m.frames}`],
+        ['Повреждённые отсчёты PCM', `${m.damaged_samples.toLocaleString('ru-RU')} / ${m.samples.toLocaleString('ru-RU')}`],
         ['Передано / информация', `${m.channel_bits.toLocaleString('ru-RU')} / ${m.information_bits.toLocaleString('ru-RU')} бит`]
       ].map(([title, value]) => `<div><dt>${title}</dt><dd>${value}</dd></div>`).join('');
     }

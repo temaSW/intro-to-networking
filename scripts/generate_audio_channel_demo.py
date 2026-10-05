@@ -30,8 +30,9 @@ def generate(output, source=None, snrs=None, parameters=CodeParameters()):
     output = Path(output)
     output.mkdir(parents=True, exist_ok=True)
     original, rate = read_source(source) if source else (synthesize(), SAMPLE_RATE)
-    snrs = list(range(-6, 11)) if snrs is None else list(snrs)
-    bits = pcm_to_bits(pcm_encode(original))
+    snrs = list(range(-6, 17)) if snrs is None else list(snrs)
+    reference_pcm = pcm_encode(original)
+    bits = pcm_to_bits(reference_pcm)
     codec = LDPC(parameters)
     audio = {mode: [] for mode in ["analog", "digital", "ldpc"]}
     points = []
@@ -40,7 +41,10 @@ def generate(output, source=None, snrs=None, parameters=CodeParameters()):
         point = {"snr_db": snr, "analog": {"noise_variance": analog_variance(original, snr)}}
         for mode, coding in [("digital", None), ("ldpc", codec)]:
             decoded, metrics = transmit(bits, snr, coding, SEED + 1)
-            audio[mode].append(pcm_decode(bits_to_pcm(decoded)))
+            received_pcm = bits_to_pcm(decoded)
+            audio[mode].append(pcm_decode(received_pcm))
+            metrics["damaged_samples"] = int(np.count_nonzero(received_pcm != reference_pcm))
+            metrics["samples"] = len(original)
             point[mode] = metrics
         points.append(point)
         print(f"SNR={snr:g}: uncoded BER={point['digital']['post_ber']:.5g}, LDPC BER={point['ldpc']['post_ber']:.5g}, FER={point['ldpc']['fer']:.5g}", flush=True)
@@ -56,8 +60,9 @@ def generate(output, source=None, snrs=None, parameters=CodeParameters()):
     manifest = {"version": 1, "sample_rate": rate, "samples": len(original),
                 "duration": len(original) / rate, "seed": SEED, "storage": "signed PCM16 little-endian",
                 "playback_gain": gain, "pcm": "unsigned uniform 8-bit, MSB first, endpoints [-1,+1]",
-                "snr": {"digital": "Es/N0; BPSK Es=1, real noise variance=1/(2*10^(SNR/10))",
-                        "analog": "audio power / noise variance; not an equal-resource system comparison"},
+                "snr": {"definition": "mean(transmitted_signal**2) / noise_variance, in dB; every mode",
+                        "digital": "BPSK signal power=1; real noise variance=1/10^(SNR/10)",
+                        "analog": "audio signal power=mean(audio**2); noise variance=signal_power/10^(SNR/10)"},
                 "code": {"name": "Sionna LDPC5GEncoder / LDPC5GDecoder", **asdict(parameters),
                          "rate": parameters.rate, "cn_update": "boxplus-phi", "llr": "log(P(1)/P(0))=-2*y/variance"},
                 "source": {"kind": "local WAV" if source else "eight windowed three-sine chords",
