@@ -1,12 +1,12 @@
-import * as model from './channel-playground-model.js?v=20261005-power-scale';
+import * as model from './channel-playground-model.js?v=20261006-lecture05';
 
 const META = {
   attenuation: ['Затухание', 'Станет ли связь слабее при удвоении расстояния? Что изменит усиление?', 'Увеличьте расстояние, найдите границу работоспособности. Включите усилитель и измените его коэффициент шума.'],
-  bandwidth: ['Ограниченная полоса', 'Восстановит ли регенератор исходные биты, если импульсы уже сливаются?', 'Сузьте полосу до 0,3 кГц и включите регенератор. Затем уменьшите скорость или расширьте полосу.'],
+  bandwidth: ['Межсимвольные искажения', 'Восстановит ли регенератор исходные биты, если импульсы уже сливаются?', 'Изменяйте битовую скорость при той же полосе канала, затем включите регенератор.'],
   noise: ['Шум и помехи', 'Когда точка перейдёт через границу решения? Будет ли помеха выглядеть как шум?', 'Уменьшите SNR, затем переключитесь на внешнюю помеху и измените её частоту.'],
   multipath: ['Многолучёвость', 'Всегда ли дополнительный луч делает сигнал сильнее?', 'Изменяйте задержку отражения. Сопоставьте сумму копий с провалами H(f).'],
   coherence: ['Полоса когерентности', 'На каком расстоянии друг от друга частоты начинают испытывать разное действие канала?', 'Раздвигайте f₁ и f₂, сравнивайте усиление и фазу. Затем увеличьте задержки лучей.'],
-  shift: ['Уход частоты', 'Как изменится сдвиг при той же скорости и более высокой несущей?', 'Сравните 0,1 и 6 ГГц; затем остановите движение и добавьте рассогласование генераторов.'],
+  shift: ['Частотное рассогласование', 'Как изменится сдвиг при той же скорости и более высокой несущей?', 'Сравните 0,1 и 6 ГГц; затем остановите движение и добавьте рассогласование генераторов.'],
   spread: ['Время когерентности', 'Будет ли канал меняться по амплитуде, если все лучи имеют одинаковый сдвиг?', 'Начните без отражений. Добавьте лучи с разными направлениями, увеличьте скорость и сравните T с Tс.'],
   media: ['Сравнение сред', 'Какие из наблюдавшихся эффектов будут важны в разных средах?', 'Выберите среду и сопоставьте причины искажений с её физикой.'],
 };
@@ -50,7 +50,7 @@ export function mountChannelPlayground(root, options = {}) {
   const lecture = (options.layout || root.dataset.channelLayout) === 'lecture';
   const shared = options.sharedState;
   let mode = fixed || 'attenuation', p = shared?.parameters || model.defaults(), view = 'time', medium = 'radio';
-  const initialParameters = () => ({...model.defaults(), ...(lecture && mode === 'attenuation' ? {aid: 'amplifier', gainDb: 0, noiseFigure: 0} : {})});
+  const initialParameters = () => ({...model.defaults(), ...(lecture && mode === 'attenuation' ? {aid: 'amplifier', gainDb: 0, noiseFigure: 0} : {}), ...(lecture && mode==='spread' ? {paths:[{amplitude:.7,delay:.5,angle:90}]} : {})});
   if (!shared) p = initialParameters();
   const prediction = {}, explanations = {};
   root.classList.add('channel-playground');
@@ -62,7 +62,7 @@ export function mountChannelPlayground(root, options = {}) {
   }
   const plot = (title, series, options = {}) => drawPlot(title, series, {width: root.querySelector('.cp-results')?.clientWidth || 720, ...options});
   function pathControls(withAngles = false) {
-    return `<fieldset class="cp-paths"><legend>Отражённые пути</legend><p>Прямой путь: амплитуда 1, задержка 0${withAngles ? `, угол ${finite(p.direction)}°` : ''}.</p>${p.paths.map((path, i) => `<div class="cp-path"><strong>Луч ${i+1}</strong>${slider(`path-${i}-amplitude`, 'Относительная амплитуда', 0, 1, .05, path.amplitude)}${slider(`path-${i}-delay`, 'Задержка', 0, 5, .025, path.delay, 'мкс')}${withAngles ? slider(`path-${i}-angle`, 'Направление прихода', 0, 180, 5, path.angle, '°') : ''}<button type="button" data-remove="${i}">Убрать луч ${i+1}</button></div>`).join('')}<button type="button" data-add ${p.paths.length >= 3 ? 'disabled' : ''}>Добавить отражение</button></fieldset>`;
+    return `<fieldset class="cp-paths"><legend>Отражённые лучи</legend><p>Прямой луч: амплитуда 1, задержка 0${withAngles ? `, угол ${finite(p.direction)}°` : ''}.</p>${p.paths.map((path, i) => `<div class="cp-path"><strong>Луч ${i+1}</strong>${slider(`path-${i}-amplitude`, 'Относительная амплитуда', 0, 1, .05, path.amplitude)}${slider(`path-${i}-delay`, 'Задержка', 0, 5, .025, path.delay, 'мкс')}${withAngles ? slider(`path-${i}-angle`, 'Направление прихода', 0, 180, 5, path.angle, '°') : ''}<button type="button" data-remove="${i}">Убрать луч ${i+1}</button></div>`).join('')}<button type="button" data-add ${p.paths.length >= 3 ? 'disabled' : ''}>Добавить отражённый луч</button></fieldset>`;
   }
   function controls() {
     const motion = () => slider('carrierGHz', 'Несущая', .1, 6, .1, p.carrierGHz, 'ГГц') + slider('speed', 'Скорость', 0, 60, 1, p.speed, 'м/с') + slider('direction', 'Угол движения к прямому лучу', 0, 180, 5, p.direction, '°');
@@ -70,18 +70,18 @@ export function mountChannelPlayground(root, options = {}) {
     if (lecture) {
       switch (mode) {
         case 'attenuation': return slider('distance', 'Расстояние', .1, 20, .1, p.distance, 'км') + slider('gainDb', 'Коэффициент передачи', -30, 40, .01, p.gainDb, 'дБ') + slider('noiseFigure', 'Коэффициент шума (КШ)', 0, 15, .5, p.noiseFigure, 'дБ');
-        case 'bandwidth': return slider('bandwidth', 'Полоса канала', .1, 20, .1, p.bandwidth, 'кГц') + select('regeneration', 'Регенератор', [['off','Выключен'], ['on','Включён']], p.regeneration);
+        case 'bandwidth': return slider('rate', 'Битовая скорость', 1, 20, .5, p.rate, 'кбит/с') + slider('bandwidth', 'Полоса канала', .1, 20, .1, p.bandwidth, 'кГц') + select('regeneration', 'Регенератор', [['off','Выключен'], ['on','Включён']], p.regeneration);
         case 'noise': return select('disturbance', 'Добавленный сигнал', [['noise','Шум'], ['interference','Внешняя помеха']], p.disturbance) + (p.disturbance === 'noise' ? slider('snr', 'Отношение сигнал/шум Eₛ/N₀', -12, 24, 1, p.snr, 'дБ') : slider('interference', 'Амплитуда помехи / сигнала', 0, 3, .05, p.interference));
-        case 'multipath': return slider('path-0-amplitude', 'Амплитуда отражённого пути', 0, 1, .05, p.paths[0].amplitude) + slider('path-0-delay', 'Задержка отражённого пути', 0, 5, .025, p.paths[0].delay, 'мкс');
-        case 'coherence': return slider('f2', 'Частота f₂', 0, 4, .01, p.f2, 'МГц') + slider('path-0-delay', 'Задержка отражённого пути', 0, 5, .025, p.paths[0].delay, 'мкс');
+        case 'multipath': return pathControls();
+        case 'coherence': return slider('frequencyGap', 'Разнос двух частот', 0, 1, .01, p.f2-p.f1, 'МГц') + slider('path-0-delay', 'Копия приходит позже на', 0, 5, .025, p.paths[0].delay, 'мкс');
         case 'shift': return slider('speed', 'Скорость', 0, 60, 1, p.speed, 'м/с') + slider('carrierGHz', 'Несущая', .1, 6, .1, p.carrierGHz, 'ГГц') + slider('offset', 'Рассогласование генераторов', -500, 500, 5, p.offset, 'Гц');
-        case 'spread': return slider('speed', 'Скорость', 0, 60, 1, p.speed, 'м/с') + slider('path-0-angle', 'Направление отражённого пути', 0, 180, 5, p.paths[0].angle, '°') + slider('duration', 'Длительность фрагмента T', .1, 100, .1, p.duration, 'мс');
-        case 'media': return select('medium', 'Среда', Object.entries(MEDIA).map(([key, value]) => [key, value[0]]), medium);
+        case 'spread': return select('movingPaths', 'Приходящие лучи', [['single','Только прямой'],['multiple','Прямой и отражённый']],p.movingPaths) + slider('speed', 'Скорость движения', 0, 60, 1, p.speed, 'м/с') + (p.movingPaths==='multiple' ? select('path-0-angle', 'Отражённый луч приходит', [['0','Спереди'],['90','Сбоку'],['180','Сзади']],String(p.paths[0].angle)) : '') + slider('duration', 'Длительность передачи', .1, 100, .1, p.duration, 'мс');
+        case 'media': return '';
       }
     }
     switch (mode) {
       case 'attenuation': return slider('power', 'Мощность передатчика', 0, 40, 1, p.power, 'дБм') + slider('distance', 'Расстояние', .1, 20, .1, p.distance, 'км') + slider('loss', 'Дополнительные потери', 0, 5, .1, p.loss, 'дБ/км') + slider('sensitivity', 'Чувствительность приёмника', -90, -40, 1, p.sensitivity, 'дБм') + amplifier() + (p.aid==='amplifier' ? slider('noiseFigure', 'Коэффициент шума NF', 0, 15, .5, p.noiseFigure, 'дБ') : '');
-      case 'bandwidth': return slider('bandwidth', 'Полоса канала', .1, 20, .1, p.bandwidth, 'кГц') + slider('rate', 'Символьная скорость', 1, 20, .5, p.rate, 'ксимв/с') + select('regeneration', 'Регенератор после канала', [['off','Выключен'], ['on','Включён']], p.regeneration);
+      case 'bandwidth': return slider('bandwidth', 'Полоса канала', .1, 20, .1, p.bandwidth, 'кГц') + slider('rate', 'Битовая скорость', 1, 20, .5, p.rate, 'кбит/с') + select('regeneration', 'Регенератор после канала', [['off','Выключен'], ['on','Включён']], p.regeneration);
       case 'noise': return select('disturbance', 'Источник добавленного сигнала', [['noise','Шум'], ['interference','Внешняя помеха']], p.disturbance) + (p.disturbance === 'noise' ? slider('snr', 'SNR (энергия символа / N₀)', -12, 24, 1, p.snr, 'дБ') : slider('interference', 'Амплитуда помехи / сигнала', 0, 3, .05, p.interference) + slider('interferenceFrequency', 'Частота помехи в полосе I/Q', .01, .49, .01, p.interferenceFrequency, 'циклов/символ'));
       case 'multipath': return slider('carrier', 'Частота сигнала', .1, 3, .05, p.carrier, 'МГц') + pathControls();
       case 'coherence': return slider('f1', 'Маркер f₁', 0, 4, .01, p.f1, 'МГц') + slider('f2', 'Маркер f₂', 0, 4, .01, p.f2, 'МГц') + slider('signalBandwidth', 'Полоса сигнала Bₛ вокруг f₁', .01, 2, .01, p.signalBandwidth, 'МГц') + pathControls();
@@ -91,9 +91,10 @@ export function mountChannelPlayground(root, options = {}) {
     }
   }
   function views() {
-    return ({attenuation: [['time','Форма']], bandwidth: [['time','Импульсы'],['spectrum','Полоса H(f)']], noise: [['time','Во времени'],['constellation','Созвездие']], multipath: [['time','Копии и сумма'],['frequency','H(f)']], coherence: [['frequency','H(f) и маркеры'],['delay','Профиль задержек']], shift: [['spectrum','Спектр']], spread: [['time','Канал во времени'],['spectrum','Сдвиги лучей']], media: []})[mode];
+    return ({attenuation: [['time','Форма']], bandwidth: [['time','Импульсы'],['spectrum','Полоса канала']], noise: [['time','Во времени'],['constellation','Созвездие']], multipath: [['time','Копии и сумма'],['frequency','H(f)']], coherence: [['compare','Два сигнала'],['frequency','Канал по частоте']], shift: [['spectrum','Спектр']], spread: [['time','Уровень во времени'],['spectrum','Сдвиги лучей']], media: []})[mode];
   }
   function shell() {
+    root.classList.toggle('cp-media-mode', lecture && mode==='media');
     const vv = views(); if (!vv.some(([v]) => v === view)) view = vv[0]?.[0] || '';
     const introduction = lecture ? '' : `<h2>${META[mode][0]}</h2><div class="cp-chain"><span>Передатчик · s(t)</span><b aria-hidden="true">→</b><span>${META[mode][0]}</span><b aria-hidden="true">→</b><span>Приёмник · r(t)</span></div><div class="cp-experiment"><strong>Предскажите</strong><p>${META[mode][1]}</p><textarea rows="2" placeholder="Моя гипотеза…" aria-label="Предсказание результата">${(prediction[mode] || '').replaceAll('&','&amp;').replaceAll('<','&lt;')}</textarea><p><strong>Проверьте:</strong> ${META[mode][2]}</p></div>`;
     root.innerHTML = `${!fixed ? `<nav class="cp-modes" aria-label="Режимы канала">${Object.entries(META).map(([key, m], i) => `<button type="button" data-mode="${key}" aria-pressed="${mode===key}">${i+1}. ${m[0]}</button>`).join('')}</nav>` : ''}${introduction}<div class="cp-layout"><div class="cp-controls" role="group" aria-label="Параметры канала">${controls()}<button type="button" data-reset>${shared ? 'Сбросить общие параметры' : 'Сбросить параметры'}</button></div><section class="cp-observation" aria-label="Наблюдение"><div class="cp-views" aria-label="Представление">${(vv.length > 1 ? vv : []).map(([key,label]) => `<button type="button" data-view="${key}" aria-pressed="${view===key}">${label}</button>`).join('')}</div><div class="cp-results"></div></section></div>${!lecture ? `<details class="cp-explanation" ${explanations[mode] ? 'open' : ''}><summary>Подсказка к опыту</summary><div class="cp-explanation-body"></div></details>` : ''}`;
@@ -103,11 +104,12 @@ export function mountChannelPlayground(root, options = {}) {
     root.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => {view = b.dataset.view; root.querySelectorAll('[data-view]').forEach(x => x.setAttribute('aria-pressed', x === b)); render();}));
     root.querySelectorAll('[data-param]').forEach(input => input.addEventListener('input', () => {
       const key = input.dataset.param, value = input.tagName === 'SELECT' ? input.value : Number(input.value);
-      if (key.startsWith('path-')) {const [,i,field] = key.split('-'); if(field==='power') p.paths[Number(i)].amplitude=Math.sqrt(value); else p.paths[Number(i)][field] = value;}
+      if (key.startsWith('path-')) {const [,i,field] = key.split('-'); p.paths[Number(i)][field] = Number(value);}
+      else if (key==='frequencyGap') p.f2=p.f1+value;
       else if (key === 'medium') medium = value; else p[key] = value;
       const output = input.parentElement.querySelector('output');
       if (output) output.textContent = finite(value, 3) + ' ' + output.dataset.unit;
-      if (key === 'disturbance' || key === 'aid') shell(); else render();
+      if (key === 'disturbance' || key === 'aid' || key==='movingPaths') shell(); else render();
       notifyPeers();
     }));
     root.querySelector('[data-add]')?.addEventListener('click', () => {if (p.paths.length < 3) p.paths.push({amplitude: .5, delay: 1+p.paths.length, angle: 120+20*p.paths.length}); shell(); notifyPeers();});
@@ -123,24 +125,24 @@ export function mountChannelPlayground(root, options = {}) {
       metrics = metric('После среды', `${finite(a.received)} дБм`) + metric('Сигнал на входе приёмника', `${finite(outputLevel)} дБм`) + metric('Диапазон приёмника', `${p.sensitivity}…${p.receiverMaximum} дБм`) + metric('Ограниченные отсчёты', `${finite(100*clipped/t.length,1)} %`);
       if (p.aid==='amplifier') metrics += metric('Собственный шум на выходе', Number.isFinite(noiseDbm) ? `${finite(noiseDbm)} дБм` : 'Нет');
       {
-        charts = plot('Мощность сигнала во времени', [{x:t,y:inputPower,label:'После среды',color:'#7a8994'}, {x:t,y:outputPower,label:'Вход приёмника',color:COLORS[0],dash:true}, {x:t,y:receiverPower,label:'После ограничения',color:COLORS[1]}],{xmax:12,ymin:-100,ymax:40,yticks:[-100,-65,-25,0,40],xlabel:'Номер символа',ylabel:'Мощность, дБм',horizontalBands:[{low:p.receiverMaximum,high:40,className:'cp-overload-band',label:'Перегрузка'}, {low:p.sensitivity,high:p.receiverMaximum,className:'cp-range-band',label:'Динамический диапазон'}, {low:-100,high:p.sensitivity,className:'cp-weak-band',label:'Ниже чувствительности'}]});
+        charts = plot('Мощность сигнала во времени', [{x:t,y:inputPower,label:'После среды',color:'#7a8994'}, {x:t,y:outputPower,label:'Вход приёмника',color:COLORS[0],dash:true}, {x:t,y:receiverPower,label:'После ограничения',color:COLORS[1]}],{xmax:12,ymin:-100,ymax:40,yticks:[-100,-65,-25,0,40],xlabel:'Условное время',ylabel:'Мощность, дБм',horizontalBands:[{low:p.receiverMaximum,high:40,className:'cp-overload-band',label:'Перегрузка'}, {low:p.sensitivity,high:p.receiverMaximum,className:'cp-range-band',label:'Динамический диапазон'}, {low:-100,high:p.sensitivity,className:'cp-weak-band',label:'Ниже чувствительности'}]});
         const millivolts = 1000 * Math.sqrt(50 * 1e-3 * 10 ** (p.sensitivity/10));
         const upper = receiverLimit * millivolts, limit = upper * 1.25;
-        charts += plot('Форма сигнала на входе приёмника', [{x:t,y:output.map(x=>x*millivolts),label:'До ограничения',dash:true}, {x:t,y:receiver.map(x=>x*millivolts),label:'После ограничения'}, {x:[0,12],y:[upper,upper],label:'Максимальная амплитуда',color:COLORS[2],dash:true}, {x:[0,12],y:[-upper,-upper],color:COLORS[2],dash:true}],{xmax:12,ymin:-limit,ymax:limit,yticks:[-upper,0,upper],xlabel:'Номер символа',ylabel:'Напряжение, мВ'});
+        charts += plot('Форма сигнала на входе приёмника', [{x:t,y:output.map(x=>x*millivolts),label:'До ограничения',dash:true}, {x:t,y:receiver.map(x=>x*millivolts),label:'После ограничения'}, {x:[0,12],y:[upper,upper],label:'Максимальная амплитуда',color:COLORS[2],dash:true}, {x:[0,12],y:[-upper,-upper],color:COLORS[2],dash:true}],{xmax:12,ymin:-limit,ymax:limit,yticks:[-upper,0,upper],xlabel:'Условное время',ylabel:'Напряжение, мВ'});
       }
       note = a.usable ? 'Запас неотрицательный: связь условно работоспособна.' : 'Запас отрицательный: работоспособность не гарантирована.';
-      explanation = 'Коэффициент передачи задан по мощности: G = 10^(g/10), по амплитуде — √G. ×4 по мощности соответствует 6,02 дБ и ×2 по амплитуде. Идеальный каскад не добавляет шума и остаётся линейным; ограничение амплитуды происходит на входе следующего приёмника. Его чувствительность −65 дБм, верхняя граница −25 дБм. При наличии собственного шума Nа = G(F − 1)kT₀B, F = 10^(NF/10), NF — коэффициент шума в децибелах, T₀ = 290 К, B = 100 МГц, k — постоянная Больцмана. Округлённые импульсы нормированы к единичной средней мощности; уровень сигнала показан до ограничения отдельно от шума.';
+      explanation = 'Коэффициент передачи задан по мощности: G = 10^(g/10), по амплитуде — √G. ×4 по мощности соответствует 6,02 дБ и ×2 по амплитуде. Идеальный каскад не добавляет шума и остаётся линейным; ограничение амплитуды происходит на входе следующего приёмника. Его чувствительность −65 дБм, верхняя граница −25 дБм. При наличии собственного шума Nа = G(F − 1)kT₀B, F = 10^(NF/10), NF — коэффициент шума в децибелах, T₀ = 290 К, B = 100 МГц, k — постоянная Больцмана. Синусоидальный сигнал нормирован к единичной средней мощности; уровень сигнала показан до ограничения отдельно от шума.';
     } else if (mode === 'bandwidth') {
       const b = model.bandwidth(p);
-      metrics = metric('B / Rₛ', finite(p.bandwidth/p.rate)) + metric('Остаток предыдущего уровня', `${finite(100*b.tail,1)} %`) + metric('Ошибочные решения', `${b.errors} / ${model.BITS.length}`);
+      metrics = metric('Длительность бита', `${finite(1/p.rate,3)} мс`) + metric('Память предыдущего бита', `${finite(100*b.tail,1)} %`) + metric('Ошибочные решения', `${b.errors} / ${model.BITS.length}`);
       if (view==='time') {
         charts = plot('Импульсы и память канала', [{x:b.time,y:b.tx,label:'s(t)'},{x:b.time,y:b.rx,label:'r(t)'},{points:b.decisions.map((_,i)=>[(i+.5)/p.rate,b.rx[i*64+32]]),label:'Отсчёты решений',color:COLORS[2]}],{xmax:12/p.rate,ymin:-1.2,ymax:1.2,xlabel:'Время, мс',ylabel:'Относительная амплитуда'});
         if(p.regeneration==='on') charts += plot('Новые импульсы после регенерации', [{x:b.regeneratedTime,y:b.tx,label:'Исходные биты с той же задержкой',dash:true},{x:b.regeneratedTime,y:b.regenerated,label:'Выход регенератора'}],{xmax:13/p.rate,ymin:-1.2,ymax:1.2,xlabel:'Время, мс · задержка один символ',ylabel:'Относительная амплитуда'});
       }
-      else {const f=Array.from({length:201},(_,i)=>i*.1); charts=plot('Полоса канала и масштаб скорости', [{x:f,y:f.map(f=>model.lowpassGain(f,p.bandwidth)),label:'|H(f)|'}],{xmax:20,ymin:0,ymax:1.1,xlabel:'Частота, кГц',ylabel:'Относительное усиление',markers:[{value:p.bandwidth,label:'B (−3 дБ)'},{value:p.rate/2,label:'Rₛ/2'}]});}
+      else {const f=Array.from({length:201},(_,i)=>i*.1); charts=plot('Полоса канала и масштаб скорости', [{x:f,y:f.map(f=>model.lowpassGain(f,p.bandwidth)),label:'Передача канала'}],{xmax:20,ymin:0,ymax:1.1,xlabel:'Частота, кГц',ylabel:'Относительное усиление',markers:[{value:p.bandwidth,label:'Полоса (−3 дБ)'},{value:p.rate/2,label:'Половина битовой скорости'}]});}
       note = `Решения: ${b.decisions.join(' ')}; передано: ${model.BITS.join(' ')}. Регенератор формирует прямоугольные импульсы по решениям приёмника; ${b.errors ? 'ошибочные биты остаются ошибочными.' : 'в этом фрагменте решения совпали с исходными битами.'}`;
       dataNote = `Передано: ${model.BITS.join(' ')}; решения: ${b.decisions.join(' ')}.`;
-      explanation = 'Канал — фильтр нижних частот первого порядка; B задаёт уровень −3 дБ. Он сглаживает фронты и сохраняет часть предыдущего уровня к моменту решения следующего символа: это межсимвольная интерференция. Амплитуда фиксирована; шума нет. Регенератор принимает решение в середине символа по порогу ноль, затем формирует новые импульсы с задержкой один символ. Тактирование задано. Он восстанавливает форму, но не исправляет ошибочные решения при сильной ISI. Rₛ/2 — ориентир частотного масштаба, а не строгая ширина спектра прямоугольных импульсов.';
+      explanation = 'Канал — фильтр нижних частот первого порядка; B задаёт уровень −3 дБ. Он сглаживает фронты и сохраняет часть предыдущего уровня к моменту решения следующего символа: это межсимвольная интерференция. Амплитуда фиксирована; шума нет. Регенератор принимает решение в середине символа по порогу ноль, затем формирует новые импульсы с задержкой один символ. Тактирование задано. Он восстанавливает форму, но не исправляет ошибочные решения при сильной ISI. Половина битовой скорости — ориентир частотного масштаба, а не строгая ширина спектра прямоугольных импульсов.';
     } else if (mode === 'noise') {
       const n = model.noisySymbols(p);
       metrics = metric('Ошибочные решения в примере', `${n.errors} / ${n.points.length}`) + metric('Передача', 'BPSK · 2 состояния');
@@ -153,17 +155,17 @@ export function mountChannelPlayground(root, options = {}) {
       explanation = 'Показаны отсчёты комплексной огибающей двоичной фазовой манипуляции (BPSK). Шум — независимые гауссовы добавки в синфазной I и квадратурной Q координатах; отношение сигнал/шум SNR здесь задано как Eₛ/N₀. Внешняя помеха — периодический треугольный сигнал в синфазной координате: точки располагаются на отрезках, а не окружностях. Число ошибок относится только к этому фрагменту.';
     } else if (mode==='multipath' || mode==='coherence') {
       const m=model.multipath(p), c=model.coherence(p), max=m.paths.reduce((v,x)=>v+x.amplitude,0);
-      metrics = mode==='multipath' ? metric('Путей',m.paths.length) + metric('|H| на частоте сигнала',finite(model.response(m.paths,p.carrier).magnitude)) : metric('Среднеквадратический разброс задержек',`${finite(c.rms)} мкс`) + metric('Ориентир Bс ≈ 1/(5στ)',`${finite(c.bc)} МГц`) + metric('Bₛ / Bс',finite(c.ratio));
-      const hplot=plot('Частотная характеристика общего канала', [{x:m.frequencies,y:m.h,label:'|H(f)|'}],{xmax:4,ymin:0,ymax:max*1.05,xlabel:'Частота, МГц',ylabel:'Относительная амплитуда',markers:mode==='coherence'?[{value:p.f1,label:'f₁'},{value:p.f2,label:'f₂'}]:[{value:p.carrier,label:'Частота сигнала'}],bands:mode==='coherence'?[[p.f1-p.signalBandwidth/2,p.f1+p.signalBandwidth/2]]:[]});
+      metrics = mode==='multipath' ? metric('Лучей',m.paths.length) + metric('Амплитуда суммы на частоте сигнала',finite(model.response(m.paths,p.carrier).magnitude)) : metric('Амплитуда первого сигнала',finite(c.h1.magnitude)) + metric('Амплитуда второго сигнала',finite(c.h2.magnitude)) + metric('Полоса когерентности · ориентир',`${finite(c.bc)} МГц`);
+      const hplot=plot('Частотная характеристика общего канала', [{x:m.frequencies,y:m.h,label:'Амплитуда принятого сигнала'}],{xmax:4,ymin:0,ymax:max*1.05,xlabel:'Частота, МГц',ylabel:'Относительная амплитуда',markers:mode==='coherence'?[{value:p.f1,label:'Первая частота'},{value:p.f2,label:'Вторая частота'}]:[{value:p.carrier,label:'Частота сигнала'}]});
       if(mode==='multipath') {
-        const copies=plot('Прямой путь и задержанные копии',m.copies.map((copy,i)=>({x:m.time,y:copy,label:i===0?'Прямой путь':`Отражение ${i}`})),{xmax:12,ymin:-1.2,ymax:1.2,xlabel:'Время, мкс',ylabel:'Амплитуда'});
+        const copies=plot('Прямой луч и задержанные копии',m.copies.map((copy,i)=>({x:m.time,y:copy,label:i===0?'Прямой луч':`Отражение ${i}`})),{xmax:12,ymin:-1.2,ymax:1.2,xlabel:'Время, мкс',ylabel:'Амплитуда'});
         const sum=plot('Сумма на приёмнике', [{x:m.time,y:m.copies[0],label:'s(t)',dash:true},{x:m.time,y:m.sum,label:'r(t)'}],{xmax:12,ymin:-max,ymax:max,xlabel:'Время, мкс',ylabel:'Амплитуда'});
         charts=view==='time'?copies+sum+hplot:hplot+sum;
         note='Задержка сдвигает начало копии и её фазу. Усиление на одной частоте может сопровождаться провалом на другой.';
       } else {
-        const profile=plot('Мощности и задержки путей', m.paths.map((path,i)=>({x:[path.delay,path.delay],y:[0,path.amplitude**2],label:i===0?'Прямой путь':`Отражение ${i}`})),{xmax:5,ymin:0,ymax:1.1,xlabel:'Задержка, мкс',ylabel:'Относительная мощность'});
-        charts=view==='delay'?profile+hplot:hplot+profile;
-        metrics+=metric('|H(f₁)| / |H(f₂)|',`${finite(c.h1.magnitude)} / ${finite(c.h2.magnitude)}`) + metric('Фаза f₁ / f₂',`${finite(Math.atan2(c.h1.im,c.h1.re)*180/Math.PI,0)}° / ${finite(Math.atan2(c.h2.im,c.h2.re)*180/Math.PI,0)}°`);
+        const cycles=Array.from({length:301},(_,i)=>3*i/300);
+        const comparison=(frequency,h)=>plot(`Сигнал ${finite(frequency)} МГц`,[{x:cycles,y:cycles.map(t=>Math.sin(2*Math.PI*t)),label:'Передано',dash:true},{x:cycles,y:cycles.map(t=>h.re*Math.sin(2*Math.PI*t)+h.im*Math.cos(2*Math.PI*t)),label:'Принято'}],{xmax:3,ymin:-max*1.05,ymax:max*1.05,xlabel:'Число периодов собственного сигнала',ylabel:'Относительная амплитуда'});
+        charts=view==='compare'?comparison(p.f1,c.h1)+comparison(p.f2,c.h2):hplot;
         note=`Различие комплексного действия на маркерах: ${finite(c.difference*100,1)} % от суммы амплитуд путей. ${c.ratio<.1?'Bₛ ≪ Bс: ожидается приблизительно плоский канал.':c.ratio>=1?'Bₛ ≳ Bс: частотная селективность существенна.':'Переходная область: исследуйте форму H(f) внутри выделенной полосы.'}`;
       }
       explanation='Фаза каждого луча следует из задержки: −2πfτ. H(f) — комплексная сумма путей, на графике показан её модуль, без искусственной нормировки максимумов. При больших задержках провалы обычно становятся чаще. RMS-разброс взвешен по мощностям лучей; Bс ≈ 1/(5στ) — учебный ориентир, зависящий от выбранного критерия сходства, а не строгое универсальное определение. Два удалённых маркера могут случайно попасть в похожие точки периодической характеристики: это не означает, что весь интервал между ними одинаков. Фаза в глубоком провале плохо определена.';
@@ -175,14 +177,14 @@ export function mountChannelPlayground(root, options = {}) {
       explanation='Один путь: fD ≈ (v/c) fс cos θ. Рассогласование генераторов добавляется отдельно и остаётся при нулевой скорости. Ширина нарисованной линии условная и фиксированная: она нужна для различимости графика и не изображает доплеровское рассеяние.';
     } else if (mode==='spread') {
       const d=model.dopplerSpread(p), max=d.paths.reduce((v,x)=>v+x.amplitude,0);
-      metrics=metric('Допплеровский разброс Bᴅ',`${finite(d.spread)} Гц`) + metric('Ориентир Tс ≈ 1/Bᴅ',`${finite(d.tc*1000)} мс`) + metric('T / Tс',finite(p.duration/1000/d.tc));
-      if(view==='time') charts=plot('Комплексный коэффициент канала во времени', [{x:d.time.map(t=>t*1000),y:d.h.map(h=>h.magnitude),label:'|h(t)|'},{x:d.time.map(t=>t*1000),y:d.h.map(h=>h.re),label:'Re h(t)'},{x:d.time.map(t=>t*1000),y:d.h.map(h=>h.im),label:'Im h(t)'}],{xmax:d.time.at(-1)*1000,ymin:-max,ymax:max,xlabel:'Время, мс',ylabel:'Коэффициент канала',bands:[[0,p.duration]],markers:Number.isFinite(d.tc)?[{value:d.tc*1000,label:'Tс'}]:[]});
-      else {const range=Math.max(100,...d.shifts.map(Math.abs))*1.2;charts=plot('Доплеровские сдвиги отдельных лучей',d.paths.map((path,i)=>({x:[d.shifts[i],d.shifts[i]],y:[0,path.amplitude**2],label:i===0?'Прямой путь':`Отражение ${i}`})),{xmin:-range,xmax:range,ymin:0,ymax:1.1,xlabel:'Доплеровский сдвиг, Гц',ylabel:'Относительная мощность'});}
+      metrics=metric('Минимум уровня за передачу',finite(d.fragmentMin)) + metric('Максимум уровня за передачу',finite(d.fragmentMax)) + metric('Время когерентности · ориентир',`${finite(d.tc*1000)} мс`);
+      if(view==='time') charts=plot('Уровень принятого сигнала; фон — время передачи', [{x:d.time.map(t=>t*1000),y:d.power,label:'Относительная мощность'}],{xmax:100,ymin:0,ymax:max*max*1.05,xlabel:'Время, мс',ylabel:'Относительная мощность',bands:[[0,p.duration]],markers:Number.isFinite(d.tc)?[{value:d.tc*1000,label:'Время когерентности'}]:[]});
+      else {const range=Math.max(100,...d.shifts.map(Math.abs))*1.2;charts=plot('Доплеровские сдвиги отдельных лучей',d.paths.map((path,i)=>({x:[d.shifts[i],d.shifts[i]],y:[0,path.amplitude**2],label:i===0?'Прямой луч':`Отражение ${i}`})),{xmin:-range,xmax:range,ymin:0,ymax:1.1,xlabel:'Доплеровский сдвиг, Гц',ylabel:'Относительная мощность'});}
       note=Number.isFinite(d.tc)?`Полоса фона на графике — фрагмент T. ${p.duration/1000<d.tc/10?'T ≪ Tс: канал меняется относительно медленно.':p.duration/1000>=d.tc?'T ≳ Tс: изменения внутри фрагмента существенны.':'Сравните изменение h(t) внутри фрагмента.'}`:'Разброса нет: относительные фазы лучей постоянны. Возможен общий частотный сдвиг и вращение фазы.';
       explanation='У каждого луча свой угол прихода: fD,k = (v/c) fс cos θk. Bᴅ здесь — диапазон сдвигов путей с ненулевой мощностью. Разные сдвиги меняют относительные фазы и создают замирания. Общий сдвиг вращает весь коэффициент, но не создаёт разброса и изменений его модуля; оценка Tс относится к изменениям после отделения общего вращения. Tс ≈ 1/Bᴅ — характерный масштаб, а не точная граница. При слабом дополнительном луче изменения могут быть малы даже при широком диапазоне сдвигов. Если канал зависит от частоты и меняется со временем, откуда система знает его текущее состояние? Это вопрос следующей темы о служебном обмене.';
     } else {
       const labels=['Затухание','Ограниченность полосы','Дисперсия','Внешние помехи','Многолучёвость','Изменение во времени'];
-      charts=`<div class="cp-media"><h3>Выбранная среда: ${MEDIA[medium][0].toLowerCase()}</h3><div class="cp-table-scroll" tabindex="0" role="region" aria-label="Сравнение сред; на узком экране таблицу можно прокрутить"><table><caption>Значимость эффектов и их причины</caption><thead><tr><th scope="col">Эффект</th>${Object.entries(MEDIA).map(([key, data])=>`<th scope="col" class="${key===medium?'cp-selected':''}">${data[0]}</th>`).join('')}</tr></thead><tbody>${labels.map((label,i)=>`<tr><th scope="row">${label}</th>${Object.entries(MEDIA).map(([key,data])=>`<td class="${key===medium?'cp-selected':''}">${data[1][i]}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div>`;
+      charts=`<div class="cp-media">${lecture ? '' : `<h3>Выбранная среда: ${MEDIA[medium][0].toLowerCase()}</h3>`}<div class="cp-table-scroll" tabindex="0" role="region" aria-label="Сравнение сред; на узком экране таблицу можно прокрутить"><table><caption>Значимость эффектов и их причины</caption><thead><tr><th scope="col">Эффект</th>${Object.entries(MEDIA).map(([key, data])=>`<th scope="col" class="${!lecture && key===medium?'cp-selected':''}">${data[0]}</th>`).join('')}</tr></thead><tbody>${labels.map((label,i)=>`<tr><th scope="row">${label}</th>${Object.entries(MEDIA).map(([key,data])=>`<td class="${!lecture && key===medium?'cp-selected':''}">${data[1][i]}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div>`;
       note='Сравнение качественное: значимость зависит от длины линии, частоты, конструкции и окружения.';
       explanation='Дисперсия — разная задержка разных частот или мод. Ограниченная полоса и дисперсия могут обе искажать форму, но не являются одним и тем же механизмом. Проводные отражения связаны с несогласованием; в радио задержанные пути формирует окружение. Нельзя переносить численные настройки учебного радиоканала на волокно или кабель.';
     }
@@ -197,7 +199,7 @@ export function mountChannelPlayground(root, options = {}) {
     if (root.clientWidth !== lastWidth) {lastWidth = root.clientWidth; render();}
   });
   observer?.observe(root);
-  return {setMode(next) {if(!META[next]) throw new Error('Unknown mode'); if(fixed) throw new Error('Standalone mode is fixed'); mode=next; shell();}, getState() {return structuredClone(p);}, destroy() {observer?.disconnect(); shared?.listeners.delete(root); root.replaceChildren(); root.classList.remove('channel-playground', 'cp-lecture');}};
+  return {setMode(next) {if(!META[next]) throw new Error('Unknown mode'); if(fixed) throw new Error('Standalone mode is fixed'); mode=next; shell();}, getState() {return structuredClone(p);}, destroy() {observer?.disconnect(); shared?.listeners.delete(root); root.replaceChildren(); root.classList.remove('channel-playground', 'cp-lecture', 'cp-media-mode');}};
 }
 // Explicitly grouped lecture blocks share this channel's parameters.
 // Unmarked blocks keep the independent-instance behavior.

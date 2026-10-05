@@ -4,7 +4,7 @@ subtitle: "Передатчик → канал → приёмник"
 toc: false
 format:
   html:
-    css: ../styles/channel-playground.css
+    css: ../styles/channel-playground.css?v=20261006-lecture05-2
 ---
 
 Общая модель для экспериментов отдельно от [лекции о среде распространения и искажениях](channel-playground.qmd). Перед изменением параметра сформулируйте предсказание, затем сопоставьте его с наблюдением.
@@ -13,4 +13,4 @@ format:
 
 <div data-channel-playground></div>
 
-<script type="module" src="../interactives/channel-playground-ui.js?v=20261005-power-scale"></script>
+<script type="module" src="../interactives/channel-playground-ui.js?v=20261006-lecture05"></script>

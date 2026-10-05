@@ -7,7 +7,7 @@ export function defaults() {
     bandwidth: 4, rate: 8, regeneration: 'off', snr: 12, disturbance: 'noise',
     interference: .7, interferenceFrequency: .17, carrier: 1, f1: .8, f2: 1,
     signalBandwidth: .2, carrierGHz: 2.4, speed: 15, direction: 0, offset: 0,
-    duration: 10, paths: [{amplitude: .7, delay: .5, angle: 60}]};
+    duration: 10, movingPaths: 'multiple', paths: [{amplitude: .7, delay: .5, angle: 60}]};
 }
 export function attenuation(p) {
   const lossDb = 40 + 20 * Math.log10(p.distance) + p.loss * p.distance;
@@ -20,12 +20,11 @@ export function samplePowerDbm(samples, referenceDbm, floor = -120) {
 }
 export function attenuationSignal(p) {
   const a = attenuation(p), gain = 10 ** ((a.received - p.sensitivity) / 20);
-  const time = Array.from({length: 240}, (_, i) => i / 20);
-  // Rounded pulse edges make receiver clipping visible; normalize mean signal power.
-  let pulse = 1;
-  const shaped = time.map(t => {pulse += .35 * ((BITS[Math.min(11, Math.floor(t))] ? 1 : -1) - pulse); return pulse;});
-  const rms = Math.sqrt(shaped.reduce((v,x) => v+x*x, 0) / shaped.length);
-  const tx = shaped.map(x => x / rms);
+  const time = Array.from({length: 601}, (_, i) => 12 * i / 600);
+  // Six complete sine periods; sqrt(2) gives unit mean power on the periodic grid.
+  const tx = time.map(t => Math.SQRT2 * Math.sin(Math.PI * t));
+  const rms = Math.sqrt(tx.reduce((v,x) => v+x*x, 0) / tx.length);
+  for (let i=0; i<tx.length; i++) tx[i] /= rms;
   const input = tx.map(x => x * gain); // This experiment's propagation channel is noiseless.
   const amplified = p.aid !== 'none', voltageGain = amplified ? 10 ** (p.gainDb / 20) : 1;
   const noiseFactor = p.aid === 'ideal' ? 1 : 10 ** (p.noiseFigure / 10);
@@ -140,13 +139,17 @@ export function frequencyShift(p) {
   return {motion, oscillator: p.offset, total: motion + p.offset};
 }
 export function dopplerSpread(p) {
-  const paths = allPaths(p).filter(x => x.amplitude > 0);
+  const paths = (p.movingPaths === 'single' ? allPaths(p).slice(0,1) : allPaths(p)).filter(x => x.amplitude > 0);
   const shifts = paths.map(x => doppler(p.carrierGHz, p.speed, x.angle));
   const spread = Math.max(...shifts) - Math.min(...shifts);
   const tc = spread > 1e-9 ? 1 / spread : Infinity;
-  const window = Math.max(.05, p.duration / 1000 * 2);
+  // Keep the observation window fixed when T changes, for comparable experiments.
+  const window = .1;
   const count = Math.max(600, Math.ceil(window * Math.max(...shifts.map(Math.abs)) * 20));
   const time = Array.from({length: count + 1}, (_, i) => window * i / count);
   const h = time.map(t => response(paths, p.carrierGHz * 1000, t, p.carrierGHz, p.speed));
-  return {paths, shifts, spread, tc, time, h};
+  const power = h.map(x=>x.magnitude**2);
+  const fragment = power.filter((_,i)=>time[i]<=p.duration/1000);
+  return {paths, shifts, spread, tc, time, h, power,
+    fragmentMin: Math.min(...fragment), fragmentMax: Math.max(...fragment)};
 }
