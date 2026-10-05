@@ -203,7 +203,7 @@ $s=0$ — проверка пройдена; $s=1$ — правило чётно
 
 **CRC** (*cyclic redundancy check*) — циклический избыточный код для обнаружения ошибок. Передатчик вычисляет контрольные биты по данным и добавляет их к блоку.
 
-<svg class="control-schematic crc-frame" viewBox="0 0 560 180" role="img" aria-labelledby="crc-frame-title crc-frame-desc">
+<svg class="control-schematic coded-frame crc-frame" viewBox="0 0 560 180" role="img" aria-labelledby="crc-frame-title crc-frame-desc">
 <title id="crc-frame-title">Передаваемый блок: данные и CRC</title>
 <desc id="crc-frame-desc">Один блок из двух полей. Верхняя строка: DATA и CRC. Нижняя строка: биты данных 1011 и контрольные биты 100.</desc>
 <rect x="20" y="20" width="320" height="140" class="frame-data"/>
@@ -220,28 +220,39 @@ $s=0$ — проверка пройдена; $s=1$ — правило чётно
 
 ## Как мы можем исправить ошибки?
 
-Один информационный бит передаётся трижды:
+**Помехоустойчивое кодирование FEC** (*forward error correction*) добавляет избыточность для исправления ошибок на приёмнике. Простой пример — повторение: один информационный бит кодируется тремя одинаковыми битами. В канале один из них изменился.
 
-<svg class="control-schematic majority-circuit" viewBox="0 0 500 170" role="img" aria-labelledby="majority-title">
-<title id="majority-title">Мажоритарное решение: три принятых бита подаются на элемент два из трёх, который выдаёт единицу, если единиц не меньше двух</title>
-<g class="diagram-wire"><path d="M85 45 H205 M85 85 H205 M85 125 H205 M295 85 H425"/></g>
-<rect x="205" y="20" width="90" height="130" class="logic-gate"/>
-<text x="250" y="96" text-anchor="middle" class="gate-label">≥2</text>
-<text x="26" y="53" class="binary-work">0</text><text x="26" y="93" class="binary-work diagram-error">1</text><text x="26" y="133" class="binary-work">0</text><text x="445" y="93" class="binary-work">0</text>
+<svg class="control-schematic coded-frame repetition-frame" viewBox="0 0 600 180" role="img" aria-labelledby="repetition-title repetition-desc">
+<title id="repetition-title">Кодирование повторением и ошибка в канале</title>
+<desc id="repetition-desc">Информационный бит 0 кодируется в слово 000. Приёмник получает 010: средний бит ошибочен и выделен цветом.</desc>
+<rect x="20" y="20" width="120" height="140" class="frame-data"/>
+<rect x="140" y="20" width="220" height="140" class="frame-crc"/>
+<rect x="360" y="20" width="220" height="140" class="frame-data"/>
+<rect x="20" y="20" width="560" height="140" class="frame-outline"/>
+<path d="M140 20 V160 M360 20 V160 M20 78 H580" class="frame-divider"/>
+<text x="80" y="57" class="frame-heading">Бит</text>
+<text x="250" y="57" class="frame-heading">Кодовое слово</text>
+<text x="470" y="57" class="frame-heading">Принято</text>
+<text x="80" y="132" class="frame-bits">0</text>
+<text x="250" y="132" class="frame-bits">000</text>
+<rect x="451" y="91" width="38" height="54" rx="4" class="error-cell"/>
+<text x="434" y="132" class="frame-bits">0</text>
+<text x="470" y="132" class="frame-bits diagram-error">1</text>
+<text x="506" y="132" class="frame-bits">0</text>
 </svg>
 
 $$\widehat b=(b'_1\land b'_2)\lor(b'_1\land b'_3)\lor(b'_2\land b'_3).$$
 
-$\land$ — логическое И, $\lor$ — логическое ИЛИ. Единица на выходе появляется, если хотя бы две из трёх входных величин равны единице.
-
-> Как восстановить исходный бит без новой передачи? Что произойдёт, если изменятся два из трёх битов?
-
-<details>
-<summary>Пояснение: исправление за счёт избыточности</summary>
-
-Решение по большинству восстанавливает `0` из `010`. Повторение трижды исправляет одну ошибку в группе; две ошибки приводят к неверному решению. Это простой пример **помехоустойчивого кодирования FEC** (*forward error correction*): избыточность позволяет исправлять часть ошибок на приёмнике без запроса повторной передачи.
-
-</details>
+| $b'_1$ | $b'_2$ | $b'_3$ | $\widehat b$ |
+|:--:|:--:|:--:|:--:|
+| 0 | 0 | 0 | 0 |
+| 0 | 0 | 1 | 0 |
+| 0 | 1 | 0 | 0 |
+| 0 | 1 | 1 | 1 |
+| 1 | 0 | 0 | 0 |
+| 1 | 0 | 1 | 1 |
+| 1 | 1 | 0 | 1 |
+| 1 | 1 | 1 | 1 |
 
 Кодовая скорость:
 

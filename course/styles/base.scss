@@ -130,12 +130,12 @@ main.content .error-rate-formulas .math.display { margin: .35rem 0; }
 .control-schematic .gate-label { text-anchor: middle; font: 27px ui-monospace, Consolas, monospace; }
 .control-schematic .adder-label text { text-anchor: middle; font: 29px system-ui, sans-serif; }
 .control-schematic .pin-label { font: 17px system-ui, sans-serif; }
-.crc-frame { max-width: 34rem; }
-.crc-frame .frame-data { fill: var(--surface); }
-.crc-frame .frame-crc { fill: var(--accent-soft); }
-.crc-frame .frame-outline, .crc-frame .frame-divider { fill: none; stroke: var(--accent); stroke-width: 1.8; }
-.crc-frame .frame-heading { text-anchor: middle; font: 600 24px system-ui, sans-serif; }
-.crc-frame .frame-bits { text-anchor: middle; font: 36px ui-monospace, Consolas, monospace; letter-spacing: 7px; }
+.coded-frame { max-width: 34rem; }
+.coded-frame .frame-data { fill: var(--surface); }
+.coded-frame .frame-crc { fill: var(--accent-soft); }
+.coded-frame .frame-outline, .coded-frame .frame-divider { fill: none; stroke: var(--accent); stroke-width: 1.8; }
+.coded-frame .frame-heading { text-anchor: middle; font: 600 24px system-ui, sans-serif; }
+.coded-frame .frame-bits { text-anchor: middle; font: 36px ui-monospace, Consolas, monospace; letter-spacing: 7px; }
 @media (max-width: 760px) {
   .course-visual, .course-interactive { overflow-x: auto; }
 }
