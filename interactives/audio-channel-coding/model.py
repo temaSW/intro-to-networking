@@ -42,17 +42,53 @@ def bits_to_pcm(bits):
     return np.packbits(bits, bitorder="big")
 
 
-def bpsk(bits):
-    return 1 - 2 * np.asarray(bits, dtype=np.float32)
+SAMPLES_PER_SYMBOL = 4
+CARRIER = np.array([1., 0., -1., 0.])  # cos(2*pi*t/4), one cycle per symbol
+
+
+def ook(bits):
+    return np.asarray(bits, dtype=np.float32)
 
 
 def hard_decision(received):
-    return (np.asarray(received) < 0).astype(np.uint8)
+    return (np.asarray(received) > .5).astype(np.uint8)
 
 
-def digital_variance(snr_db):
-    # Real BPSK symbols are +/-1, so mean(symbol**2)=1.
-    return 10 ** (-float(snr_db) / 10)
+def digital_variance(snr_db, bits):
+    # Passband power: E[b^2]*E[cos^2]. Coherent correlation divides
+    # channel noise variance by sum(carrier^2)=2.
+    return analog_variance(bits, snr_db) / 2
+
+
+def ook_receive(bits, snr_db, seed=SEED):
+    variance = digital_variance(snr_db, bits)
+    # Exact distribution of sum((b*c+n)*c)/sum(c^2), with iid RF AWGN.
+    # Generate only its sufficient statistic, rather than all four RF samples.
+    return channel(ook(bits), variance / 2, seed), variance / 2
+
+
+def am_transmit(audio, snr_db, seed=SEED):
+    """Conventional full-carrier AM, coherent mixing and ideal audio LPF.
+
+    RF sample rate is four times the audio rate, carrier equals the audio
+    rate, modulation index 1, peak message .85 (no overmodulation).
+    FFT interpolation/filtering is periodic, matching the audio loop.
+    """
+    audio = np.asarray(audio, dtype=np.float64)
+    spectrum = np.fft.rfft(audio)
+    if len(audio) % 2 == 0:
+        spectrum[-1] *= .5
+    message = np.fft.irfft(spectrum, n=4 * len(audio)) * 4
+    carrier = np.tile(CARRIER, len(audio))
+    transmitted = (1 + message) * carrier
+    variance = analog_variance(transmitted, snr_db)
+    received = channel(transmitted, variance, seed)
+    mixed = 2 * received * carrier
+    spectrum = np.fft.rfft(mixed)
+    spectrum[len(audio) // 2 + 1:] = 0
+    recovered = np.fft.irfft(spectrum, n=len(mixed))[::4] - 1
+    return recovered.astype(np.float32), {"noise_variance": variance,
+                                         "signal_power": float(np.mean(transmitted**2))}
 
 
 def analog_variance(audio, snr_db):
@@ -108,8 +144,8 @@ class LDPC:
     def decode(self, received, variance, batch_size=16):
         if variance <= 0:
             raise ValueError("Use finite positive variance for soft decoding")
-        # Sionna expects log(P(1)/P(0)), hence the negative sign for 0 -> +1.
-        logits = (-2 * np.asarray(received) / variance).astype(np.float32)
+        # Equal-prior OOK likelihood ratio, 0 -> amplitude 0, 1 -> amplitude 1.
+        logits = ((np.asarray(received) - .5) / variance).astype(np.float32)
         with self.torch.inference_mode():
             return np.concatenate([self.decoder(self.torch.from_numpy(batch)).numpy().astype(np.uint8)
                                    for batch in np.array_split(logits, max(1, math.ceil(len(logits) / batch_size)))])
@@ -121,8 +157,7 @@ def transmit(bits, snr_db, codec=None, seed=SEED):
     padding = (-len(bits)) % k
     frames = np.pad(bits, (0, padding)).reshape(-1, k)
     encoded = codec.encode(frames) if codec else frames
-    variance = digital_variance(snr_db)
-    received = channel(bpsk(encoded), variance, seed)
+    received, variance = ook_receive(encoded, snr_db, seed)
     raw = errors(encoded, hard_decision(received))
     decoded = codec.decode(received, variance) if codec else hard_decision(received)
     post = errors(frames, decoded)
@@ -133,4 +168,7 @@ def transmit(bits, snr_db, codec=None, seed=SEED):
         "frames": post["frames"], "information_bits": int(len(bits)),
         "evaluated_bits": post["bits"], "padding_bits": padding,
         "channel_bits": int(encoded.size), "rate": frames.size / encoded.size,
-        "overhead": encoded.size / len(bits)}
+        "overhead": encoded.size / len(bits),
+        "signal_power": float(np.mean(encoded)) / 2,
+        "noise_variance": variance * 2,
+        "decision_noise_variance": variance}

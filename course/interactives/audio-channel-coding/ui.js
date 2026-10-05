@@ -1,6 +1,6 @@
 import {decodePack, envelope, loopPhase, nearestPoint} from './model.js';
 
-const MODES = {analog: 'Analog', digital: 'Digital', ldpc: 'Digital + LDPC'};
+const MODES = {analog: 'Analog · AM', digital: 'Digital · OOK', ldpc: 'Digital + LDPC · OOK'};
 const percent = value => value === 0 ? '0 %' : `${(value * 100).toLocaleString('ru-RU', {maximumFractionDigits: 4})} %`;
 
 export class AudioChannelDemo {
@@ -174,11 +174,11 @@ export class AudioChannelDemo {
     this.root.querySelector('.acd-definition').textContent = 'Во всех режимах SNR — отношение средней мощности передаваемого сигнала к мощности шума. При 0 dB эти мощности равны.';
     const chain = this.root.querySelector('.acd-chain');
     if (this.mode === 'analog') {
-      chain.innerHTML = '<span>Аудио</span><b>→</b><span>+ AWGN</span><b>→</b><span>Аудио с шумом</span>';
+      chain.innerHTML = '<span>Аудио</span><b>→</b><span>AM</span><b>→</b><span>+ AWGN</span><b>→</b><span>AM демодулятор</span><b>→</b><span>Аудио</span>';
     } else {
-      chain.innerHTML = ['Аудио','PCM','FEC','BPSK','AWGN','Решения','Декодер','PCM','Аудио'].map((block, index) => {
+      chain.innerHTML = ['Аудио','PCM','FEC','OOK','AWGN','Коррелятор / биты','Декодер','PCM','Аудио'].map((block, index) => {
         const fec = index === 2 || index === 6;
-        const label = index === 2 ? 'LDPC' : index === 5 && this.mode === 'ldpc' ? 'Soft LLR' : block;
+        const label = index === 2 ? 'LDPC' : index === 5 && this.mode === 'ldpc' ? 'Коррелятор / LLR' : block;
         return `${index ? '<b aria-hidden="true">→</b>' : ''}<span class="${fec ? (this.mode === 'ldpc' ? 'acd-active' : 'acd-bypass') : ''}">${label}${fec && this.mode === 'digital' ? '<small>обход</small>' : ''}</span>`;
       }).join('');
     }
@@ -186,7 +186,7 @@ export class AudioChannelDemo {
     details.hidden = this.mode === 'analog';
     const price = this.root.querySelector('.acd-price');
     if (this.mode === 'analog') {
-      price.innerHTML = '<strong>Шум складывается с сигналом</strong><span>При уменьшении SNR качество ухудшается постепенно.</span>';
+      price.innerHTML = '<strong>Амплитудная модуляция с несущей</strong><span>Синхронная демодуляция и фильтр звуковой полосы. При уменьшении SNR качество ухудшается постепенно.</span>';
     } else {
       const m = point[this.mode];
       price.innerHTML = `<strong>${this.mode === 'ldpc' ? `R = ${this.manifest.code.k} / ${this.manifest.code.n} ≈ ${m.rate.toLocaleString('ru-RU', {maximumFractionDigits: 3})}` : 'R = 1'}</strong><span>Передаваемых / информационных битов: ${m.overhead.toLocaleString('ru-RU', {maximumFractionDigits: 3})} / 1${this.mode === 'ldpc' ? ' · цена восстановления' : ' · без избыточности'}</span>`;
