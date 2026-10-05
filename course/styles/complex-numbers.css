@@ -1,0 +1,27 @@
+.complex-widget, .complex-figure {
+  margin: 1.2rem 0;
+  padding: .85rem;
+  border: 1px solid var(--line);
+  border-radius: .45rem;
+  background: var(--surface);
+  color: var(--ink);
+}
+.complex-widget input { accent-color: var(--accent); }
+.complex-widget svg, .complex-figure svg {
+  display: block;
+  width: 100%;
+  max-width: 28rem;
+  height: auto;
+  margin: auto;
+}
+.complex-widget svg text, .complex-figure svg text {
+  fill: var(--ink);
+  font: 17px system-ui, sans-serif;
+}
+.complex-figure figcaption { margin-top: .6rem; }
+.cn-axis { stroke: var(--ink); stroke-width: 1.5; }
+.cn-axis-head { fill: var(--ink); }
+.cn-guide { fill: none; stroke: var(--line); stroke-width: 1.5; stroke-dasharray: 4 4; }
+.cn-reference { fill: none; stroke: var(--focus); stroke-width: 3; stroke-dasharray: 6 4; }
+.cn-vector { fill: none; stroke: var(--accent); stroke-width: 3; }
+.cn-head { fill: var(--accent); }
