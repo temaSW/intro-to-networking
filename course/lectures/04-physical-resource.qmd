@@ -199,90 +199,24 @@ $s=0$ — проверка пройдена; $s=1$ — правило чётно
 
 </details>
 
-### CRC: контрольные биты из остатка деления
+### CRC: контрольные биты блока
 
-**CRC** (*cyclic redundancy check*) — циклический избыточный код для обнаружения ошибок. Биты данных рассматривают как коэффициенты полинома; контрольные биты получают из остатка деления на согласованный **порождающий полином** $G(x)$.
+**CRC** (*cyclic redundancy check*) — циклический избыточный код для обнаружения ошибок. Передатчик вычисляет контрольные биты по данным и добавляет их к блоку.
 
-Для короткого примера возьмём:
-
-$$M(x)=x^3+x+1\quad\longleftrightarrow\quad1011,$$
-
-$$G(x)=x^3+x^2+1\quad\longleftrightarrow\quad1101.$$
-
-Степень $G(x)$ равна 3, поэтому CRC содержит три бита. Добавление трёх нулей к данным соответствует умножению $M(x)$ на $x^3$. Делим полиномы по модулю 2: сложение и вычитание коэффициентов выполняются через XOR, без переносов.
-
-$$r(x)=\operatorname{rem}_{G(x)}\!\left[x^3M(x)\right].$$
-
-$$r(x)=x^2\quad\longleftrightarrow\quad100.$$
-
-::: {.error-control-diagram}
-```{mermaid}
-flowchart LR
-  D["Данные<br/>1011"] --> F["Передаваемый блок<br/>1011 | 100"]
-  R["CRC<br/>100"] --> F
-```
-:::
-
-<svg class="control-schematic crc-register" viewBox="0 0 650 330" role="img" aria-labelledby="lfsr-title lfsr-desc">
-<title id="lfsr-title">CRC-регистр для полинома x³ + x² + 1</title>
-<desc id="lfsr-desc">Входной бит XOR со старшим разрядом r2 образует обратную связь f. На каждом фронте такта r0 получает f, r1 получает старое r0, r2 получает старое r1 XOR f. Начальное состояние 000; биты 1011 поступают старшим вперёд и дают состояние r2r1r0 равное 100.</desc>
-<g class="diagram-wire"><path d="M40 150 H94 M134 150 H195 M267 150 H315 M387 150 H420 M460 150 H520 M592 150 H625 V45 H114 V130 M165 150 V250 H440 V170"/></g>
-<circle cx="165" cy="150" r="3" class="junction"/>
-<g class="modulo-adder"><circle cx="114" cy="150" r="20"/><circle cx="440" cy="150" r="20"/></g>
-<g class="adder-label"><text x="114" y="158">+</text><text x="440" y="158">+</text></g>
-<g class="logic-gate"><rect x="195" y="115" width="72" height="70"/><rect x="315" y="115" width="72" height="70"/><rect x="520" y="115" width="72" height="70"/></g>
-<g class="diagram-wire"><path d="M195 164 L205 170 L195 176 M315 164 L325 170 L315 176 M520 164 L530 170 L520 176 M95 295 H505 M180 295 V170 H195 M300 295 V170 H315 M505 295 V170 H520"/></g>
-<circle cx="180" cy="295" r="3" class="junction"/><circle cx="300" cy="295" r="3" class="junction"/>
-<text x="204" y="143" class="pin-label">D</text><text x="248" y="143" class="pin-label">Q</text><text x="324" y="143" class="pin-label">D</text><text x="368" y="143" class="pin-label">Q</text><text x="529" y="143" class="pin-label">D</text><text x="573" y="143" class="pin-label">Q</text>
-<text x="20" y="136">b</text><text x="156" y="136">f</text><text x="231" y="215" text-anchor="middle">r₀</text><text x="351" y="215" text-anchor="middle">r₁</text><text x="556" y="215" text-anchor="middle">r₂</text>
-<text x="32" y="304" class="diagram-caption">CLK</text><text x="352" y="34" text-anchor="middle" class="diagram-caption">обратная связь от r₂</text>
-<text x="315" y="325" text-anchor="middle" class="diagram-muted">⊕ — сложение по модулю 2</text>
+<svg class="control-schematic crc-frame" viewBox="0 0 560 180" role="img" aria-labelledby="crc-frame-title crc-frame-desc">
+<title id="crc-frame-title">Передаваемый блок: данные и CRC</title>
+<desc id="crc-frame-desc">Один блок из двух полей. Верхняя строка: DATA и CRC. Нижняя строка: биты данных 1011 и контрольные биты 100.</desc>
+<rect x="20" y="20" width="320" height="140" class="frame-data"/>
+<rect x="340" y="20" width="200" height="140" class="frame-crc"/>
+<rect x="20" y="20" width="520" height="140" class="frame-outline"/>
+<path d="M340 20 V160 M20 78 H540" class="frame-divider"/>
+<text x="180" y="57" class="frame-heading">DATA</text>
+<text x="440" y="57" class="frame-heading">CRC</text>
+<text x="180" y="132" class="frame-bits">1011</text>
+<text x="440" y="132" class="frame-bits">100</text>
 </svg>
 
-Разряды обновляются одновременно по фронту такта. Начальное состояние — `000`; биты `1011` подаются старшим вперёд. После четырёх тактов CRC считывается как $r_2r_1r_0=100$.
-
-<details>
-<summary>Состояния регистра и проверка делением</summary>
-
-| Входной бит | $r_2r_1r_0$ после такта |
-|:--:|:--:|
-| Начальное состояние | `000` |
-| `1` | `101` |
-| `0` | `111` |
-| `1` | `110` |
-| `1` | `100` |
-
-Обратная связь $f=b\oplus r_2$; новые значения разрядов: $r_0^+=f$, $r_1^+=r_0$, $r_2^+=r_1\oplus f$.
-
-Тот же остаток при полиномиальном делении:
-
-$$\begin{aligned}
-1011000\oplus1101000&=0110000,\\
-0110000\oplus0110100&=0000100.
-\end{aligned}$$
-
-</details>
-
-Передаваемый полином $T(x)=x^3M(x)+r(x)$ делится на $G(x)$ без остатка. Приёмник пропускает весь принятый блок, включая CRC, через такой же регистр с начальным состоянием `000`. Ненулевое состояние обнаруживается логическим ИЛИ разрядов:
-
-<svg class="control-schematic crc-syndrome-circuit" viewBox="0 0 500 170" role="img" aria-labelledby="syndrome-title">
-<title id="syndrome-title">Обнаружение ненулевого состояния CRC-регистра: логическое ИЛИ разрядов r0, r1 и r2 выдаёт признак ошибки</title>
-<g class="diagram-wire"><path d="M85 45 H205 M85 85 H205 M85 125 H205 M295 85 H400"/></g>
-<rect x="205" y="20" width="90" height="130" class="logic-gate"/>
-<text x="250" y="96" text-anchor="middle" class="gate-label">≥1</text>
-<text x="30" y="53">r₀</text><text x="30" y="93">r₁</text><text x="30" y="133">r₂</text><text x="410" y="93" class="diagram-caption">ошибка</text>
-</svg>
-
-Для блока `1011100` конечное состояние регистра — `000`, сигнал ошибки — `0`. После изменения третьего бита блок `1001100` даёт состояние `001`, сигнал ошибки — `1`.
-
-> Может ли CRC сам восстановить изменившийся бит?
-
-<details>
-<summary>Что означает результат проверки CRC</summary>
-
-CRC сам по себе не восстанавливает данные. Ненулевой остаток обнаруживает ошибку; нулевой не гарантирует отсутствия всех искажений — некоторые ошибки сохраняют делимость на $G(x)$. Это пример базового полиномиального CRC; в конкретных протоколах также задаются начальное состояние, порядок обработки битов и преобразование результата. Принцип вычисления остатка описан в [примере MathWorks](https://www.mathworks.com/help/matlab/matlab_prog/perform-cyclic-redundancy-check.html).
-
-</details>
+Приёмник проверяет данные по CRC. Несовпадение указывает на ошибку; сама CRC не исправляет данные и может не обнаружить некоторые искажения.
 
 ## Как мы можем исправить ошибки?
 
