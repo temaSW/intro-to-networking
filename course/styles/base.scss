@@ -101,6 +101,35 @@ table td, table th { border-color: var(--line); overflow-wrap: anywhere; }
 .error-rate-formulas { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: .5rem 1.5rem; margin-block: 1rem; }
 main.content .error-rate-formulas > p { flex: 0 0 auto; max-width: 100%; margin: 0; }
 main.content .error-rate-formulas .math.display { margin: .35rem 0; }
+.error-control-diagram .cell-output-display { display: flex; justify-content: center; }
+.error-control-diagram svg.mermaid-js { width: 100%; max-width: 32rem !important; height: auto; }
+.error-control-diagram svg .node :is(rect, polygon, circle, path) { fill: var(--surface) !important; stroke: var(--accent) !important; }
+.error-control-diagram svg :is(.nodeLabel, .edgeLabel, .label) { color: var(--ink) !important; }
+.error-control-diagram svg :is(.nodeLabel, .edgeLabel, .label) p { color: var(--ink) !important; }
+.error-control-diagram svg text { fill: var(--ink) !important; }
+.error-control-diagram svg .flowchart-link { stroke: var(--ink) !important; }
+.error-control-diagram svg marker path { fill: var(--ink) !important; stroke: var(--ink) !important; }
+.error-control-diagram svg :is(.edgeLabel, .edgeLabel p, .labelBkg) { background: var(--surface-alt) !important; fill: var(--surface-alt) !important; }
+.control-schematic { display: block; width: 100%; max-width: 38rem; height: auto; margin: 1rem auto; color: var(--ink); }
+.control-schematic text { fill: currentColor; font: 22px system-ui, sans-serif; }
+.control-schematic .diagram-caption { font-size: 19px; }
+.control-schematic .diagram-muted { fill: var(--muted); font-size: 18px; }
+.control-schematic .bit-cell rect { fill: var(--surface); stroke: var(--line); stroke-width: 1.5; }
+.control-schematic .parity-cell { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.5; }
+.control-schematic .error-cell { fill: var(--surface); stroke: var(--focus); stroke-width: 2.5; }
+.control-schematic .bit-value text { text-anchor: middle; font: 27px ui-monospace, Consolas, monospace; }
+.control-schematic .binary-work { font: 27px ui-monospace, Consolas, monospace; }
+.control-schematic .diagram-rule { fill: none; stroke: var(--ink); stroke-width: 1.5; }
+.control-schematic .error-arrow { fill: none; stroke: var(--focus); stroke-width: 2; }
+.control-schematic .diagram-error { fill: var(--focus); }
+.control-schematic .diagram-emphasis { fill: var(--accent); font-weight: 700; }
+.control-schematic .logic-gate, .control-schematic .modulo-adder circle { fill: var(--surface); stroke: var(--ink); stroke-width: 1.8; }
+.control-schematic .diagram-wire { fill: none; stroke: var(--ink); stroke-width: 1.8; }
+.control-schematic .junction { fill: var(--ink); }
+.control-schematic .gate-label { text-anchor: middle; font: 27px ui-monospace, Consolas, monospace; }
+.control-schematic .adder-label text { text-anchor: middle; font: 29px system-ui, sans-serif; }
+.control-schematic .pin-label { font: 17px system-ui, sans-serif; }
+.crc-register { max-width: 46rem; }
 @media (max-width: 760px) {
   .course-visual, .course-interactive { overflow-x: auto; }
 }
