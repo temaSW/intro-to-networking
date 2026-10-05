@@ -11,61 +11,21 @@ subtitle: "От состояний сигнала к ресурсу пользо
 
 > Посмотрите на три способа передачи одной и той же последовательности битов. Что у несущей меняется между соседними битами?
 
-
-#### Три способа передать бит
-
-Что меняется у несущей?
-
-#### Амплитуда · ASK
-
-**ASK** (*amplitude-shift keying*) — амплитудная манипуляция.
-
-Где сигнал становится сильнее?
-
-#### Частота · FSK
-
-**FSK** (*frequency-shift keying*) — частотная манипуляция.
-
-Где колебаний за битовый интервал больше?
-
-#### Фаза · PSK
-
-**PSK** (*phase-shift keying*) — фазовая манипуляция.
-
-Где меняется положение колебания?
-
-#### Три параметра
-
-Сравните ответы с исходной гипотезой.
+**ASK** (*amplitude-shift keying*) — амплитудная манипуляция; **FSK** (*frequency-shift keying*) — частотная; **PSK** (*phase-shift keying*) — фазовая.
 
 $T_b$ — длительность бита, $f_c$ — несущая частота.
 
-<div class="keying-scene" data-keying-figure data-stage="all" role="img" aria-label="Три способа передать одну последовательность битов: ASK, FSK, PSK">
-  <div class="scene-overline">Одна последовательность битов <span>ASK / FSK / PSK</span></div>
-  <div class="keying-detail">
-<picture class="keying-slide" data-keying="ask"><source media="(max-width: 760px)" srcset="../assets/lecture-04/keying-ask-mobile.svg"><img src="../assets/lecture-04/keying-ask.svg" alt="ASK: амплитуда сигнала и его спектр"></picture>
-<picture class="keying-slide" data-keying="fsk"><source media="(max-width: 760px)" srcset="../assets/lecture-04/keying-fsk-mobile.svg"><img src="../assets/lecture-04/keying-fsk.svg" alt="FSK: частота сигнала и его спектр"></picture>
-<picture class="keying-slide" data-keying="psk"><source media="(max-width: 760px)" srcset="../assets/lecture-04/keying-psk-mobile.svg"><img src="../assets/lecture-04/keying-psk.svg" alt="PSK: фаза сигнала и его спектр"></picture>
-  </div>
-  <div class="keying-mode" aria-hidden="true">ASK · FSK · PSK</div>
-  <div class="scene-step-indicator" aria-hidden="true"><span data-scene-step>00</span> / 03</div>
-</div>
+<picture class="keying-slide"><source media="(max-width: 760px)" srcset="../assets/lecture-04/keying-ask-mobile.svg"><img src="../assets/lecture-04/keying-ask.svg" alt="ASK: амплитуда сигнала и его спектр"></picture>
+<picture class="keying-slide"><source media="(max-width: 760px)" srcset="../assets/lecture-04/keying-fsk-mobile.svg"><img src="../assets/lecture-04/keying-fsk.svg" alt="FSK: частота сигнала и его спектр"></picture>
+<picture class="keying-slide"><source media="(max-width: 760px)" srcset="../assets/lecture-04/keying-psk-mobile.svg"><img src="../assets/lecture-04/keying-psk.svg" alt="PSK: фаза сигнала и его спектр"></picture>
 
+### Как длительность бита влияет на спектр?
 
-#### Предскажите изменение спектра
-
-> Что произойдёт со спектром при сокращении $T_b$? Сначала предскажите результат, затем проверьте его на модели.
-
-#### Что показывает модель?
+> Что произойдёт со спектром при сокращении $T_b$?
 
 Модель использует прямоугольные битовые импульсы; ось частоты отсчитывается от несущей. Реальный спектр также зависит от формирования импульсов и фильтрации.
 
-<div class="interactive-scene">
-<div class="scene-overline">Спектры манипуляции</div>
-<div class="scene-model">
 <div class="lecture-interactive" data-lecture-interactive="spectrum"></div>
-</div>
-</div>
 
 
 ## Сколько бит несёт состояние сигнала?
