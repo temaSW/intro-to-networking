@@ -23,7 +23,7 @@ def main():
     for p in CANDIDATES:
         codec = LDPC(p)
         bits = np.random.Generator(np.random.PCG64(SEED + 100)).integers(0, 2, args.frames * p.k, dtype=np.uint8)
-        for snr in [-6, -5, -4, -3, -2.5, -2, -1.75, -1.5, -1.25, -1, -.5, 0, 1, 2, 4]:
+        for snr in [-6, -5.5, -5, -4.75, -4.5, -4.25, -4, -3.5, -3, -2, -1, 0, 1, 2, 4]:
             _, metrics = transmit(bits, snr, codec, SEED + 200)
             row = {"k": p.k, "n": p.n, "iterations": p.iterations, "snr_db": snr, **metrics}
             rows.append(row)

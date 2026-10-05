@@ -15,9 +15,8 @@ import model as m
 
 
 def test_noise_power_definitions():
-    assert m.digital_variance(0) == 1
-    assert m.digital_variance(10) == pytest.approx(.1)
-    assert m.digital_variance(10) == m.analog_variance(np.array([1, -1]), 10)
+    assert m.digital_variance(0, [0, 1]) == .25
+    assert m.digital_variance(10, [0, 1]) == pytest.approx(.025)
     assert m.analog_variance(np.array([1, -1]), 10) == pytest.approx(.1)
     assert m.analog_variance(np.zeros(4), 0) == 0
     noise = m.channel(np.zeros(200000), .5)
@@ -39,10 +38,10 @@ def test_pcm_quantization_bound():
     assert np.max(np.abs(original - recovered)) <= 1 / 255 + 1e-7
 
 
-def test_bpsk_mapping_and_high_snr():
+def test_ook_mapping_and_high_snr():
     bits = np.array([0, 1, 1, 0], dtype=np.uint8)
-    assert m.bpsk(bits).tolist() == [1, -1, -1, 1]
-    assert np.array_equal(m.hard_decision(m.channel(m.bpsk(bits), 0)), bits)
+    assert m.ook(bits).tolist() == [0, 1, 1, 0]
+    assert np.array_equal(m.hard_decision(m.channel(m.ook(bits), 0)), bits)
     payload = m.pcm_to_bits(m.pcm_encode(m.synthesize()))
     recovered, metrics = m.transmit(payload, 30)
     assert np.array_equal(payload, recovered)
@@ -53,9 +52,9 @@ def test_bpsk_mapping_and_high_snr():
 def test_uncoded_ber_at_zero_db():
     payload = m.pcm_to_bits(m.pcm_encode(m.synthesize()))
     _, metrics = m.transmit(payload, 0)
-    theory = .5 * math.erfc(math.sqrt(.5))  # Q(sqrt(P_signal/P_noise))
+    theory = .5 * math.erfc(.5 / math.sqrt(2 * m.digital_variance(0, payload) / 2))
     assert metrics["post_ber"] == pytest.approx(theory, abs=.002)
-    assert .14 < metrics["channel_ber"] < .18
+    assert .07 < metrics["channel_ber"] < .09
 
 
 def test_seed_reproducibility():
@@ -67,6 +66,30 @@ def test_seed_reproducibility():
     assert np.array_equal(m.channel(source, 0), source)
 
 
+def test_am_clean_recovery_and_carrier_power():
+    source = m.synthesize()
+    recovered, metrics = m.am_transmit(source, 160)
+    assert np.max(np.abs(recovered - source)) < 1e-6
+    expected_power = .5 * np.mean((1 + source.astype(np.float64))**2)
+    assert metrics['signal_power'] == pytest.approx(expected_power, rel=1e-6)
+    assert metrics['noise_variance'] == pytest.approx(expected_power * 1e-16)
+    noisy, _ = m.am_transmit(source, 0)
+    assert np.mean((noisy - source)**2) == pytest.approx(expected_power / 2, rel=.03)
+
+
+def test_ook_matched_receiver_against_explicit_rf():
+    bits = np.random.default_rng(12).integers(0, 2, 200000)
+    rf = bits[:, None] * m.CARRIER
+    variance = m.digital_variance(0, bits)
+    received = m.channel(rf, variance, 81)
+    statistic = np.sum(received * m.CARRIER, axis=1) / 2
+    assert np.mean((statistic - bits)**2) == pytest.approx(variance / 2, rel=.02)
+    compressed, projected_variance = m.ook_receive(bits, 0, 82)
+    assert projected_variance == variance / 2
+    assert np.mean(m.hard_decision(statistic) != bits) == pytest.approx(
+        np.mean(m.hard_decision(compressed) != bits), abs=.003)
+
+
 def test_pcm_bit_errors_match_independent_audio_error_power():
     reference_pcm = m.pcm_encode(m.synthesize())
     bits = m.pcm_to_bits(reference_pcm)
@@ -75,7 +98,7 @@ def test_pcm_bit_errors_match_independent_audio_error_power():
     reference = m.pcm_decode(reference_pcm).astype(np.float64)
     received = m.pcm_decode(received_pcm).astype(np.float64)
     # Binary symmetric bit errors imply attenuation plus a calculable PCM error power.
-    p = .5 * math.erfc(math.sqrt(.5))
+    p = .5 * math.erfc(.5 / math.sqrt(m.digital_variance(0, bits)))
     expected_mse = 4 * p**2 * np.mean(reference**2) + 4*p*(1-p)*sum(4**j for j in range(8))/255**2
     assert np.mean((received-reference)**2) == pytest.approx(expected_mse, rel=.05)
     assert np.mean(received_pcm != reference_pcm) == pytest.approx(1-(1-p)**8, abs=.015)
@@ -83,7 +106,7 @@ def test_pcm_bit_errors_match_independent_audio_error_power():
 
 def test_sparse_digital_errors_leave_other_samples_unchanged():
     reference_pcm = m.pcm_encode(m.synthesize())
-    decoded, _ = m.transmit(m.pcm_to_bits(reference_pcm), 12, seed=m.SEED + 1)
+    decoded, _ = m.transmit(m.pcm_to_bits(reference_pcm), 9, seed=m.SEED + 1)
     received_pcm = m.bits_to_pcm(decoded)
     changed = received_pcm != reference_pcm
     assert 0 < np.count_nonzero(changed) < 30
@@ -119,8 +142,8 @@ def test_ldpc_round_trip_and_rate(codec):
     encoded = codec.encode(frames)
     assert encoded.shape == (4, 6144)
     assert codec.encoder.coderate == pytest.approx(1 / 3)
-    received = m.channel(m.bpsk(encoded), m.digital_variance(20))
-    assert np.array_equal(codec.decode(received, m.digital_variance(20)), frames)
+    received, variance = m.ook_receive(encoded, 20)
+    assert np.array_equal(codec.decode(received, variance), frames)
 
 
 def test_ldpc_improvement_and_cliff(codec):
@@ -162,8 +185,8 @@ def test_shipped_assets_match_manifest():
         samples = np.frombuffer(data, dtype="<i2")
         assert np.max(np.abs(samples.astype(np.int32))) < 32767
     point = next(p for p in manifest["points"] if p["snr_db"] == 0)
-    assert .14 < point["digital"]["post_ber"] < .18
-    assert point["digital"]["damaged_samples"] > manifest["samples"] / 2
+    assert .07 < point["digital"]["post_ber"] < .09
+    assert point["digital"]["damaged_samples"] > manifest["samples"] / 3
     assert point["ldpc"]["damaged_samples"] == 0
     assert point["ldpc"]["post_ber"] <= 1e-4
     assert point["ldpc"]["fer"] <= .03
@@ -180,12 +203,13 @@ def test_shipped_uncoded_audio_is_channel_decisions_not_added_audio_noise():
     manifest = json.loads((directory / "manifest.json").read_text(encoding="utf-8"))
     q = m.pcm_encode(m.synthesize())
     bits = np.unpackbits(q)
-    symbols = np.where(bits == 0, 1.0, -1.0)
+    symbols = bits.astype(np.float32)
     noise = np.random.Generator(np.random.PCG64(manifest["seed"] + 1)).standard_normal(len(bits))
     pack = np.frombuffer((directory / "digital.pcm").read_bytes(), dtype="<i2").reshape(-1, len(q))
     for index, point in enumerate(manifest["points"]):
-        y = symbols + noise / math.sqrt(10 ** (point["snr_db"] / 10))
-        received_q = np.packbits((y < 0).astype(np.uint8))
+        variance = np.mean(bits) / 4 / 10 ** (point["snr_db"] / 10)
+        y = (symbols + noise * math.sqrt(variance)).astype(np.float32)
+        received_q = np.packbits((y > .5).astype(np.uint8))
         audio = received_q.astype(np.float32) / 127.5 - 1
         expected = np.rint(audio * manifest["playback_gain"] * 32767).astype("<i2")
         assert np.array_equal(pack[index], expected)
