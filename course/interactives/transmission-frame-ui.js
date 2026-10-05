@@ -1,4 +1,4 @@
-import {PCM,pcmSlot,pcmRead,NR,STAGES,CHANNELS,nrEvents,slotDirection,SSB_REGIONS} from './transmission-frame-model.js';
+import {NR,STAGES,CHANNELS,nrEvents,slotDirection,SSB_REGIONS} from './transmission-frame-model.js';
 
 const legend='<div class="frame-legend"><span class="sync">Синхронизация</span><span class="reference">Опорные сигналы</span><span class="control">Управление</span><span class="access">Доступ</span><span class="payload">Пользовательские данные</span></div>';
 const button=(text,attrs='')=>`<button type="button" ${attrs}>${text}</button>`;
@@ -8,45 +8,6 @@ function focusKey(root) {
 }
 function restoreFocus(root,key) {
   if(key?.length) [...root.querySelectorAll('button')].find(b=>key.every(([k,v])=>b.dataset[k]===v))?.focus({preventScroll:true});
-}
-
-export function mountPcm(root) {
-  let selected=1, offset=0, frame=0;
-  root.innerHTML=`<div class="frame-heading"><strong>Цикл ИКМ-30 / E1</strong><span>32 × 8 = 256 бит · 125 мкс · 2,048 Мбит/с</span></div>
-    <p class="frame-caption">Вариант с поканальной сигнализацией: 30 речевых каналов, КИ 0 и КИ 16 — служебные. КИ — канальный интервал.</p>
-    ${legend}<div class="pcm-slots" aria-label="32 канальных интервала"></div>
-    <div class="frame-controls"><label>Цикл внутри сверхцикла <select data-frame>${Array.from({length:16},(_,i)=>`<option value="${i}">${i}</option>`).join('')}</select></label>
-    <label>Смещение начала приёмника, бит <input data-offset type="range" min="0" max="255" value="0"><output data-offset-value>0</output></label></div>
-    <div class="frame-presets" aria-label="Примеры смещения">${[0,1,8].map(n=>button(n===0?'Начало совпадает':n===1?'Сдвиг на 1 бит':'Сдвиг на 1 КИ',`data-shift="${n}"`)).join('')}</div>
-    <div class="frame-detail" aria-live="polite" data-pcm-detail></div>
-    <div class="pcm-superframe"><strong>Сверхцикл: 16 циклов × 125 мкс = 2 мс</strong><p>КИ 0 привязывает цикл; КИ 16 в цикле 0 содержит признак сверхцикла, а в циклах 1–15 — сигнализацию каналов.</p><div class="pcm-superframe-row"></div></div>`;
-  const draw=()=>{
-    const focus=focusKey(root);
-    root.querySelector('.pcm-slots').innerHTML=Array.from({length:32},(_,i)=>{
-      const s=pcmSlot(i,frame);
-      return button(`<small>КИ ${i}</small><strong>${i===0?'СИНХ':i===16?'СИГН':`Речь ${i<16?i:i-1}`}</strong>`,`class="${s.kind}" data-slot="${i}" aria-pressed="${i===selected}"`);
-    }).join('');
-    const s=pcmSlot(selected,frame),read=pcmRead(selected,offset,frame);
-    const source=pcmSlot(read.sourceSlot,read.sourceFrame);
-    root.querySelector('[data-offset-value]').textContent=offset;
-    root.querySelector('[data-pcm-detail]').innerHTML=`<h4>${s.title}</h4><p>${s.text}</p>
-      <div class="pcm-word" aria-label="Переданные восемь бит">${[...s.bits].map((b,i)=>`<span><small>${i+1}</small><b>${b}</b></span>`).join('')}</div>
-      <div class="pcm-receive"><span>Передано в КИ ${selected}: <code>${s.bits}</code></span><span>Приёмник относит к КИ ${selected}: <code>${read.bits}</code></span></div>
-      <p class="frame-outcome">${read.aligned?'Границы совпадают: слово и назначение канала восстановлены.':read.wordAligned?`Границы восьмибитных слов сохранены, но приёмник читает КИ ${read.sourceSlot} цикла ${read.sourceFrame}: «${source.title}». Назначение не совпадает с ожидаемым КИ ${selected}.`:`Начало чтения — КИ ${read.sourceSlot} цикла ${read.sourceFrame}, бит ${read.bitOffset+1}. Слово собрано из частей соседних интервалов; такт битов в этой модели сохранён.`}</p>`;
-    root.querySelector('.pcm-superframe-row').innerHTML=Array.from({length:16},(_,i)=>button(`<small>Цикл ${i}</small><span>${i===0?'0000':`${i} / ${i+15}`}</span>`,`data-cycle="${i}" aria-pressed="${i===frame}"`)).join('');
-    restoreFocus(root,focus);
-  };
-  root.addEventListener('click',e=>{
-    const slot=e.target.closest('[data-slot]'),shift=e.target.closest('[data-shift]'),cycle=e.target.closest('[data-cycle]');
-    if(slot) selected=Number(slot.dataset.slot);
-    else if(shift) {offset=Number(shift.dataset.shift);root.querySelector('[data-offset]').value=offset;}
-    else if(cycle) {frame=Number(cycle.dataset.cycle);root.querySelector('[data-frame]').value=frame;}
-    else return;
-    draw();
-  });
-  root.querySelector('[data-offset]').addEventListener('input',e=>{offset=Number(e.target.value);draw();});
-  root.querySelector('[data-frame]').addEventListener('change',e=>{frame=Number(e.target.value);draw();});
-  draw();
 }
 
 function ssbDiagram(focus='all') {
@@ -121,5 +82,5 @@ export function mountNr(root) {
   root.querySelector('[data-duplex]').addEventListener('change',e=>{mode=e.target.value;const first=nrEvents(stage,mode)[0];selected=first.id;slot=first.slot;direction=first.direction;draw();});
   draw();
 }
-document.querySelectorAll('[data-pcm-frame]').forEach(mountPcm);
+
 document.querySelectorAll('[data-nr-frame-map]').forEach(mountNr);
