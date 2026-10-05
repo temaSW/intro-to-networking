@@ -1,6 +1,7 @@
 % BER without channel coding: 5G NR QPSK/16QAM/64QAM symbol mapping over AWGN.
 % Run from repository root: matlab -batch "run('scripts/lecture-04/generate_uncoded_ber.m')"
-% Requires MATLAB R2024a and 5G Toolbox. SNR is Es/N0 for unit-power symbols.
+% Requires MATLAB R2024a, 5G Toolbox and Communications Toolbox.
+% AWGN uses the measured average power of the transmitted complex samples.
 
 rng(20260929, 'twister');
 repositoryRoot = fileparts(fileparts(fileparts(mfilename('fullpath'))));
@@ -23,14 +24,12 @@ for scheme = 1:numel(schemes)
     q = bitsPerSymbol(scheme);
     assert(mod(bitsPerBatch,q) == 0);
     for snrDB = snrRanges{scheme}
-        noiseVariance = 10^(-snrDB/10);
         bitErrors = 0;
         batches = 0;
         while batches < minimumBatches || (batches < maximumBatches && bitErrors < targetBitErrors)
             bits = randi([0 1],bitsPerBatch,1,'int8');
             symbols = nrSymbolModulate(bits,modulation);
-            noise = sqrt(noiseVariance/2) * (randn(size(symbols)) + 1i*randn(size(symbols)));
-            received = symbols + noise;
+            received = awgn(symbols, snrDB, 'measured');
             decisions = nrSymbolDemodulate(received,modulation,'DecisionType','Hard');
             bitErrors = bitErrors + nnz(decisions ~= bits);
             batches = batches + 1;

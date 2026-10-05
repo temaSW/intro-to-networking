@@ -31,7 +31,6 @@ for scheme = 1:numel(schemes)
     info = nrDLSCHInfo(transportBlockSize, codeRate);
     outputLength = q * ceil((transportBlockSize / codeRate) / q);
     for snrDB = snrRanges{scheme}
-        noiseVariance = 10^(-snrDB/10);
         bitErrors = 0;
         blocks = 0;
         while blocks < minimumBlocks || (blocks < maximumBlocks && bitErrors < targetBitErrors)
@@ -41,8 +40,7 @@ for scheme = 1:numel(schemes)
             encoded = nrLDPCEncode(codeBlocks, info.BGN);
             transmittedBits = nrRateMatchLDPC(encoded, outputLength, redundancyVersion, modulation, layers);
             symbols = nrSymbolModulate(transmittedBits, modulation);
-            noise = sqrt(noiseVariance/2) * (randn(size(symbols)) + 1i*randn(size(symbols)));
-            receivedSymbols = symbols + noise;
+            [receivedSymbols, noiseVariance] = awgn(symbols, snrDB, 'measured');
             softBits = nrSymbolDemodulate(receivedSymbols, modulation, noiseVariance);
             recovered = nrRateRecoverLDPC(softBits, transportBlockSize, codeRate, redundancyVersion, modulation, layers);
             decoded = nrLDPCDecode(recovered, info.BGN, maximumIterations);
