@@ -22,25 +22,46 @@ format:
 
 ## 1. ИКМ: восстановление структуры потока
 
-### Где находятся отсчёты и служебные признаки?
+### От сверхцикла к битам канального интервала
 
-В тракте ИКМ-30 / E1 речевые слова передаются по очереди в 32 канальных интервалах (**КИ**) по 8 бит. Цикл длится 125 мкс; скорость — 2,048 Мбит/с. Показан вариант с поканальной сигнализацией: КИ 0 служебный, КИ 16 отведён сигнализации, остальные 30 — речи ([G.704, §2.3 и §5](https://www.itu.int/rec/T-REC-G.704-199810-I/en)).
+В тракте ИКМ-30 / E1 речевые слова передаются по очереди в 32 канальных интервалах (**КИ**) по 8 бит. Цикл длится 125 мкс; скорость — 2,048 Мбит/с. Здесь рассматривается вариант с поканальной сигнализацией: КИ 0 служебный, КИ 16 отведён сигнализации, остальные 30 — речи ([G.704, §2.3 и §5](https://www.itu.int/rec/T-REC-G.704-199810-I/en)).
 
-> Где в этой структуре найти начало цикла? Чем отличается сдвиг на один бит от сдвига на целый канальный интервал?
+> Где на общей схеме цикл, канальный интервал и отдельный бит? Какие позиции несут речь, а какие помогают разобрать поток?
 
-::: {.column-page .course-interactive}
-<div class="frame-map" data-pcm-frame>
-<p>КИ 0: синхронизм → КИ 1–15: речевые каналы 1–15 → КИ 16: сигнализация → КИ 17–31: речевые каналы 16–30. Цикл повторяется через 125 мкс.</p>
-</div>
+::: {.column-page}
+<figure class="pcm-overview">
+<img src="../assets/lecture-06/pcm-30-structure.png" alt="Иерархическая структура ИКМ-30: сверхцикл из 16 циклов, цикл из 32 КИ и развёртка восьми бит КИ 0, речевого КИ и КИ 16" width="1241" height="900">
+<figcaption>Общая схема из предоставленного образца. Развёртки читаются сверху вниз: сверхцикл 2 мс → цикл 125 мкс → КИ около 3,91 мкс → бит около 488 нс. Нажмите на рисунок, чтобы увеличить. ТЧ — телефонный канал; ЦС / СЦС — цикловой / сверхцикловой синхросигнал. Поля крупно разобраны ниже.</figcaption>
+</figure>
 :::
 
-<details><summary>Цикл, сверхцикл и роль КИ 16</summary>
+### КИ 0: где начинается цикл?
 
-КИ 0 несёт комбинацию циклового синхронизма в чередующихся циклах; она обозначает положение всей структуры. Восемь бит речевого КИ — кодовая комбинация одного отсчёта, а не восемь отсчётов.
+> Какие биты приёмник может искать как известную комбинацию? Почему в соседнем цикле содержимое КИ 0 другое?
 
-При поканальной сигнализации сверхцикл объединяет 16 циклов (2 мс). В КИ 16 цикла 0 находится признак его начала; в циклах 1–15 передаются биты сигнализации для пар речевых каналов. Приёмник должен различать цикловую и сверхцикловую привязку. Здесь не рассматриваются контроль CRC-4 и другие варианты использования КИ 16; его показанное назначение относится именно к выбранному варианту ИКМ-30.
+<div class="pcm-scheme frame-scroll" tabindex="0" role="region" aria-label="Развёртка КИ 0 по восьми битам в чётном и нечётном циклах"><svg class="pcm-bit-scheme" viewBox="0 0 820 420" role="img" aria-label="Развёртка КИ 0 по восьми битам в чётном и нечётном циклах"><text x="410" y="28" text-anchor="middle" class="scheme-title">КИ 0 · 8 бит · цикловая синхронизация</text><text x="50" y="55">Чётные циклы: Ц0, Ц2, …, Ц14</text><rect x="50" y="75" width="90" height="65"/><text x="95" y="95" text-anchor="middle" class="scheme-position">Бит 1</text><text x="95" y="124" text-anchor="middle" class="scheme-bit">Si</text><rect x="140" y="75" width="90" height="65"/><text x="185" y="95" text-anchor="middle" class="scheme-position">Бит 2</text><text x="185" y="124" text-anchor="middle" class="scheme-bit">0</text><rect x="230" y="75" width="90" height="65"/><text x="275" y="95" text-anchor="middle" class="scheme-position">Бит 3</text><text x="275" y="124" text-anchor="middle" class="scheme-bit">0</text><rect x="320" y="75" width="90" height="65"/><text x="365" y="95" text-anchor="middle" class="scheme-position">Бит 4</text><text x="365" y="124" text-anchor="middle" class="scheme-bit">1</text><rect x="410" y="75" width="90" height="65"/><text x="455" y="95" text-anchor="middle" class="scheme-position">Бит 5</text><text x="455" y="124" text-anchor="middle" class="scheme-bit">1</text><rect x="500" y="75" width="90" height="65"/><text x="545" y="95" text-anchor="middle" class="scheme-position">Бит 6</text><text x="545" y="124" text-anchor="middle" class="scheme-bit">0</text><rect x="590" y="75" width="90" height="65"/><text x="635" y="95" text-anchor="middle" class="scheme-position">Бит 7</text><text x="635" y="124" text-anchor="middle" class="scheme-bit">1</text><rect x="680" y="75" width="90" height="65"/><text x="725" y="95" text-anchor="middle" class="scheme-position">Бит 8</text><text x="725" y="124" text-anchor="middle" class="scheme-bit">1</text><path d="M54,145 v10 H136 v-10"/><text x="95.0" y="180" text-anchor="middle" class="scheme-label">Служебный</text><path d="M144,145 v10 H766 v-10"/><text x="455.0" y="180" text-anchor="middle" class="scheme-label">ЦС: комбинация 0011011 — положение начала цикла</text><text x="50" y="250">Нечётные циклы: Ц1, Ц3, …, Ц15</text><rect x="50" y="270" width="90" height="65"/><text x="95" y="290" text-anchor="middle" class="scheme-position">Бит 1</text><text x="95" y="319" text-anchor="middle" class="scheme-bit">Si</text><rect x="140" y="270" width="90" height="65"/><text x="185" y="290" text-anchor="middle" class="scheme-position">Бит 2</text><text x="185" y="319" text-anchor="middle" class="scheme-bit">1</text><rect x="230" y="270" width="90" height="65"/><text x="275" y="290" text-anchor="middle" class="scheme-position">Бит 3</text><text x="275" y="319" text-anchor="middle" class="scheme-bit">A</text><rect x="320" y="270" width="90" height="65"/><text x="365" y="290" text-anchor="middle" class="scheme-position">Бит 4</text><text x="365" y="319" text-anchor="middle" class="scheme-bit">Sa4</text><rect x="410" y="270" width="90" height="65"/><text x="455" y="290" text-anchor="middle" class="scheme-position">Бит 5</text><text x="455" y="319" text-anchor="middle" class="scheme-bit">Sa5</text><rect x="500" y="270" width="90" height="65"/><text x="545" y="290" text-anchor="middle" class="scheme-position">Бит 6</text><text x="545" y="319" text-anchor="middle" class="scheme-bit">Sa6</text><rect x="590" y="270" width="90" height="65"/><text x="635" y="290" text-anchor="middle" class="scheme-position">Бит 7</text><text x="635" y="319" text-anchor="middle" class="scheme-bit">Sa7</text><rect x="680" y="270" width="90" height="65"/><text x="725" y="290" text-anchor="middle" class="scheme-position">Бит 8</text><text x="725" y="319" text-anchor="middle" class="scheme-bit">Sa8</text><path d="M54,340 v10 H136 v-10"/><text x="95.0" y="375" text-anchor="middle" class="scheme-label">Служебный</text><path d="M144,340 v10 H226 v-10"/><text x="185.0" y="375" text-anchor="middle" class="scheme-label">Всегда 1</text><path d="M234,340 v10 H316 v-10"/><text x="275.0" y="375" text-anchor="middle" class="scheme-label">Авария</text><path d="M324,340 v10 H766 v-10"/><text x="545.0" y="375" text-anchor="middle" class="scheme-label">Служебные / резервные позиции</text></svg></div>
 
-Цвет обозначает функцию, номер — позицию. Интервалы на схеме читаются слева направо, строка за строкой. При смещении начала приёмника меняется выделенное слово: видно, какая часть переданного потока ошибочно отнесена к выбранному каналу.
+<details><summary>Назначение позиций КИ 0</summary>
+
+В чётных циклах биты 2–8 — **0011011**, комбинация циклового синхронизма. Приёмник проверяет её повторяемость в ожидаемых позициях. Найденное положение КИ 0 позволяет отсчитать остальные КИ и границы восьмибитных речевых слов.
+
+В нечётных циклах бит 2 равен **1**; он помогает отличать эти циклы от циклов с синхрокомбинацией. Бит **A** сообщает удалённую аварию: 0 — нормальное состояние, 1 — аварийное. **Sa4–Sa8** — служебные / резервные позиции, их использование зависит от режима. **Si** — служебная позиция; здесь режим CRC-4 не разбирается. Эти обозначения соответствуют [таблице 5A G.704](https://www.itu.int/rec/T-REC-G.704-199810-I/en).
+
+</details>
+
+### КИ 16: где сигнализация и начало сверхцикла?
+
+> Зачем объединять 16 циклов, если начало каждого уже известно? Как распределить сигнализацию тридцати каналов между КИ 16?
+
+<div class="pcm-scheme frame-scroll" tabindex="0" role="region" aria-label="Развёртка КИ 16: синхронизм сверхцикла в Ц0 и сигнализация каналов в Ц1–Ц15"><svg class="pcm-bit-scheme" viewBox="0 0 820 420" role="img" aria-label="Развёртка КИ 16: синхронизм сверхцикла в Ц0 и сигнализация каналов в Ц1–Ц15"><text x="410" y="28" text-anchor="middle" class="scheme-title">КИ 16 · 8 бит · поканальная сигнализация</text><text x="50" y="55">Ц0: начало сверхцикла</text><rect x="50" y="75" width="90" height="65"/><text x="95" y="95" text-anchor="middle" class="scheme-position">Бит 1</text><text x="95" y="124" text-anchor="middle" class="scheme-bit">0</text><rect x="140" y="75" width="90" height="65"/><text x="185" y="95" text-anchor="middle" class="scheme-position">Бит 2</text><text x="185" y="124" text-anchor="middle" class="scheme-bit">0</text><rect x="230" y="75" width="90" height="65"/><text x="275" y="95" text-anchor="middle" class="scheme-position">Бит 3</text><text x="275" y="124" text-anchor="middle" class="scheme-bit">0</text><rect x="320" y="75" width="90" height="65"/><text x="365" y="95" text-anchor="middle" class="scheme-position">Бит 4</text><text x="365" y="124" text-anchor="middle" class="scheme-bit">0</text><rect x="410" y="75" width="90" height="65"/><text x="455" y="95" text-anchor="middle" class="scheme-position">Бит 5</text><text x="455" y="124" text-anchor="middle" class="scheme-bit">x</text><rect x="500" y="75" width="90" height="65"/><text x="545" y="95" text-anchor="middle" class="scheme-position">Бит 6</text><text x="545" y="124" text-anchor="middle" class="scheme-bit">y</text><rect x="590" y="75" width="90" height="65"/><text x="635" y="95" text-anchor="middle" class="scheme-position">Бит 7</text><text x="635" y="124" text-anchor="middle" class="scheme-bit">x</text><rect x="680" y="75" width="90" height="65"/><text x="725" y="95" text-anchor="middle" class="scheme-position">Бит 8</text><text x="725" y="124" text-anchor="middle" class="scheme-bit">x</text><path d="M54,145 v10 H406 v-10"/><text x="230.0" y="180" text-anchor="middle" class="scheme-label">СЦС: комбинация 0000</text><path d="M414,145 v10 H766 v-10"/><text x="590.0" y="180" text-anchor="middle" class="scheme-label">x — резерв; y — авария сверхцикла</text><text x="50" y="250">Цn, где n = 1…15: сигнализация пары каналов</text><rect x="50" y="270" width="90" height="65"/><text x="95" y="290" text-anchor="middle" class="scheme-position">Бит 1</text><text x="95" y="319" text-anchor="middle" class="scheme-bit">a</text><rect x="140" y="270" width="90" height="65"/><text x="185" y="290" text-anchor="middle" class="scheme-position">Бит 2</text><text x="185" y="319" text-anchor="middle" class="scheme-bit">b</text><rect x="230" y="270" width="90" height="65"/><text x="275" y="290" text-anchor="middle" class="scheme-position">Бит 3</text><text x="275" y="319" text-anchor="middle" class="scheme-bit">c</text><rect x="320" y="270" width="90" height="65"/><text x="365" y="290" text-anchor="middle" class="scheme-position">Бит 4</text><text x="365" y="319" text-anchor="middle" class="scheme-bit">d</text><rect x="410" y="270" width="90" height="65"/><text x="455" y="290" text-anchor="middle" class="scheme-position">Бит 5</text><text x="455" y="319" text-anchor="middle" class="scheme-bit">a</text><rect x="500" y="270" width="90" height="65"/><text x="545" y="290" text-anchor="middle" class="scheme-position">Бит 6</text><text x="545" y="319" text-anchor="middle" class="scheme-bit">b</text><rect x="590" y="270" width="90" height="65"/><text x="635" y="290" text-anchor="middle" class="scheme-position">Бит 7</text><text x="635" y="319" text-anchor="middle" class="scheme-bit">c</text><rect x="680" y="270" width="90" height="65"/><text x="725" y="290" text-anchor="middle" class="scheme-position">Бит 8</text><text x="725" y="319" text-anchor="middle" class="scheme-bit">d</text><path d="M54,340 v10 H406 v-10"/><text x="230.0" y="375" text-anchor="middle" class="scheme-label">Речевой канал n</text><path d="M414,340 v10 H766 v-10"/><text x="590.0" y="375" text-anchor="middle" class="scheme-label">Речевой канал n + 15</text></svg></div>
+
+<details><summary>Назначение позиций КИ 16</summary>
+
+В **Ц0** первые четыре бита **0000** — признак начала сверхцикла. Позиции **x** резервные (при отсутствии использования устанавливаются в 1); **y** сообщает потерю сверхциклового синхронизма: 0 — нормальное состояние, 1 — аварийное.
+
+В **Ц1–Ц15** две группы **abcd** несут сигнализацию двух речевых каналов. Ц1: каналы 1 и 16; Ц2: 2 и 17; …; Ц15: 15 и 30. Номера речевых каналов отличаются от номеров КИ: канал 16 передаёт речь в КИ 17, потому что КИ 16 занят сигнализацией. Состав сигнализации зависит от системы; схема показывает общий формат [таблицы 14 G.704](https://www.itu.int/rec/T-REC-G.704-199810-I/en).
+
+Один сверхцикл — **16 × 125 мкс = 2 мс**. КИ 0 даёт привязку к циклу, КИ 16 в Ц0 — к сверхциклу; речевой КИ содержит кодовую комбинацию одного отсчёта. Следующий отсчёт того же канала придёт через 125 мкс. Такое назначение КИ 16 относится к выбранному варианту с поканальной сигнализацией.
 
 </details>
 
@@ -64,7 +85,7 @@ format:
 
 Приёмник правильно распознаёт биты. В известном ему формате один отсчёт представлен восьмибитной комбинацией.
 
-> Достаточно ли отсчитывать по восемь бит с момента включения? Что произойдёт при смещении начала слова на один бит?
+> Достаточно ли отсчитывать по восемь бит с момента включения? Как найденное начало цикла определяет границы речевых слов?
 
 <details><summary>Граница кодовой комбинации</summary>
 
@@ -395,3 +416,5 @@ MIB даёт базовые параметры и сведения для пои
 </details>
 
 <script type="module" src="../interactives/transmission-frame-ui.js"></script>
+
+<script src="../interactives/image-lightbox.js"></script>

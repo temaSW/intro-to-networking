@@ -39,20 +39,9 @@
 .frame-controls { display: flex; flex-wrap: wrap; gap: 1rem; margin-block: 1rem; }
 .frame-controls label { display: grid; gap: .4rem; flex: 1 1 15rem; }
 .frame-controls input { width: 100%; accent-color: var(--accent); }
-.pcm-slots { display: grid; grid-template-columns: repeat(8,minmax(0,1fr)); gap: .3rem; }
-.pcm-slots button { padding: .5rem .2rem; display: grid; gap: .3rem; }
-.pcm-slots button strong { font-size: .8rem; }
 .frame-detail { padding: 1rem; margin-top: 1rem; border: 1px solid var(--line); border-radius: .4rem; background: var(--surface-alt); }
 .frame-detail h4 { margin-top: 0; font-size: 1.05rem; }
-.pcm-word { display: grid; grid-template-columns: repeat(8,minmax(0,1fr)); gap: .25rem; max-width: 30rem; margin-block: 1rem; }
-.pcm-word span { display: grid; text-align: center; border: 1px solid var(--line); padding: .3rem; }
-.pcm-word small { color: var(--muted); }
-.pcm-word b { font: 700 1.3rem monospace; }
-.pcm-receive { display: grid; gap: .5rem; }
 .frame-outcome { margin-block: 1rem 0; padding-left: .75rem; border-left: 3px solid var(--accent); }
-.pcm-superframe { margin-top: 1.5rem; }
-.pcm-superframe-row { display: grid; grid-template-columns: repeat(8,minmax(0,1fr)); gap: .3rem; }
-.pcm-superframe-row button { display: grid; gap: .3rem; }
 .frame-scroll { overflow-x: auto; max-width: 100%; margin-block: 1rem; }
 .frame-map .nr-frame { min-width: 76rem; }
 .nr-axis { display: grid; grid-template-columns: 4rem repeat(10,minmax(0,1fr)); text-align: center; font-size: .8rem; margin-bottom: .5rem; }
@@ -83,6 +72,21 @@
 @media (max-width: 600px) {
   .frame-map { padding: .7rem; }
   .frame-detail { padding: .7rem; }
-  .pcm-slots, .pcm-superframe-row { grid-template-columns: repeat(4,minmax(0,1fr)); }
   .frame-map select { width: 100%; min-width: 0; }
 }
+
+.pcm-overview { margin-block: 1.5rem; }
+.pcm-overview img { display: block; width: 100%; height: auto; background: white; border: 1px solid var(--line); }
+.pcm-overview figcaption { color: var(--muted); font-size: .9rem; margin-top: .7rem; }
+.pcm-scheme { margin-block: 1.5rem; padding: .5rem; border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
+.pcm-scheme .pcm-bit-scheme { display: block; width: 100%; min-width: 42rem; height: auto; }
+.pcm-bit-scheme rect { fill: var(--surface-alt); stroke: var(--ink); }
+.pcm-bit-scheme path { fill: none; stroke: var(--ink); stroke-width: 1.5; }
+.pcm-bit-scheme text { fill: var(--ink); font: 17px sans-serif; }
+.pcm-bit-scheme .scheme-title { font-size: 22px; font-weight: bold; }
+.pcm-bit-scheme .scheme-bit { font-size: 26px; font-weight: bold; }
+.pcm-bit-scheme .scheme-position { font-size: 14px; fill: var(--muted); }
+.pcm-bit-scheme .scheme-label { font-size: 15px; }
+.pcm-scheme:focus-visible { outline: 2px solid var(--accent); }
+
+.lecture-lightbox .pcm-bit-scheme { width: 100%; height: auto; min-width: 0; background: var(--surface); }

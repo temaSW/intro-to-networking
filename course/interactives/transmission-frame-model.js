@@ -1,22 +1,4 @@
 // Functional frame maps. Standard structure is separate from illustrative allocations.
-export const PCM = Object.freeze({slots:32, bitsPerSlot:8, frameUs:125, rate:2048000});
-export function pcmSlot(slot, frame=0) {
-  if (!Number.isInteger(slot) || slot<0 || slot>31) throw new RangeError('КИ 0…31');
-  if (slot===0) return {kind:'sync', title:'КИ 0 — цикловый синхронизм и служебные биты', bits:frame%2===0?'10011011':'11000000',
-    text:frame%2===0?'Биты 2–8: 0011011 — комбинация циклового синхронизма. Бит 1 служебный. Приёмник проверяет повторение признака в предусмотренных циклах.':'В этом цикле комбинации 0011011 нет: бит 2 равен 1, бит 3 сообщает аварийное состояние, остальные позиции служебные. В показанном слове авария отсутствует.'};
-  if (slot===16) return {kind:'control', title:'КИ 16 — сигнализация каналов', bits:frame===0?'00001011':'10101010',
-    text:frame===0?'В варианте с поканальной сигнализацией первые четыре бита 0000 обозначают начало сверхцикла. Остальные биты служебные. Это не отсчёт речи.':'В сверхцикле из 16 циклов КИ 16 передаёт по четыре бита сигнализации для двух речевых каналов. Цикл '+frame+': каналы '+frame+' и '+(frame+15)+'. Здесь показаны условные значения сигнализации.'};
-  const channel=slot<16?slot:slot-1;
-  return {kind:'payload', title:`КИ ${slot} — речевой канал ${channel}`, bits:(channel*7+frame).toString(2).padStart(8,'0'),
-    text:`Восемь бит представляют один отсчёт канала ${channel}. Его следующий отсчёт придёт через 125 мкс в той же позиции следующего цикла. Значения слов здесь выбраны для различения каналов, а не для воспроизведения звука.`};
-}
-export function pcmRead(slot, offset=0, frame=0) {
-  const stream=[frame,(frame+1)%16].map(f=>Array.from({length:32},(_,i)=>pcmSlot(i,f).bits).join('')).join('');
-  const start=slot*8+offset;
-  const bits=stream.slice(start,start+8);
-  return {bits, start, sourceSlot:Math.floor((start%256)/8), sourceFrame:(frame+Math.floor(start/256))%16, bitOffset:start%8,
-    aligned:offset%256===0, wordAligned:offset%8===0};
-}
 export const NR = Object.freeze({frameMs:10,subframeMs:1,slotMs:.5,slots:20,symbols:14,spacingKhz:30});
 export const STAGES = [
   {id:'overview',label:'Карта ресурсов'},
