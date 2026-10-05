@@ -1,8 +1,8 @@
 ```{=html}
 <figure class="multipath-scheme">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" role="img" aria-labelledby="multipath-scheme-title multipath-scheme-desc">
-  <title id="multipath-scheme-title">Прямой и отражённые пути радиосигнала</title>
-  <desc id="multipath-scheme-desc">Передатчик слева, приёмник справа. Один путь соединяет их напрямую, два других проходят через отражающие поверхности сверху и снизу.</desc>
+  <title id="multipath-scheme-title">Прямой и отражённые лучи радиосигнала</title>
+  <desc id="multipath-scheme-desc">Передатчик слева, приёмник справа. Один луч соединяет их напрямую, два других проходят через отражающие поверхности сверху и снизу.</desc>
   <defs>
     <marker id="multipath-arrow-direct" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="#1479b8"/></marker>
     <marker id="multipath-arrow-top" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="#d66720"/></marker>
@@ -21,7 +21,7 @@
   </g>
   <g fill="currentColor" font-family="system-ui, sans-serif" font-size="21" text-anchor="middle">
     <text x="80" y="260">Передатчик</text><text x="520" y="260">Приёмник</text>
-    <text x="300" y="180">Прямой путь</text>
+    <text x="300" y="180">Прямой луч</text>
     <text x="300" y="105">Отражение 1</text>
     <text x="300" y="310">Отражение 2</text>
   </g>
