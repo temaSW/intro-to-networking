@@ -1,4 +1,4 @@
-import * as model from './channel-playground-model.js?v=20261006-lecture05';
+import * as model from './channel-playground-model.js?v=20261006-ray-motion';
 
 const META = {
   attenuation: ['Затухание', 'Станет ли связь слабее при удвоении расстояния? Что изменит усиление?', 'Увеличьте расстояние, найдите границу работоспособности. Включите усилитель и измените его коэффициент шума.'],
@@ -75,7 +75,7 @@ export function mountChannelPlayground(root, options = {}) {
         case 'multipath': return pathControls();
         case 'coherence': return slider('frequencyGap', 'Разнос двух частот', 0, 1, .01, p.f2-p.f1, 'МГц') + slider('path-0-delay', 'Копия приходит позже на', 0, 5, .025, p.paths[0].delay, 'мкс');
         case 'shift': return slider('speed', 'Скорость', 0, 60, 1, p.speed, 'м/с') + slider('carrierGHz', 'Несущая', .1, 6, .1, p.carrierGHz, 'ГГц') + slider('offset', 'Рассогласование генераторов', -500, 500, 5, p.offset, 'Гц');
-        case 'spread': return select('movingPaths', 'Приходящие лучи', [['single','Только прямой'],['multiple','Прямой и отражённый']],p.movingPaths) + slider('speed', 'Скорость движения', 0, 60, 1, p.speed, 'м/с') + (p.movingPaths==='multiple' ? select('path-0-angle', 'Отражённый луч приходит', [['0','Спереди'],['90','Сбоку'],['180','Сзади']],String(p.paths[0].angle)) : '') + slider('duration', 'Длительность передачи', .1, 100, .1, p.duration, 'мс');
+        case 'spread': return slider('speed', 'Скорость движения приёмника', 0, 60, 1, p.speed, 'м/с') + slider('duration', 'Длительность одной передачи', .1, 100, .1, p.duration, 'мс') + slider('probePercent','Момент внутри передачи',0,100,.1,p.probePercent ?? 0,'%');
         case 'media': return '';
       }
     }
@@ -91,6 +91,7 @@ export function mountChannelPlayground(root, options = {}) {
     }
   }
   function views() {
+    if (lecture && mode==='spread') return [['time','Одна передача']];
     return ({attenuation: [['time','Форма']], bandwidth: [['time','Импульсы'],['spectrum','Полоса канала']], noise: [['time','Во времени'],['constellation','Созвездие']], multipath: [['time','Копии и сумма'],['frequency','H(f)']], coherence: [['compare','Два сигнала'],['frequency','Канал по частоте']], shift: [['spectrum','Спектр']], spread: [['time','Уровень во времени'],['spectrum','Сдвиги лучей']], media: []})[mode];
   }
   function shell() {
@@ -176,10 +177,38 @@ export function mountChannelPlayground(root, options = {}) {
       note='0° — движение навстречу: положительный сдвиг; 90° — поперёк: нулевой; 180° — удаление: отрицательный.';
       explanation='Один путь: fD ≈ (v/c) fс cos θ. Рассогласование генераторов добавляется отдельно и остаётся при нулевой скорости. Ширина нарисованной линии условная и фиксированная: она нужна для различимости графика и не изображает доплеровское рассеяние.';
     } else if (mode==='spread') {
-      const d=model.dopplerSpread(p), max=d.paths.reduce((v,x)=>v+x.amplitude,0);
+      const d=model.dopplerSpread(p, lecture ? p.duration/1000 : .1), max=d.paths.reduce((v,x)=>v+x.amplitude,0);
       metrics=metric('Минимум уровня за передачу',finite(d.fragmentMin)) + metric('Максимум уровня за передачу',finite(d.fragmentMax)) + metric('Время когерентности · ориентир',`${finite(d.tc*1000)} мс`);
       if(view==='time') charts=plot('Уровень принятого сигнала; фон — время передачи', [{x:d.time.map(t=>t*1000),y:d.power,label:'Относительная мощность'}],{xmax:100,ymin:0,ymax:max*max*1.05,xlabel:'Время, мс',ylabel:'Относительная мощность',bands:[[0,p.duration]],markers:Number.isFinite(d.tc)?[{value:d.tc*1000,label:'Время когерентности'}]:[]});
       else {const range=Math.max(100,...d.shifts.map(Math.abs))*1.2;charts=plot('Доплеровские сдвиги отдельных лучей',d.paths.map((path,i)=>({x:[d.shifts[i],d.shifts[i]],y:[0,path.amplitude**2],label:i===0?'Прямой луч':`Отражение ${i}`})),{xmin:-range,xmax:range,ymin:0,ymax:1.1,xlabel:'Доплеровский сдвиг, Гц',ylabel:'Относительная мощность'});}
+      if (lecture) {
+        const t=d.time.map(x=>x*1000), envelope=d.h.map(x=>100*x.magnitude);
+        const moment=(p.probePercent ?? 0)/100*p.duration;
+        const snapshot=model.movingRaySnapshot(p,moment/1000);
+        metrics=metric('Момент после начала передачи',`${finite(moment,2)} мс`) + metric('Приёмник прошёл',`${finite(snapshot.displacement*1000,1)} мм`) + metric('Амплитуда суммы сейчас',`${finite(snapshot.amplitude*100,1)} %`);
+        const rx=350-(p.speed ? (p.probePercent ?? 0)*2 : 0);
+        const motionId=`cp-motion-${drawPlot.id++}`;
+        charts=`<figure class="cp-plot"><figcaption>Приёмник движется навстречу прямому лучу</figcaption><svg viewBox="0 0 430 225" role="img" aria-label="Прямой луч приходит слева, отражённый сверху. Приёмник движется влево: прямой путь сокращается, путь сбоку почти не меняется.">
+          <defs><marker id="${motionId}" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="${COLORS[0]}"/></marker><marker id="${motionId}-side" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="${COLORS[2]}"/></marker></defs>
+          <text x="20" y="24">Прямой луч приходит слева</text><text x="180" y="48">Отражённый — сверху</text>
+          ${[70,90,110,130].map(y=>`<path d="M140 ${y}H390" stroke="${COLORS[2]}" opacity=".15"/>`).join('')}
+          <path d="M20 110H${rx-12}" stroke="${COLORS[0]}" stroke-width="3" marker-end="url(#${motionId})"/>
+          <path d="M${rx} 60V98" stroke="${COLORS[2]}" stroke-width="3" marker-end="url(#${motionId}-side)"/>
+          <circle cx="350" cy="110" r="9" fill="none" stroke="currentColor" stroke-dasharray="3 3" opacity=".5"/>
+          <circle cx="${rx}" cy="110" r="10" fill="${COLORS[1]}"/><text x="${rx}" y="148" text-anchor="middle">Приёмник</text>
+          <path d="M350 174H150" stroke="${COLORS[0]}" stroke-width="2" marker-end="url(#${motionId})"/><text x="250" y="196" text-anchor="middle">Направление движения</text>
+          <text x="20" y="218">Позиция в начале · пунктирный кружок</text></svg>
+          <div class="cp-legend"><span>Прямой путь сократился на ${finite(-snapshot.pathChanges[0]*1000,1)} мм</span><span>Путь сбоку: почти без изменения</span><span>Длина волны: ${finite(snapshot.wavelength*1000,1)} мм</span></div></figure>`;
+        charts+=plot('Две приходящие волны и их сумма в выбранный момент',[
+          {x:snapshot.cycles,y:snapshot.copies[0],label:'Прямой луч',color:COLORS[0],dash:true},
+          {x:snapshot.cycles,y:snapshot.copies[1],label:'Отражённый луч',color:COLORS[2],dash:true},
+          {x:snapshot.cycles,y:snapshot.sum,label:'Сумма на приёмнике',color:COLORS[1]}
+        ],{xmax:2,ymin:-1.8,ymax:1.8,yticks:[-1.7,-1,0,1,1.7],xlabel:'Колебания несущей · два периода',ylabel:'Относительная амплитуда'});
+        charts+=plot('Как меняется амплитуда суммы за передачу',[
+          {x:t,y:t.map(()=>100),label:'Передано: постоянная амплитуда',dash:true,color:COLORS[0]},
+          {x:t,y:envelope,label:'Принято: сумма прямого и отражённого лучей',color:COLORS[1]}
+        ],{xmax:p.duration,ymin:0,ymax:180,yticks:[0,50,100,150],xlabel:'Время от начала передачи, мс',ylabel:'Амплитуда относительно переданной, %',markers:[{value:moment,label:'Выбранный момент'}]});
+      }
       note=Number.isFinite(d.tc)?`Полоса фона на графике — фрагмент T. ${p.duration/1000<d.tc/10?'T ≪ Tс: канал меняется относительно медленно.':p.duration/1000>=d.tc?'T ≳ Tс: изменения внутри фрагмента существенны.':'Сравните изменение h(t) внутри фрагмента.'}`:'Разброса нет: относительные фазы лучей постоянны. Возможен общий частотный сдвиг и вращение фазы.';
       explanation='У каждого луча свой угол прихода: fD,k = (v/c) fс cos θk. Bᴅ здесь — диапазон сдвигов путей с ненулевой мощностью. Разные сдвиги меняют относительные фазы и создают замирания. Общий сдвиг вращает весь коэффициент, но не создаёт разброса и изменений его модуля; оценка Tс относится к изменениям после отделения общего вращения. Tс ≈ 1/Bᴅ — характерный масштаб, а не точная граница. При слабом дополнительном луче изменения могут быть малы даже при широком диапазоне сдвигов. Если канал зависит от частоты и меняется со временем, откуда система знает его текущее состояние? Это вопрос следующей темы о служебном обмене.';
     } else {
