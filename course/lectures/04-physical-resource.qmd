@@ -42,7 +42,6 @@ $T_b$ — длительность бита, $f_c$ — несущая часто
 
 <div class="keying-scene" data-keying-figure data-stage="all" role="img" aria-label="Три способа передать одну последовательность битов: ASK, FSK, PSK">
   <div class="scene-overline">Одна последовательность битов <span>ASK / FSK / PSK</span></div>
-  <div class="keying-overview"><img src="../assets/lecture-04/keying-comparison.svg" alt="Три ряда сигналов и их спектров"></div>
   <div class="keying-detail">
 <picture class="keying-slide" data-keying="ask"><source media="(max-width: 760px)" srcset="../assets/lecture-04/keying-ask-mobile.svg"><img src="../assets/lecture-04/keying-ask.svg" alt="ASK: амплитуда сигнала и его спектр"></picture>
 <picture class="keying-slide" data-keying="fsk"><source media="(max-width: 760px)" srcset="../assets/lecture-04/keying-fsk-mobile.svg"><img src="../assets/lecture-04/keying-fsk.svg" alt="FSK: частота сигнала и его спектр"></picture>
@@ -73,13 +72,13 @@ $T_b$ — длительность бита, $f_c$ — несущая часто
 
 **QPSK** (*quadrature phase-shift keying*) — квадратурная фазовая манипуляция; **QAM** (*quadrature amplitude modulation*) — квадратурная амплитудная модуляция. $I$ и $Q$ — синфазная и квадратурная координаты сигнала.
 
+![Квадратурный модулятор](../assets/lecture-04/qpsk-iq-modulator.svg)
+
 ::: {.callout-note}
 ### Почему здесь комплексные числа?
 
 Точка созвездия задаёт две реальные ортогональные составляющие сигнала — $I$ и $Q$. Запись $I+jQ$ объединяет их в один объект: расстояние до нуля задаёт амплитуду, угол — фазу. Тот же язык помогает описывать импеданс и частотные характеристики. Подробнее — [«Почему инженеры любят комплексные числа»](../reference/complex-numbers.qmd).
 :::
-
-![Квадратурный модулятор](../assets/lecture-04/qpsk-iq-modulator.svg)
 
 <div class="constellation-figures">
   <figure><figcaption>QPSK · 2 бита на символ</figcaption><img src="../assets/lecture-04/qpsk.svg" alt="Созвездие QPSK: четыре точки"></figure>
@@ -170,31 +169,6 @@ $$\eta\leq\frac{C}{B}=\log_2(1+\mathrm{SNR}),$$
 </div>
 
 
-## Если потоков несколько
-
-`Потоки → объединение → общий канал → разделение → потоки`
-
-**Мультиплексирование** — совместное использование канала несколькими потоками. Обозначения: **FDM** (*frequency-division multiplexing*) — частотное разделение; **TDM** (*time-division multiplexing*) — временное; **WDM** (*wavelength-division multiplexing*) — разделение по длинам волн; **OFDM** (*orthogonal frequency-division multiplexing*) — разделение по ортогональным поднесущим.
-
-> Как можно объединить данные нескольких пользователей для передачи по общему каналу?
-
-<div class="multiplex-figures">
-  <figure class="multiplex-figure" tabindex="0">
-    <img src="../assets/lecture-04/tdm-vs-fdm.webp" alt="При TDM потоки по очереди занимают временные интервалы одного канала; при FDM потоки одновременно занимают разные частотные полосы">
-    <figcaption>Временное и частотное мультиплексирование. Изображение: <a href="https://resources.l-p.com/glossary/tdm-time-division-multiplexing-basics-uses-benefits-guide">LINK-PP</a>.</figcaption>
-  </figure>
-  <figure class="multiplex-figure" tabindex="0">
-    <img src="../assets/lecture-04/fdm-vs-ofdm.png" alt="Сверху пять неперекрывающихся частотных каналов FDM, снизу пять перекрывающихся по частоте поднесущих OFDM">
-    <figcaption>Схематическое сравнение FDM и OFDM: перекрытие поднесущих позволяет плотнее использовать полосу. Источник: <a href="https://www.researchgate.net/figure/Difference-between-OFDM-and-conventional-FDM-signals-1_fig1_268742923">рисунок на ResearchGate</a>.</figcaption>
-  </figure>
-</div>
-
-## Кому достанется общий ресурс?
-
-**Множественный доступ** — назначение ресурса независимым пользователям. **FDMA** (*frequency-division multiple access*) — доступ с частотным разделением; **TDMA** (*time-division multiple access*) — с временным; **CDMA** (*code-division multiple access*) — с кодовым; **OFDMA** (*orthogonal frequency-division multiple access*) — назначение пользователям поднесущих и временных интервалов; **SDMA** (*space-division multiple access*) — с пространственным разделением. **MU-MIMO** (*multi-user multiple-input multiple-output*) — многопользовательская передача с несколькими антеннами на передающей и приёмной сторонах.
-
-{{< include ../_includes/lecture-04-access.qmd >}}
-
 ## Что делать с ошибками?
 
 **BER** (*bit error rate*) — доля ошибочных битов; **BLER** (*block error rate*) — доля блоков с ошибкой. **CRC** (*cyclic redundancy check*) — циклический избыточный код для обнаружения искажений; **FEC** (*forward error correction*) — помехоустойчивое кодирование; **ARQ** (*automatic repeat request*) — повторная передача по запросу; **HARQ** (*hybrid automatic repeat request*) — сочетание кодирования и повторной передачи.
@@ -244,6 +218,32 @@ $$R_u\approx R_s\,\rho_u\,Q_m\,R_c.$$
 $R_u$ — полезная скорость пользователя; $R_s$ — символьная скорость; $\rho_u$ — доля общего ресурса пользователя; $Q_m$ — бит на символ; $R_c$ — кодовая скорость.
 
 > Пользователь удаляется от базовой станции, а число активных пользователей растёт. Какие множители формулы могут измениться? Где в рассуждении нужны SNR, планировщик ресурса, множественный доступ и повторы?
+
+
+## Если потоков несколько
+
+`Потоки → объединение → общий канал → разделение → потоки`
+
+**Мультиплексирование** — совместное использование канала несколькими потоками. Обозначения: **FDM** (*frequency-division multiplexing*) — частотное разделение; **TDM** (*time-division multiplexing*) — временное; **WDM** (*wavelength-division multiplexing*) — разделение по длинам волн; **OFDM** (*orthogonal frequency-division multiplexing*) — разделение по ортогональным поднесущим.
+
+> Как можно объединить данные нескольких пользователей для передачи по общему каналу?
+
+<div class="multiplex-figures">
+  <figure class="multiplex-figure" tabindex="0">
+    <img src="../assets/lecture-04/tdm-vs-fdm.webp" alt="При TDM потоки по очереди занимают временные интервалы одного канала; при FDM потоки одновременно занимают разные частотные полосы">
+    <figcaption>Временное и частотное мультиплексирование. Изображение: <a href="https://resources.l-p.com/glossary/tdm-time-division-multiplexing-basics-uses-benefits-guide">LINK-PP</a>.</figcaption>
+  </figure>
+  <figure class="multiplex-figure" tabindex="0">
+    <img src="../assets/lecture-04/fdm-vs-ofdm.png" alt="Сверху пять неперекрывающихся частотных каналов FDM, снизу пять перекрывающихся по частоте поднесущих OFDM">
+    <figcaption>Схематическое сравнение FDM и OFDM: перекрытие поднесущих позволяет плотнее использовать полосу. Источник: <a href="https://www.researchgate.net/figure/Difference-between-OFDM-and-conventional-FDM-signals-1_fig1_268742923">рисунок на ResearchGate</a>.</figcaption>
+  </figure>
+</div>
+
+## Кому достанется общий ресурс?
+
+**Множественный доступ** — назначение ресурса независимым пользователям. **FDMA** (*frequency-division multiple access*) — доступ с частотным разделением; **TDMA** (*time-division multiple access*) — с временным; **CDMA** (*code-division multiple access*) — с кодовым; **OFDMA** (*orthogonal frequency-division multiple access*) — назначение пользователям поднесущих и временных интервалов; **SDMA** (*space-division multiple access*) — с пространственным разделением. **MU-MIMO** (*multi-user multiple-input multiple-output*) — многопользовательская передача с несколькими антеннами на передающей и приёмной сторонах.
+
+{{< include ../_includes/lecture-04-access.qmd >}}
 
 <script type="module" src="../interactives/lecture-04-ui.js?v=20261005-gray"></script>
 <script type="module" src="../interactives/lecture-04-spectrum-ui.js?v=20260928-spectrum-wide"></script>
