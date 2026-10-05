@@ -15,9 +15,13 @@ subtitle: "От состояний сигнала к ресурсу пользо
 
 $T_b$ — длительность бита, $f_c$ — несущая частота.
 
+::: {.column-page .keying-figures}
+
 <picture class="keying-slide"><source media="(max-width: 760px)" srcset="../assets/lecture-04/keying-ask-mobile.svg"><img src="../assets/lecture-04/keying-ask.svg" alt="ASK: амплитуда сигнала и его спектр"></picture>
 <picture class="keying-slide"><source media="(max-width: 760px)" srcset="../assets/lecture-04/keying-fsk-mobile.svg"><img src="../assets/lecture-04/keying-fsk.svg" alt="FSK: частота сигнала и его спектр"></picture>
 <picture class="keying-slide"><source media="(max-width: 760px)" srcset="../assets/lecture-04/keying-psk-mobile.svg"><img src="../assets/lecture-04/keying-psk.svg" alt="PSK: фаза сигнала и его спектр"></picture>
+
+:::
 
 ### Как длительность бита влияет на спектр?
 

@@ -83,6 +83,7 @@ main.content code:not(.sourceCode) { color: var(--accent); background: var(--sur
 .path-node-index { display: grid; place-items: center; width: 3.5rem; height: 3.5rem; border: 2px solid var(--accent); border-radius: 50%; color: var(--accent); font-weight: 750; }
 .path-node-mask, .path-scene-track, .scene-step-indicator, .keying-mode { display: none; }
 .keying-overview img, .keying-slide img { display: block; width: 100%; height: auto; }
+main.content .keying-figures > p { max-width: none; }
 .keying-slide { display: block; margin-block: 1.25rem; background: var(--surface); border: 1px solid var(--line); border-radius: .4rem; }
 .scene-model { margin-block: 1rem; }
 @media (max-width: 760px) {
