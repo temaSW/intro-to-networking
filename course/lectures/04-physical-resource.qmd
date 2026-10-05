@@ -166,7 +166,7 @@ $$p=1\oplus0\oplus1\oplus1=1.$$
 <text x="250" y="264" text-anchor="middle" class="diagram-muted">=1 — двухвходовой XOR</text>
 </svg>
 
-<svg class="control-schematic parity-schematic" viewBox="0 0 500 245" role="img" aria-labelledby="parity-title parity-desc">
+<svg class="control-schematic parity-schematic" viewBox="0 0 560 245" role="img" aria-labelledby="parity-title parity-desc">
 <title id="parity-title">Проверка чётности: один бит изменился в канале</title>
 <desc id="parity-desc">Данные 1011 и контрольный бит 1 дают четыре единицы. После изменения третьего бита приняты данные 1001 и тот же контрольный бит 1: три единицы, ошибка обнаружена.</desc>
 <text x="222" y="23" text-anchor="middle" class="diagram-muted">данные</text><text x="391" y="23" text-anchor="middle" class="diagram-muted">p</text>
@@ -174,13 +174,13 @@ $$p=1\oplus0\oplus1\oplus1=1.$$
 <g class="bit-cell"><rect x="118" y="43" width="44" height="44" rx="5"/><rect x="174" y="43" width="44" height="44" rx="5"/><rect x="230" y="43" width="44" height="44" rx="5"/><rect x="286" y="43" width="44" height="44" rx="5"/></g>
 <rect x="369" y="43" width="44" height="44" rx="5" class="parity-cell"/>
 <g class="bit-value"><text x="140" y="73">1</text><text x="196" y="73">0</text><text x="252" y="73">1</text><text x="308" y="73">1</text><text x="391" y="73">1</text></g>
-<text x="430" y="73" class="diagram-caption">4 × 1</text>
+<text x="430" y="73" class="diagram-caption">4 единицы</text>
 <path d="M252 95 V139 m-5 -8 5 8 5 -8" class="error-arrow"/><text x="270" y="121" class="diagram-error">1 → 0</text>
 <text x="12" y="182" class="diagram-caption">Принято</text>
 <g class="bit-cell"><rect x="118" y="152" width="44" height="44" rx="5"/><rect x="174" y="152" width="44" height="44" rx="5"/><rect x="286" y="152" width="44" height="44" rx="5"/></g>
 <rect x="230" y="152" width="44" height="44" rx="5" class="error-cell"/><rect x="369" y="152" width="44" height="44" rx="5" class="parity-cell"/>
 <g class="bit-value"><text x="140" y="182">1</text><text x="196" y="182">0</text><text x="252" y="182" class="diagram-error">0</text><text x="308" y="182">1</text><text x="391" y="182">1</text></g>
-<text x="430" y="182" class="diagram-caption">3 × 1</text>
+<text x="430" y="182" class="diagram-caption">3 единицы</text>
 <text x="265" y="231" text-anchor="middle" class="diagram-caption">Чётность нарушена: s = 1</text>
 </svg>
 
