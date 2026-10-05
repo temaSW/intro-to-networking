@@ -23,11 +23,11 @@ def main():
     for p in CANDIDATES:
         codec = LDPC(p)
         bits = np.random.Generator(np.random.PCG64(SEED + 100)).integers(0, 2, args.frames * p.k, dtype=np.uint8)
-        for snr in [-8, -7, -6, -5, -4.75, -4.5, -4.25, -4, -3.5, -3, -2.5, -2, -1, 0, 1, 2]:
+        for snr in [-6, -5, -4, -3, -2.5, -2, -1.75, -1.5, -1.25, -1, -.5, 0, 1, 2, 4]:
             _, metrics = transmit(bits, snr, codec, SEED + 200)
             row = {"k": p.k, "n": p.n, "iterations": p.iterations, "snr_db": snr, **metrics}
             rows.append(row)
-            print(f"k={p.k} n={p.n} BP={p.iterations} Es/N0={snr:g}: BER={metrics['post_ber']:.6g}, FER={metrics['fer']:.4g}", flush=True)
+            print(f"k={p.k} n={p.n} BP={p.iterations} SNR={snr:g}: BER={metrics['post_ber']:.6g}, FER={metrics['fer']:.4g}", flush=True)
     with (args.output / "benchmark.csv").open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=list(rows[0]))
         writer.writeheader()
@@ -43,7 +43,7 @@ def main():
         for ax, key in zip(axes, ["post_ber", "fer"]):
             floor = 1 / (args.frames * p.k) if key == "post_ber" else 1 / args.frames
             ax.semilogy([r["snr_db"] for r in curve], [max(r[key], floor / 2) for r in curve], "o-", label=label)
-            ax.set(xlabel="Es/N0 (dB)", ylabel=key, title=key)
+            ax.set(xlabel="SNR = signal power / noise power (dB)", ylabel=key, title=key)
             ax.grid(True, which="both", alpha=.3)
     axes[0].legend(fontsize=8)
     fig.suptitle(f"Random payload, fixed seed, {args.frames} frames/point; zero errors plotted below 1/N")

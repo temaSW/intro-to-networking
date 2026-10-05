@@ -8,8 +8,9 @@
   "playback_gain": 0.3843183475827112,
   "pcm": "unsigned uniform 8-bit, MSB first, endpoints [-1,+1]",
   "snr": {
-    "digital": "Es/N0; BPSK Es=1, real noise variance=1/(2*10^(SNR/10))",
-    "analog": "audio power / noise variance; not an equal-resource system comparison"
+    "definition": "mean(transmitted_signal**2) / noise_variance, in dB; every mode",
+    "digital": "BPSK signal power=1; real noise variance=1/10^(SNR/10)",
+    "analog": "audio signal power=mean(audio**2); noise variance=signal_power/10^(SNR/10)"
   },
   "code": {
     "name": "Sionna LDPC5GEncoder / LDPC5GDecoder",
@@ -56,18 +57,18 @@
     },
     "analog": {
       "file": "analog.pcm",
-      "bytes": 1114112,
-      "sha256": "08f7e63434e4dd7fb2b97138294f3dcb8dae8bec3d413881381098c812fadd77"
+      "bytes": 1507328,
+      "sha256": "69a2b1ab40861395740921595a8ec4deeb4ce8b9dcd0509f2cc67d43858db5b7"
     },
     "digital": {
       "file": "digital.pcm",
-      "bytes": 1114112,
-      "sha256": "3a3d6ad6eb9548073d96f446706329e74624354d6785507f24cdccffe6e3b9cf"
+      "bytes": 1507328,
+      "sha256": "1f06c0608a2fa941e5386fcf9d65d66856d969ef986718511ecfc547f08c3cee"
     },
     "ldpc": {
       "file": "ldpc.pcm",
-      "bytes": 1114112,
-      "sha256": "af5a8f4cec5f41953037b38eeff07f7dfaf757ba5b3f039e0870515f9bbd1f3b"
+      "bytes": 1507328,
+      "sha256": "ced9866e77cc2a6fdef2a076f173e5e7143ecdd4e4e35e8ba946992020ed0e95"
     }
   },
   "points": [
@@ -77,11 +78,11 @@
         "noise_variance": 0.24373196202639058
       },
       "digital": {
-        "channel_ber": 0.23869705200195312,
-        "channel_bit_errors": 62573,
-        "post_ber": 0.23869705200195312,
+        "channel_ber": 0.3072013854980469,
+        "channel_bit_errors": 80531,
+        "post_ber": 0.3072013854980469,
         "fer": 1.0,
-        "bit_errors": 62573,
+        "bit_errors": 80531,
         "frame_errors": 128,
         "frames": 128,
         "information_bits": 262144,
@@ -89,14 +90,16 @@
         "padding_bits": 0,
         "channel_bits": 262144,
         "rate": 1.0,
-        "overhead": 1.0
+        "overhead": 1.0,
+        "damaged_samples": 30961,
+        "samples": 32768
       },
       "ldpc": {
-        "channel_ber": 0.23809814453125,
-        "channel_bit_errors": 187248,
-        "post_ber": 0.24153900146484375,
+        "channel_ber": 0.3072242736816406,
+        "channel_bit_errors": 241611,
+        "post_ber": 0.3331336975097656,
         "fer": 1.0,
-        "bit_errors": 63318,
+        "bit_errors": 87329,
         "frame_errors": 128,
         "frames": 128,
         "information_bits": 262144,
@@ -104,7 +107,9 @@
         "padding_bits": 0,
         "channel_bits": 786432,
         "rate": 0.3333333333333333,
-        "overhead": 3.0
+        "overhead": 3.0,
+        "damaged_samples": 31298,
+        "samples": 32768
       }
     },
     {
@@ -113,11 +118,11 @@
         "noise_variance": 0.19360317914230846
       },
       "digital": {
-        "channel_ber": 0.21325302124023438,
-        "channel_bit_errors": 55903,
-        "post_ber": 0.21325302124023438,
+        "channel_ber": 0.28580474853515625,
+        "channel_bit_errors": 74922,
+        "post_ber": 0.28580474853515625,
         "fer": 1.0,
-        "bit_errors": 55903,
+        "bit_errors": 74922,
         "frame_errors": 128,
         "frames": 128,
         "information_bits": 262144,
@@ -125,22 +130,26 @@
         "padding_bits": 0,
         "channel_bits": 262144,
         "rate": 1.0,
-        "overhead": 1.0
+        "overhead": 1.0,
+        "damaged_samples": 30482,
+        "samples": 32768
       },
       "ldpc": {
-        "channel_ber": 0.21242396036783853,
-        "channel_bit_errors": 167057,
-        "post_ber": 0.1227569580078125,
-        "fer": 0.984375,
-        "bit_errors": 32180,
-        "frame_errors": 126,
+        "channel_ber": 0.2857513427734375,
+        "channel_bit_errors": 224724,
+        "post_ber": 0.3095550537109375,
+        "fer": 1.0,
+        "bit_errors": 81148,
+        "frame_errors": 128,
         "frames": 128,
         "information_bits": 262144,
         "evaluated_bits": 262144,
         "padding_bits": 0,
         "channel_bits": 786432,
         "rate": 0.3333333333333333,
-        "overhead": 3.0
+        "overhead": 3.0,
+        "damaged_samples": 30870,
+        "samples": 32768
       }
     },
     {
@@ -149,11 +158,11 @@
         "noise_variance": 0.1537844715251187
       },
       "digital": {
-        "channel_ber": 0.1859588623046875,
-        "channel_bit_errors": 48748,
-        "post_ber": 0.1859588623046875,
+        "channel_ber": 0.2633476257324219,
+        "channel_bit_errors": 69035,
+        "post_ber": 0.2633476257324219,
         "fer": 1.0,
-        "bit_errors": 48748,
+        "bit_errors": 69035,
         "frame_errors": 128,
         "frames": 128,
         "information_bits": 262144,
@@ -161,22 +170,26 @@
         "padding_bits": 0,
         "channel_bits": 262144,
         "rate": 1.0,
-        "overhead": 1.0
+        "overhead": 1.0,
+        "damaged_samples": 29834,
+        "samples": 32768
       },
       "ldpc": {
-        "channel_ber": 0.18552144368489584,
-        "channel_bit_errors": 145900,
-        "post_ber": 0.0,
-        "fer": 0.0,
-        "bit_errors": 0,
-        "frame_errors": 0,
+        "channel_ber": 0.26290257771809894,
+        "channel_bit_errors": 206755,
+        "post_ber": 0.280975341796875,
+        "fer": 1.0,
+        "bit_errors": 73656,
+        "frame_errors": 128,
         "frames": 128,
         "information_bits": 262144,
         "evaluated_bits": 262144,
         "padding_bits": 0,
         "channel_bits": 786432,
         "rate": 0.3333333333333333,
-        "overhead": 3.0
+        "overhead": 3.0,
+        "damaged_samples": 30306,
+        "samples": 32768
       }
     },
     {
@@ -185,11 +198,11 @@
         "noise_variance": 0.12215534779455407
       },
       "digital": {
-        "channel_ber": 0.15838623046875,
-        "channel_bit_errors": 41520,
-        "post_ber": 0.15838623046875,
+        "channel_ber": 0.2390289306640625,
+        "channel_bit_errors": 62660,
+        "post_ber": 0.2390289306640625,
         "fer": 1.0,
-        "bit_errors": 41520,
+        "bit_errors": 62660,
         "frame_errors": 128,
         "frames": 128,
         "information_bits": 262144,
@@ -197,22 +210,26 @@
         "padding_bits": 0,
         "channel_bits": 262144,
         "rate": 1.0,
-        "overhead": 1.0
+        "overhead": 1.0,
+        "damaged_samples": 28994,
+        "samples": 32768
       },
       "ldpc": {
-        "channel_ber": 0.1578954060872396,
-        "channel_bit_errors": 124174,
-        "post_ber": 0.0,
-        "fer": 0.0,
-        "bit_errors": 0,
-        "frame_errors": 0,
+        "channel_ber": 0.2383550008138021,
+        "channel_bit_errors": 187450,
+        "post_ber": 0.24202346801757812,
+        "fer": 1.0,
+        "bit_errors": 63445,
+        "frame_errors": 128,
         "frames": 128,
         "information_bits": 262144,
         "evaluated_bits": 262144,
         "padding_bits": 0,
         "channel_bits": 786432,
         "rate": 0.3333333333333333,
-        "overhead": 3.0
+        "overhead": 3.0,
+        "damaged_samples": 29163,
+        "samples": 32768
       }
     },
     {
@@ -221,11 +238,11 @@
         "noise_variance": 0.0970314417757788
       },
       "digital": {
-        "channel_ber": 0.13076019287109375,
-        "channel_bit_errors": 34278,
-        "post_ber": 0.13076019287109375,
+        "channel_ber": 0.21353530883789062,
+        "channel_bit_errors": 55977,
+        "post_ber": 0.21353530883789062,
         "fer": 1.0,
-        "bit_errors": 34278,
+        "bit_errors": 55977,
         "frame_errors": 128,
         "frames": 128,
         "information_bits": 262144,
@@ -233,22 +250,26 @@
         "padding_bits": 0,
         "channel_bits": 262144,
         "rate": 1.0,
-        "overhead": 1.0
+        "overhead": 1.0,
+        "damaged_samples": 27864,
+        "samples": 32768
       },
       "ldpc": {
-        "channel_ber": 0.1302032470703125,
-        "channel_bit_errors": 102396,
-        "post_ber": 0.0,
-        "fer": 0.0,
-        "bit_errors": 0,
-        "frame_errors": 0,
+        "channel_ber": 0.21271387736002603,
+        "channel_bit_errors": 167285,
+        "post_ber": 0.1258087158203125,
+        "fer": 0.984375,
+        "bit_errors": 32980,
+        "frame_errors": 126,
         "frames": 128,
         "information_bits": 262144,
         "evaluated_bits": 262144,
         "padding_bits": 0,
         "channel_bits": 786432,
         "rate": 0.3333333333333333,
-        "overhead": 3.0
+        "overhead": 3.0,
+        "damaged_samples": 19523,
+        "samples": 32768
       }
     },
     {
@@ -257,11 +278,11 @@
         "noise_variance": 0.07707481385850627
       },
       "digital": {
-        "channel_ber": 0.1038360595703125,
-        "channel_bit_errors": 27220,
-        "post_ber": 0.1038360595703125,
+        "channel_ber": 0.18627166748046875,
+        "channel_bit_errors": 48830,
+        "post_ber": 0.18627166748046875,
         "fer": 1.0,
-        "bit_errors": 27220,
+        "bit_errors": 48830,
         "frame_errors": 128,
         "frames": 128,
         "information_bits": 262144,
@@ -269,11 +290,13 @@
         "padding_bits": 0,
         "channel_bits": 262144,
         "rate": 1.0,
-        "overhead": 1.0
+        "overhead": 1.0,
+        "damaged_samples": 26390,
+        "samples": 32768
       },
       "ldpc": {
-        "channel_ber": 0.10329310099283855,
-        "channel_bit_errors": 81233,
+        "channel_ber": 0.18583170572916666,
+        "channel_bit_errors": 146144,
         "post_ber": 0.0,
         "fer": 0.0,
         "bit_errors": 0,
@@ -284,7 +307,9 @@
         "padding_bits": 0,
         "channel_bits": 786432,
         "rate": 0.3333333333333333,
-        "overhead": 3.0
+        "overhead": 3.0,
+        "damaged_samples": 0,
+        "samples": 32768
       }
     },
     {
@@ -293,11 +318,11 @@
         "noise_variance": 0.061222700833929874
       },
       "digital": {
-        "channel_ber": 0.07840347290039062,
-        "channel_bit_errors": 20553,
-        "post_ber": 0.07840347290039062,
+        "channel_ber": 0.1586151123046875,
+        "channel_bit_errors": 41580,
+        "post_ber": 0.1586151123046875,
         "fer": 1.0,
-        "bit_errors": 20553,
+        "bit_errors": 41580,
         "frame_errors": 128,
         "frames": 128,
         "information_bits": 262144,
@@ -305,11 +330,13 @@
         "padding_bits": 0,
         "channel_bits": 262144,
         "rate": 1.0,
-        "overhead": 1.0
+        "overhead": 1.0,
+        "damaged_samples": 24495,
+        "samples": 32768
       },
       "ldpc": {
-        "channel_ber": 0.07818222045898438,
-        "channel_bit_errors": 61485,
+        "channel_ber": 0.15817642211914062,
+        "channel_bit_errors": 124395,
         "post_ber": 0.0,
         "fer": 0.0,
         "bit_errors": 0,
@@ -320,7 +347,9 @@
         "padding_bits": 0,
         "channel_bits": 786432,
         "rate": 0.3333333333333333,
-        "overhead": 3.0
+        "overhead": 3.0,
+        "damaged_samples": 0,
+        "samples": 32768
       }
     },
     {
@@ -329,11 +358,11 @@
         "noise_variance": 0.048630919878468314
       },
       "digital": {
-        "channel_ber": 0.056133270263671875,
-        "channel_bit_errors": 14715,
-        "post_ber": 0.056133270263671875,
+        "channel_ber": 0.13107681274414062,
+        "channel_bit_errors": 34361,
+        "post_ber": 0.13107681274414062,
         "fer": 1.0,
-        "bit_errors": 14715,
+        "bit_errors": 34361,
         "frame_errors": 128,
         "frames": 128,
         "information_bits": 262144,
@@ -341,11 +370,13 @@
         "padding_bits": 0,
         "channel_bits": 262144,
         "rate": 1.0,
-        "overhead": 1.0
+        "overhead": 1.0,
+        "damaged_samples": 22094,
+        "samples": 32768
       },
       "ldpc": {
-        "channel_ber": 0.055890401204427086,
-        "channel_bit_errors": 43954,
+        "channel_ber": 0.13047917683919272,
+        "channel_bit_errors": 102613,
         "post_ber": 0.0,
         "fer": 0.0,
         "bit_errors": 0,
@@ -356,7 +387,9 @@
         "padding_bits": 0,
         "channel_bits": 786432,
         "rate": 0.3333333333333333,
-        "overhead": 3.0
+        "overhead": 3.0,
+        "damaged_samples": 0,
+        "samples": 32768
       }
     },
     {
@@ -365,11 +398,11 @@
         "noise_variance": 0.038628912740081706
       },
       "digital": {
-        "channel_ber": 0.0372467041015625,
-        "channel_bit_errors": 9764,
-        "post_ber": 0.0372467041015625,
+        "channel_ber": 0.10410690307617188,
+        "channel_bit_errors": 27291,
+        "post_ber": 0.10410690307617188,
         "fer": 1.0,
-        "bit_errors": 9764,
+        "bit_errors": 27291,
         "frame_errors": 128,
         "frames": 128,
         "information_bits": 262144,
@@ -377,11 +410,13 @@
         "padding_bits": 0,
         "channel_bits": 262144,
         "rate": 1.0,
-        "overhead": 1.0
+        "overhead": 1.0,
+        "damaged_samples": 19137,
+        "samples": 32768
       },
       "ldpc": {
-        "channel_ber": 0.037228902180989586,
-        "channel_bit_errors": 29278,
+        "channel_ber": 0.10357030232747395,
+        "channel_bit_errors": 81451,
         "post_ber": 0.0,
         "fer": 0.0,
         "bit_errors": 0,
@@ -392,7 +427,9 @@
         "padding_bits": 0,
         "channel_bits": 786432,
         "rate": 0.3333333333333333,
-        "overhead": 3.0
+        "overhead": 3.0,
+        "damaged_samples": 0,
+        "samples": 32768
       }
     },
     {
@@ -401,11 +438,11 @@
         "noise_variance": 0.03068403606614741
       },
       "digital": {
-        "channel_ber": 0.022602081298828125,
-        "channel_bit_errors": 5925,
-        "post_ber": 0.022602081298828125,
+        "channel_ber": 0.07864761352539062,
+        "channel_bit_errors": 20617,
+        "post_ber": 0.07864761352539062,
         "fer": 1.0,
-        "bit_errors": 5925,
+        "bit_errors": 20617,
         "frame_errors": 128,
         "frames": 128,
         "information_bits": 262144,
@@ -413,11 +450,13 @@
         "padding_bits": 0,
         "channel_bits": 262144,
         "rate": 1.0,
-        "overhead": 1.0
+        "overhead": 1.0,
+        "damaged_samples": 15746,
+        "samples": 32768
       },
       "ldpc": {
-        "channel_ber": 0.022614796956380207,
-        "channel_bit_errors": 17785,
+        "channel_ber": 0.07842254638671875,
+        "channel_bit_errors": 61674,
         "post_ber": 0.0,
         "fer": 0.0,
         "bit_errors": 0,
@@ -428,7 +467,9 @@
         "padding_bits": 0,
         "channel_bits": 786432,
         "rate": 0.3333333333333333,
-        "overhead": 3.0
+        "overhead": 3.0,
+        "damaged_samples": 0,
+        "samples": 32768
       }
     },
     {
@@ -437,11 +478,11 @@
         "noise_variance": 0.024373196202639055
       },
       "digital": {
-        "channel_ber": 0.012218475341796875,
-        "channel_bit_errors": 3203,
-        "post_ber": 0.012218475341796875,
+        "channel_ber": 0.05635833740234375,
+        "channel_bit_errors": 14774,
+        "post_ber": 0.05635833740234375,
         "fer": 1.0,
-        "bit_errors": 3203,
+        "bit_errors": 14774,
         "frame_errors": 128,
         "frames": 128,
         "information_bits": 262144,
@@ -449,11 +490,13 @@
         "padding_bits": 0,
         "channel_bits": 262144,
         "rate": 1.0,
-        "overhead": 1.0
+        "overhead": 1.0,
+        "damaged_samples": 12163,
+        "samples": 32768
       },
       "ldpc": {
-        "channel_ber": 0.012246449788411459,
-        "channel_bit_errors": 9631,
+        "channel_ber": 0.056119283040364586,
+        "channel_bit_errors": 44134,
         "post_ber": 0.0,
         "fer": 0.0,
         "bit_errors": 0,
@@ -464,7 +507,9 @@
         "padding_bits": 0,
         "channel_bits": 786432,
         "rate": 0.3333333333333333,
-        "overhead": 3.0
+        "overhead": 3.0,
+        "damaged_samples": 0,
+        "samples": 32768
       }
     },
     {
@@ -473,11 +518,11 @@
         "noise_variance": 0.019360317914230846
       },
       "digital": {
-        "channel_ber": 0.00600433349609375,
-        "channel_bit_errors": 1574,
-        "post_ber": 0.00600433349609375,
+        "channel_ber": 0.037387847900390625,
+        "channel_bit_errors": 9801,
+        "post_ber": 0.037387847900390625,
         "fer": 1.0,
-        "bit_errors": 1574,
+        "bit_errors": 9801,
         "frame_errors": 128,
         "frames": 128,
         "information_bits": 262144,
@@ -485,11 +530,13 @@
         "padding_bits": 0,
         "channel_bits": 262144,
         "rate": 1.0,
-        "overhead": 1.0
+        "overhead": 1.0,
+        "damaged_samples": 8617,
+        "samples": 32768
       },
       "ldpc": {
-        "channel_ber": 0.005850474039713542,
-        "channel_bit_errors": 4601,
+        "channel_ber": 0.03738530476888021,
+        "channel_bit_errors": 29401,
         "post_ber": 0.0,
         "fer": 0.0,
         "bit_errors": 0,
@@ -500,7 +547,9 @@
         "padding_bits": 0,
         "channel_bits": 786432,
         "rate": 0.3333333333333333,
-        "overhead": 3.0
+        "overhead": 3.0,
+        "damaged_samples": 0,
+        "samples": 32768
       }
     },
     {
@@ -509,23 +558,25 @@
         "noise_variance": 0.015378447152511871
       },
       "digital": {
-        "channel_ber": 0.00238037109375,
-        "channel_bit_errors": 624,
-        "post_ber": 0.00238037109375,
-        "fer": 0.984375,
-        "bit_errors": 624,
-        "frame_errors": 126,
+        "channel_ber": 0.0227203369140625,
+        "channel_bit_errors": 5956,
+        "post_ber": 0.0227203369140625,
+        "fer": 1.0,
+        "bit_errors": 5956,
+        "frame_errors": 128,
         "frames": 128,
         "information_bits": 262144,
         "evaluated_bits": 262144,
         "padding_bits": 0,
         "channel_bits": 262144,
         "rate": 1.0,
-        "overhead": 1.0
+        "overhead": 1.0,
+        "damaged_samples": 5480,
+        "samples": 32768
       },
       "ldpc": {
-        "channel_ber": 0.0023473103841145835,
-        "channel_bit_errors": 1846,
+        "channel_ber": 0.02274322509765625,
+        "channel_bit_errors": 17886,
         "post_ber": 0.0,
         "fer": 0.0,
         "bit_errors": 0,
@@ -536,7 +587,9 @@
         "padding_bits": 0,
         "channel_bits": 786432,
         "rate": 0.3333333333333333,
-        "overhead": 3.0
+        "overhead": 3.0,
+        "damaged_samples": 0,
+        "samples": 32768
       }
     },
     {
@@ -545,23 +598,25 @@
         "noise_variance": 0.012215534779455408
       },
       "digital": {
-        "channel_ber": 0.000743865966796875,
-        "channel_bit_errors": 195,
-        "post_ber": 0.000743865966796875,
-        "fer": 0.78125,
-        "bit_errors": 195,
-        "frame_errors": 100,
+        "channel_ber": 0.01233673095703125,
+        "channel_bit_errors": 3234,
+        "post_ber": 0.01233673095703125,
+        "fer": 1.0,
+        "bit_errors": 3234,
+        "frame_errors": 128,
         "frames": 128,
         "information_bits": 262144,
         "evaluated_bits": 262144,
         "padding_bits": 0,
         "channel_bits": 262144,
         "rate": 1.0,
-        "overhead": 1.0
+        "overhead": 1.0,
+        "damaged_samples": 3097,
+        "samples": 32768
       },
       "ldpc": {
-        "channel_ber": 0.0007654825846354166,
-        "channel_bit_errors": 602,
+        "channel_ber": 0.012350718180338541,
+        "channel_bit_errors": 9713,
         "post_ber": 0.0,
         "fer": 0.0,
         "bit_errors": 0,
@@ -572,7 +627,9 @@
         "padding_bits": 0,
         "channel_bits": 786432,
         "rate": 0.3333333333333333,
-        "overhead": 3.0
+        "overhead": 3.0,
+        "damaged_samples": 0,
+        "samples": 32768
       }
     },
     {
@@ -581,23 +638,25 @@
         "noise_variance": 0.00970314417757788
       },
       "digital": {
-        "channel_ber": 0.00020599365234375,
-        "channel_bit_errors": 54,
-        "post_ber": 0.00020599365234375,
-        "fer": 0.3671875,
-        "bit_errors": 54,
-        "frame_errors": 47,
+        "channel_ber": 0.00606536865234375,
+        "channel_bit_errors": 1590,
+        "post_ber": 0.00606536865234375,
+        "fer": 1.0,
+        "bit_errors": 1590,
+        "frame_errors": 128,
         "frames": 128,
         "information_bits": 262144,
         "evaluated_bits": 262144,
         "padding_bits": 0,
         "channel_bits": 262144,
         "rate": 1.0,
-        "overhead": 1.0
+        "overhead": 1.0,
+        "damaged_samples": 1568,
+        "samples": 32768
       },
       "ldpc": {
-        "channel_ber": 0.00019327799479166666,
-        "channel_bit_errors": 152,
+        "channel_ber": 0.00591278076171875,
+        "channel_bit_errors": 4650,
         "post_ber": 0.0,
         "fer": 0.0,
         "bit_errors": 0,
@@ -608,13 +667,135 @@
         "padding_bits": 0,
         "channel_bits": 786432,
         "rate": 0.3333333333333333,
-        "overhead": 3.0
+        "overhead": 3.0,
+        "damaged_samples": 0,
+        "samples": 32768
       }
     },
     {
       "snr_db": 9,
       "analog": {
         "noise_variance": 0.007707481385850628
+      },
+      "digital": {
+        "channel_ber": 0.002399444580078125,
+        "channel_bit_errors": 629,
+        "post_ber": 0.002399444580078125,
+        "fer": 0.984375,
+        "bit_errors": 629,
+        "frame_errors": 126,
+        "frames": 128,
+        "information_bits": 262144,
+        "evaluated_bits": 262144,
+        "padding_bits": 0,
+        "channel_bits": 262144,
+        "rate": 1.0,
+        "overhead": 1.0,
+        "damaged_samples": 627,
+        "samples": 32768
+      },
+      "ldpc": {
+        "channel_ber": 0.002368927001953125,
+        "channel_bit_errors": 1863,
+        "post_ber": 0.0,
+        "fer": 0.0,
+        "bit_errors": 0,
+        "frame_errors": 0,
+        "frames": 128,
+        "information_bits": 262144,
+        "evaluated_bits": 262144,
+        "padding_bits": 0,
+        "channel_bits": 786432,
+        "rate": 0.3333333333333333,
+        "overhead": 3.0,
+        "damaged_samples": 0,
+        "samples": 32768
+      }
+    },
+    {
+      "snr_db": 10,
+      "analog": {
+        "noise_variance": 0.006122270083392988
+      },
+      "digital": {
+        "channel_ber": 0.00075531005859375,
+        "channel_bit_errors": 198,
+        "post_ber": 0.00075531005859375,
+        "fer": 0.78125,
+        "bit_errors": 198,
+        "frame_errors": 100,
+        "frames": 128,
+        "information_bits": 262144,
+        "evaluated_bits": 262144,
+        "padding_bits": 0,
+        "channel_bits": 262144,
+        "rate": 1.0,
+        "overhead": 1.0,
+        "damaged_samples": 198,
+        "samples": 32768
+      },
+      "ldpc": {
+        "channel_ber": 0.0007769266764322916,
+        "channel_bit_errors": 611,
+        "post_ber": 0.0,
+        "fer": 0.0,
+        "bit_errors": 0,
+        "frame_errors": 0,
+        "frames": 128,
+        "information_bits": 262144,
+        "evaluated_bits": 262144,
+        "padding_bits": 0,
+        "channel_bits": 786432,
+        "rate": 0.3333333333333333,
+        "overhead": 3.0,
+        "damaged_samples": 0,
+        "samples": 32768
+      }
+    },
+    {
+      "snr_db": 11,
+      "analog": {
+        "noise_variance": 0.00486309198784683
+      },
+      "digital": {
+        "channel_ber": 0.000213623046875,
+        "channel_bit_errors": 56,
+        "post_ber": 0.000213623046875,
+        "fer": 0.3671875,
+        "bit_errors": 56,
+        "frame_errors": 47,
+        "frames": 128,
+        "information_bits": 262144,
+        "evaluated_bits": 262144,
+        "padding_bits": 0,
+        "channel_bits": 262144,
+        "rate": 1.0,
+        "overhead": 1.0,
+        "damaged_samples": 56,
+        "samples": 32768
+      },
+      "ldpc": {
+        "channel_ber": 0.00019582112630208334,
+        "channel_bit_errors": 154,
+        "post_ber": 0.0,
+        "fer": 0.0,
+        "bit_errors": 0,
+        "frame_errors": 0,
+        "frames": 128,
+        "information_bits": 262144,
+        "evaluated_bits": 262144,
+        "padding_bits": 0,
+        "channel_bits": 786432,
+        "rate": 0.3333333333333333,
+        "overhead": 3.0,
+        "damaged_samples": 0,
+        "samples": 32768
+      }
+    },
+    {
+      "snr_db": 12,
+      "analog": {
+        "noise_variance": 0.003862891274008171
       },
       "digital": {
         "channel_ber": 1.1444091796875e-05,
@@ -629,7 +810,9 @@
         "padding_bits": 0,
         "channel_bits": 262144,
         "rate": 1.0,
-        "overhead": 1.0
+        "overhead": 1.0,
+        "damaged_samples": 3,
+        "samples": 32768
       },
       "ldpc": {
         "channel_ber": 3.0517578125e-05,
@@ -644,13 +827,15 @@
         "padding_bits": 0,
         "channel_bits": 786432,
         "rate": 0.3333333333333333,
-        "overhead": 3.0
+        "overhead": 3.0,
+        "damaged_samples": 0,
+        "samples": 32768
       }
     },
     {
-      "snr_db": 10,
+      "snr_db": 13,
       "analog": {
-        "noise_variance": 0.006122270083392988
+        "noise_variance": 0.0030684036066147406
       },
       "digital": {
         "channel_ber": 3.814697265625e-06,
@@ -665,7 +850,9 @@
         "padding_bits": 0,
         "channel_bits": 262144,
         "rate": 1.0,
-        "overhead": 1.0
+        "overhead": 1.0,
+        "damaged_samples": 1,
+        "samples": 32768
       },
       "ldpc": {
         "channel_ber": 5.086263020833333e-06,
@@ -680,7 +867,129 @@
         "padding_bits": 0,
         "channel_bits": 786432,
         "rate": 0.3333333333333333,
-        "overhead": 3.0
+        "overhead": 3.0,
+        "damaged_samples": 0,
+        "samples": 32768
+      }
+    },
+    {
+      "snr_db": 14,
+      "analog": {
+        "noise_variance": 0.0024373196202639065
+      },
+      "digital": {
+        "channel_ber": 0.0,
+        "channel_bit_errors": 0,
+        "post_ber": 0.0,
+        "fer": 0.0,
+        "bit_errors": 0,
+        "frame_errors": 0,
+        "frames": 128,
+        "information_bits": 262144,
+        "evaluated_bits": 262144,
+        "padding_bits": 0,
+        "channel_bits": 262144,
+        "rate": 1.0,
+        "overhead": 1.0,
+        "damaged_samples": 0,
+        "samples": 32768
+      },
+      "ldpc": {
+        "channel_ber": 0.0,
+        "channel_bit_errors": 0,
+        "post_ber": 0.0,
+        "fer": 0.0,
+        "bit_errors": 0,
+        "frame_errors": 0,
+        "frames": 128,
+        "information_bits": 262144,
+        "evaluated_bits": 262144,
+        "padding_bits": 0,
+        "channel_bits": 786432,
+        "rate": 0.3333333333333333,
+        "overhead": 3.0,
+        "damaged_samples": 0,
+        "samples": 32768
+      }
+    },
+    {
+      "snr_db": 15,
+      "analog": {
+        "noise_variance": 0.0019360317914230844
+      },
+      "digital": {
+        "channel_ber": 0.0,
+        "channel_bit_errors": 0,
+        "post_ber": 0.0,
+        "fer": 0.0,
+        "bit_errors": 0,
+        "frame_errors": 0,
+        "frames": 128,
+        "information_bits": 262144,
+        "evaluated_bits": 262144,
+        "padding_bits": 0,
+        "channel_bits": 262144,
+        "rate": 1.0,
+        "overhead": 1.0,
+        "damaged_samples": 0,
+        "samples": 32768
+      },
+      "ldpc": {
+        "channel_ber": 0.0,
+        "channel_bit_errors": 0,
+        "post_ber": 0.0,
+        "fer": 0.0,
+        "bit_errors": 0,
+        "frame_errors": 0,
+        "frames": 128,
+        "information_bits": 262144,
+        "evaluated_bits": 262144,
+        "padding_bits": 0,
+        "channel_bits": 786432,
+        "rate": 0.3333333333333333,
+        "overhead": 3.0,
+        "damaged_samples": 0,
+        "samples": 32768
+      }
+    },
+    {
+      "snr_db": 16,
+      "analog": {
+        "noise_variance": 0.0015378447152511866
+      },
+      "digital": {
+        "channel_ber": 0.0,
+        "channel_bit_errors": 0,
+        "post_ber": 0.0,
+        "fer": 0.0,
+        "bit_errors": 0,
+        "frame_errors": 0,
+        "frames": 128,
+        "information_bits": 262144,
+        "evaluated_bits": 262144,
+        "padding_bits": 0,
+        "channel_bits": 262144,
+        "rate": 1.0,
+        "overhead": 1.0,
+        "damaged_samples": 0,
+        "samples": 32768
+      },
+      "ldpc": {
+        "channel_ber": 0.0,
+        "channel_bit_errors": 0,
+        "post_ber": 0.0,
+        "fer": 0.0,
+        "bit_errors": 0,
+        "frame_errors": 0,
+        "frames": 128,
+        "information_bits": 262144,
+        "evaluated_bits": 262144,
+        "padding_bits": 0,
+        "channel_bits": 786432,
+        "rate": 0.3333333333333333,
+        "overhead": 3.0,
+        "damaged_samples": 0,
+        "samples": 32768
       }
     }
   ]

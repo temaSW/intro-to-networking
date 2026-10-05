@@ -1,4 +1,4 @@
-"""Offline numerical model. SNR means Es/N0 for real BPSK, not audio SNR."""
+"""Offline numerical model. Every mode uses signal-power / noise-power SNR."""
 from dataclasses import dataclass
 import math
 import numpy as np
@@ -51,8 +51,8 @@ def hard_decision(received):
 
 
 def digital_variance(snr_db):
-    # Es=1. Noise in one real dimension has variance N0/2.
-    return .5 * 10 ** (-float(snr_db) / 10)
+    # Real BPSK symbols are +/-1, so mean(symbol**2)=1.
+    return 10 ** (-float(snr_db) / 10)
 
 
 def analog_variance(audio, snr_db):
