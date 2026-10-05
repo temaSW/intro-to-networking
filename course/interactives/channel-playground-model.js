@@ -138,13 +138,26 @@ export function frequencyShift(p) {
   const motion = doppler(p.carrierGHz, p.speed, p.direction);
   return {motion, oscillator: p.offset, total: motion + p.offset};
 }
-export function dopplerSpread(p) {
+// Carrier cycles at one slow-time instant. Remove the common direct-ray phase
+// so the relative phase and the sum remain visible on a fixed carrier scale.
+export function movingRaySnapshot(p, seconds) {
+  const paths = (p.movingPaths === 'single' ? allPaths(p).slice(0,1) : allPaths(p)).filter(x=>x.amplitude>0);
+  const directShift = doppler(p.carrierGHz,p.speed,p.direction);
+  const cycles = Array.from({length:301},(_,i)=>2*i/300);
+  const phases = paths.map(path=>-2*Math.PI*p.carrierGHz*1000*path.delay + 2*Math.PI*(doppler(p.carrierGHz,p.speed,path.angle)-directShift)*seconds);
+  const copies=paths.map((path,i)=>cycles.map(x=>path.amplitude*Math.sin(2*Math.PI*x+phases[i])));
+  const sum=cycles.map((_,i)=>copies.reduce((total,copy)=>total+copy[i],0));
+  return {cycles,copies,sum,amplitude:response(paths,p.carrierGHz*1000,seconds,p.carrierGHz,p.speed).magnitude,
+    displacement:p.speed*seconds, wavelength:299792458/(p.carrierGHz*1e9),
+    pathChanges:paths.map(path=>-p.speed*seconds*Math.cos(path.angle*Math.PI/180))};
+}
+export function dopplerSpread(p, observationSeconds = .1) {
   const paths = (p.movingPaths === 'single' ? allPaths(p).slice(0,1) : allPaths(p)).filter(x => x.amplitude > 0);
   const shifts = paths.map(x => doppler(p.carrierGHz, p.speed, x.angle));
   const spread = Math.max(...shifts) - Math.min(...shifts);
   const tc = spread > 1e-9 ? 1 / spread : Infinity;
   // Keep the observation window fixed when T changes, for comparable experiments.
-  const window = .1;
+  const window = observationSeconds;
   const count = Math.max(600, Math.ceil(window * Math.max(...shifts.map(Math.abs)) * 20));
   const time = Array.from({length: count + 1}, (_, i) => window * i / count);
   const h = time.map(t => response(paths, p.carrierGHz * 1000, t, p.carrierGHz, p.speed));

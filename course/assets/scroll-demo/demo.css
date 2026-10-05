@@ -1,0 +1,10 @@
+/* Static illustration; no scroll animation or pinned elements. */
+.scroll-demo-stage { margin-block: 1.5rem; padding: 1rem; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: .4rem; }
+.scroll-demo-svg { display: block; width: 100%; height: auto; }
+.scroll-demo-caption { display: flex; justify-content: space-between; color: var(--muted); }
+.scroll-demo-svg [data-node] { text-anchor: middle; fill: var(--ink); font-size: 22px; font-weight: 700; }
+.scroll-demo-svg [data-node] circle { fill: var(--surface); stroke: var(--line); stroke-width: 3; }
+.scroll-demo-sub { fill: var(--muted); font-size: 15px; font-weight: 500; }
+.scroll-demo-route { fill: none; stroke: var(--accent); stroke-width: 4; }
+.scroll-demo-route-active, .scroll-demo-wave, .scroll-demo-packet { display: none; }
+.scroll-demo-legend { color: var(--muted); text-align: center; }

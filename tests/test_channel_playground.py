@@ -220,3 +220,40 @@ def test_component_import_and_page_embedding():
     page = (ROOT / "course/lectures/channel-playground.qmd").read_text(encoding="utf-8")
     assert 'data-channel-playground' in page
     assert 'channel-playground-ui.js' in page
+
+
+def test_transmission_envelope_for_stationary_short_and_long_reception():
+    run_js("""
+const setup={...p,paths:[{amplitude:.7,delay:.5,angle:90}]};
+const still=m.dopplerSpread({...setup,speed:0},.1);
+for(const sample of still.h) close(sample.magnitude,1.7);
+const short=m.dopplerSpread({...setup,duration:.1},.0001);
+const long=m.dopplerSpread({...setup,duration:100},.1);
+close(short.time.at(-1),.0001); close(long.time.at(-1),.1);
+const range=d=>Math.max(...d.h.map(x=>x.magnitude))-Math.min(...d.h.map(x=>x.magnitude));
+assert(range(short)<.01);
+assert(range(long)>1.3);
+for(const sample of long.h) assert(sample.magnitude>=.3-1e-9 && sample.magnitude<=1.7+1e-9);
+""")
+
+
+def test_moving_wave_addition_matches_fading_and_half_wavelength():
+    run_js("""
+const setup={...p,paths:[{amplitude:.7,delay:.5,angle:90}]};
+const wavelength=299792458/(setup.carrierGHz*1e9);
+const halfPeriod=wavelength/(2*setup.speed);
+const start=m.movingRaySnapshot(setup,0);
+const cancel=m.movingRaySnapshot(setup,halfPeriod);
+close(start.amplitude,1.7); close(cancel.amplitude,.3);
+close(cancel.displacement,wavelength/2);
+close(cancel.wavelength,wavelength);
+close(cancel.pathChanges[0],-wavelength/2);
+close(cancel.pathChanges[1],0);
+for(let i=0;i<cancel.sum.length;i++) {
+  close(cancel.sum[i],cancel.copies[0][i]+cancel.copies[1][i]);
+  close(cancel.copies[1][i],-.7*cancel.copies[0][i]);
+}
+const still=m.movingRaySnapshot({...setup,speed:0},.1);
+assert.deepEqual(still.sum,start.sum);
+close(still.displacement,0);
+""")
