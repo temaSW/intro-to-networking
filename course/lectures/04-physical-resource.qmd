@@ -341,7 +341,7 @@ $$R_u\approx\frac{\rho_uR_c}{T_b}.$$
 
 {{< include ../_includes/lecture-04-fdm-ofdm.qmd >}}
 
-    <figcaption>FDM и OFDM при одинаковом масштабе частоты. Показаны основные лепестки спектров; сравнение полосы схематическое. В OFDM шаг поднесущих равен 1/T, где T — длительность полезной части символа. <a href="https://www.mathworks.com/help/comm/ref/ofdmmod.html">Подробнее об ортогональности поднесущих</a>.</figcaption>
+<figcaption>FDM и OFDM при одинаковом масштабе частоты. Показаны основные лепестки спектров; сравнение полосы схематическое. В OFDM шаг поднесущих равен 1/T, где T — длительность полезной части символа. <a href="https://www.mathworks.com/help/comm/ref/ofdmmod.html">Подробнее об ортогональности поднесущих</a>.</figcaption>
   </figure>
 </div>
 
