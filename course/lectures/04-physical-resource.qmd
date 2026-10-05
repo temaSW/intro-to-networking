@@ -328,9 +328,11 @@ $R_u$ — полезная скорость пользователя; $R_s$ — 
     <img src="../assets/lecture-04/tdm-vs-fdm.webp" alt="При TDM потоки по очереди занимают временные интервалы одного канала; при FDM потоки одновременно занимают разные частотные полосы">
     <figcaption>Временное и частотное мультиплексирование. Изображение: <a href="https://resources.l-p.com/glossary/tdm-time-division-multiplexing-basics-uses-benefits-guide">LINK-PP</a>.</figcaption>
   </figure>
-  <figure class="multiplex-figure" tabindex="0">
-    <img src="../assets/lecture-04/fdm-vs-ofdm.png" alt="Сверху пять неперекрывающихся частотных каналов FDM, снизу пять перекрывающихся по частоте поднесущих OFDM">
-    <figcaption>Схематическое сравнение FDM и OFDM: перекрытие поднесущих позволяет плотнее использовать полосу. Источник: <a href="https://www.researchgate.net/figure/Difference-between-OFDM-and-conventional-FDM-signals-1_fig1_268742923">рисунок на ResearchGate</a>.</figcaption>
+  <figure class="multiplex-figure fdm-ofdm-container">
+
+{{< include ../_includes/lecture-04-fdm-ofdm.qmd >}}
+
+    <figcaption>FDM и OFDM при одинаковом масштабе частоты. Показаны основные лепестки спектров; сравнение полосы схематическое. В OFDM шаг поднесущих равен 1/T, где T — длительность полезной части символа. <a href="https://www.mathworks.com/help/comm/ref/ofdmmod.html">Подробнее об ортогональности поднесущих</a>.</figcaption>
   </figure>
 </div>
 
