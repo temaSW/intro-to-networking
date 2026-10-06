@@ -1,104 +1,116 @@
-// Slot-driven model: one frame contains seven explicitly timed windows.
-export const WINDOWS=['Общие правила','Общий доступ','Ответ сети','Индивидуализация','Запрос ресурса','Назначение','Данные'];
-export const State=Object.freeze({SYNCED:'SYNCED',INFO:'SYSTEM_INFO_KNOWN',NEEDED:'ACCESS_NEEDED',RESPONSE:'WAITING_RESPONSE',BACKOFF:'BACKOFF',CONTEXT:'TEMPORARY_CONTEXT',KNOWN:'KNOWN_TO_NETWORK',REQUESTED:'RESOURCE_REQUESTED',GRANTED:'RESOURCE_GRANTED',DATA:'DATA_TRANSMISSION'});
-export function random(seed=7){let s=seed>>>0;return()=>((s=(Math.imul(s,1664525)+1013904223)>>>0)/4294967296);}
+// Functional acquisition and access model. Time is in educational windows.
+import {correlationIllustration, random} from './transmission-agreement-model.js';
+export {random};
+export const frameObservation = () => correlationIllustration('bits');
+export function carrierObservation({hz=25, estimate=0}={}) {
+  if (![hz,estimate].every(Number.isFinite) || Math.abs(hz)>80 || Math.abs(estimate)>80) throw new RangeError('Invalid frequency');
+  return {hz,estimate,residual:hz-estimate,points:Array.from({length:9},(_,i)=>{
+    const t=i*.004,phase=2*Math.PI*hz*t,correctedPhase=2*Math.PI*(hz-estimate)*t;
+    return {t,phase,correctedPhase,raw:[Math.cos(phase),Math.sin(phase)],corrected:[Math.cos(correctedPhase),Math.sin(correctedPhase)]};
+  })};
+}
 export class InitialAccess {
-  constructor({terminals=1,opportunities=1,capacity=1,arrival=0,backoff=4,seed=7,continuous=false}={}){
-    for(const [v,max] of [[terminals,16],[opportunities,8],[capacity,8],[backoff,16]])if(!Number.isInteger(v)||v<0||v>max)throw new RangeError('Invalid parameter');
-    if(!terminals||!opportunities||!Number.isFinite(arrival)||arrival<0||arrival>1)throw new RangeError('Invalid parameter');
-    this.config={terminals,opportunities,capacity,arrival,backoff,seed,continuous};this.reset();
-  }
+  constructor(){this.reset();}
   reset(){
-    this.rng=random(this.config.seed);this.tick=-1;this.cursor=0;this.events=[];this.slots=[];this.log=[];
-    this.terminals=Array.from({length:this.config.terminals},(_,id)=>({id,state:State.SYNCED,info:false,context:null,queue:[],attempts:0,retryFrame:0,responseDue:null,serviceGrant:null,grants:[],sent:0,service:0,firstDemand:null,firstGrant:null,firstService:null,last:'Сигнал найден; синхронизация уже установлена.'}));
-    // Network knowledge does not read the real terminal queue without a request.
-    this.network=this.terminals.map(()=>({detected:false,context:null,known:false,reported:0,choice:null}));
-    this.metrics={arrivals:0,delivered:0,successes:0,conflicts:0,attempts:0,successfulAttempts:0,availableCells:0,serviceMessages:0,grantDelays:[],deliveryDelays:[]};
-    this.samples=[{frame:0,queue:0,arrivals:0,delivered:0}];
+    this.frameTiming=null;this.carrierKnown=false;this.carrierEstimate=0;this.info=false;
+    this.context=null;this.known=false;this.requested=false;this.serviceGrant=null;this.grant=null;
+    this.time=0;this.queue=1;this.sent=0;this.waiting=false;this.timedOut=false;this.messages=[];
   }
-  get frame(){return Math.max(0,Math.floor(this.tick/7));}
-  get phase(){return this.tick<0?-1:this.tick%7;}
-  get nextPhase(){return(this.tick+1)%7;}
-  event(terminal,kind,text,{direction=null,resource=null,targets=null}={}){
-    const e={tick:this.tick,frame:this.frame,phase:this.phase,terminal,kind,text,direction,resource,targets};this.events.push(e);this.log.push(e);this.log=this.log.slice(-250);
-    if(terminal!==null)this.terminals[terminal].last=text;return e;
+  locateFrame(guess){
+    const d=frameObservation();
+    if(!Number.isInteger(guess)||guess<0||guess>=d.scores.length)throw new RangeError('Invalid frame guess');
+    const correct=guess===d.peak;if(correct)this.frameTiming=d.peak;
+    return {correct,peak:d.peak,score:d.scores[guess]};
   }
-  service(t,kind,text,direction,resource=null){t.service++;this.metrics.serviceMessages++;this.event(t.id,kind,text,{direction,resource});}
-  inject(id,count=1){
-    const t=this.terminals[id];if(!t||!Number.isInteger(count)||count<1)throw new RangeError('Invalid arrival');
-    for(let i=0;i<count;i++)t.queue.push(this.tick);if(t.firstDemand===null)t.firstDemand=this.tick;this.metrics.arrivals+=count;
-    if(t.info&&[State.INFO,State.DATA].includes(t.state))t.state=this.network[id].known?State.KNOWN:State.NEEDED;
-    this.event(id,'arrival',`Появились данные. Размер очереди: ${t.queue.length}.`);
+  tuneCarrier(estimate){
+    if(this.frameTiming===null)throw new Error('Find frame timing first');
+    if(this.info)throw new Error('Restart the story before changing acquired carrier');
+    const d=carrierObservation({estimate});this.carrierEstimate=estimate;this.carrierKnown=Math.abs(d.residual)<=1;return d;
   }
-  canTransmit(id){
-    const t=this.terminals[id];return Boolean(t&&t.queue.length&&this.network[id].known&&t.grants.length&&t.state===State.GRANTED&&t.grants.every(g=>g.tick===this.tick+1)&&this.nextPhase===6);
+  readSystemInfo(){
+    if(this.frameTiming===null||!this.carrierKnown)throw new Error('Frame and carrier required');
+    this.info=true;return {options:4,responseWindow:1,backoff:4};
   }
-  checkData(id){
-    const t=this.terminals[id];if(!t)throw new RangeError('Unknown terminal');
-    if(!t.queue.length)return {allowed:false,reason:'В очереди нет пользовательского блока.'};
-    if(!t.info)return {allowed:false,reason:'Общие правила неизвестны: сначала нужно прочитать широковещательную информацию.'};
-    if(!this.network[id].known)return {allowed:false,reason:'Сеть ещё не может адресно назначить ресурс этому терминалу. Разрешена только служебная попытка в общем доступе.'};
-    if(!this.canTransmit(id))return {allowed:false,reason:'Терминал известен, но ячейка и момент пользовательской передачи не назначены.'};
-    return {allowed:true,reason:`Можно передать в следующем окне данных, только в ${t.grants.map(g=>`Д${g.cell+1}`).join(', ')}.`};
+  canUse(resource){
+    if(resource==='common')return this.info&&!this.context&&!this.waiting;
+    if(resource==='service')return !!this.serviceGrant;
+    if(resource==='data')return this.checkData().allowed;
+    return false;
   }
-  transmit(id){
-    const t=this.terminals[id];
-    if(!t||this.phase!==6||!t.queue.length||!this.network[id].known||!t.grants.length||t.grants.some(g=>g.tick!==this.tick))throw new Error('Data require a grant for this exact time');
-    for(const g of t.grants){
-      const created=t.queue.shift();t.sent++;this.metrics.delivered++;this.metrics.deliveryDelays.push(this.tick-created);this.network[id].reported=Math.max(0,this.network[id].reported-1);
-      this.event(id,'data',`Пользовательский блок передан в Д${g.cell+1}.`,{direction:'up',resource:g.cell});
+  beginAccess(){
+    if(!this.canUse('common'))throw new Error('Only informed unknown terminals may attempt common access');
+    this.waiting=true;this.timedOut=false;
+  }
+  resolveAccess(detected){
+    if(!this.waiting)throw new Error('No expected response');
+    this.time++;this.waiting=false;
+    if(detected){this.context='В-A';this.serviceGrant={resource:'С-A',time:this.time+1};this.messages.push({from:'Сеть',to:'A',text:'Временный контекст В-A; служебный ресурс С-A для индивидуальных сведений'});}
+    else this.timedOut=true;
+  }
+  identify(){
+    if(!this.serviceGrant||this.serviceGrant.time!==this.time+1)throw new Error('Service grant required');
+    this.time++;this.serviceGrant=null;this.known=true;
+    this.messages.push({from:'A',to:'Сеть',text:'Индивидуальные сведения в С-A; теперь сеть различает телефон'});
+  }
+  requestResource(){
+    if(!this.known||!this.queue||this.requested)throw new Error('Addressed context and data required');
+    this.time++;this.requested=true;this.messages.push({from:'A',to:'Сеть',text:'Адресный запрос: есть один пользовательский блок'});
+  }
+  assignResource(){
+    if(!this.requested||this.grant)throw new Error('Request required');
+    this.time++;this.grant={resource:'Д-A',time:this.time+1};
+    this.messages.push({from:'Сеть',to:'A',text:`Назначение: Д-A, момент ${this.grant.time}; только для пользовательского блока`});
+  }
+  checkData(resource=this.grant?.resource,time=this.time+1){
+    let reason='';
+    if(!this.queue)reason='Пользовательский блок уже передан.';
+    else if(!this.info)reason='Сначала нужно найти структуру кадра, уточнить несущую и прочитать общие правила.';
+    else if(!this.known)reason='Индивидуальный ресурс не назначен. Сеть ещё не знает телефон для адресного назначения; разрешена только служебная попытка через общий ресурс.';
+    else if(!this.grant)reason='Телефон известен сети, но служебный ресурс не даёт права передавать пользовательские данные. Нужны запрос и пользовательское назначение.';
+    else if(resource!==this.grant.resource||time!==this.grant.time)reason='Назначение действует только в указанном ресурсе и в указанное время.';
+    return {allowed:!reason,reason:reason||`Можно передать блок в ${resource}, в момент ${time}.`};
+  }
+  transmit(resource,time){
+    if(!this.grant||resource!==this.grant.resource||time!==this.grant.time)throw new Error('Назначение действует только в указанном ресурсе и в указанное время.');
+    const permission=this.checkData(resource,time);if(!permission.allowed)throw new Error(permission.reason);
+    this.time=time;this.queue--;this.sent++;this.grant=null;this.requested=false;
+    this.messages.push({from:'A',to:'Сеть',text:`Первый пользовательский блок передан в ${resource}, момент ${time}`});
+  }
+  knowledge(){return ['символьный такт',this.frameTiming!==null&&'границу кадра',this.carrierKnown&&'уточнённую несущую',this.info&&'правила доступа',this.context&&`временный контекст ${this.context}`,this.known&&'адресный контекст',this.grant&&`назначение ${this.grant.resource} в момент ${this.grant.time}`].filter(Boolean);}
+  permission(){
+    if(this.sent)return 'Первый блок передан; для следующих данных потребуется новое назначение.';
+    if(this.grant)return 'Передать пользовательский блок только в назначенном ресурсе и времени.';
+    if(this.requested)return 'Принимать адресное назначение ресурса.';
+    if(this.known)return 'Запросить пользовательский ресурс.';
+    if(this.context)return 'Передать индивидуальные сведения в служебном ресурсе.';
+    if(this.waiting)return 'Ждать ответа: исход попытки телефону ещё неизвестен.';
+    if(this.info)return 'Обратиться через общий ресурс; пользовательская передача запрещена.';
+    if(this.carrierKnown)return 'Принимать широковещательную служебную информацию.';
+    if(this.frameTiming!==null)return 'Принимать нужные участки кадра и уточнять несущую.';
+    return 'Только принимать; искать кадр по известной последовательности.';
+  }
+}
+export class Contention {
+  constructor({terminals=2,options=4,backoff=4,seed=7}={}){
+    for(const [v,min,max] of [[terminals,2,8],[options,1,8],[backoff,0,8]])if(!Number.isInteger(v)||v<min||v>max)throw new RangeError('Invalid contention parameter');
+    this.config={terminals,options,backoff,seed};this.reset();
+  }
+  reset(){this.rng=random(this.config.seed);this.window=0;this.phase='access';this.events=[];this.bins=[];this.terminals=Array.from({length:this.config.terminals},(_,id)=>({id,status:'ready',choice:null,retry:0,detected:false,context:null,attempts:0}));}
+  attempt(choices=null){
+    if(this.phase!=='access')throw new Error('Wait for response timeout');
+    const eligible=this.terminals.filter(t=>!t.context&&this.window>=t.retry);
+    if(choices&&eligible.some(t=>!Number.isInteger(choices[t.id])||choices[t.id]<0||choices[t.id]>=this.config.options))throw new RangeError('Invalid choices');
+    this.events=[];this.bins=Array.from({length:this.config.options},()=>[]);
+    for(const t of eligible){t.choice=choices?choices[t.id]:Math.floor(this.rng()*this.config.options);t.status='waiting';t.attempts++;this.bins[t.choice].push(t.id);}
+    this.bins.forEach((ids,option)=>{if(!ids.length)return;const detected=ids.length===1;ids.forEach(id=>this.terminals[id].detected=detected);this.events.push({kind:detected?'success':'collision',ids,option});});
+    this.phase='response';return this.events;
+  }
+  response(){
+    if(this.phase!=='response')throw new Error('Attempt required');this.events=[];
+    for(const t of this.terminals)if(t.status==='waiting'){
+      if(t.detected){t.context=`В-${String.fromCharCode(65+t.id)}`;t.status='context';this.events.push({kind:'response',id:t.id,context:t.context});}
+      else{const delay=this.config.backoff?Math.floor(this.rng()*this.config.backoff):0;t.retry=this.window+1+delay;t.status='backoff';this.events.push({kind:'timeout',id:t.id,delay,retry:t.retry});}
     }
-    if(t.firstService===null)t.firstService=t.service;t.grants=[];t.state=State.DATA;
+    this.window++;this.phase='access';return this.events;
   }
-  step({choices={}}={}){
-    for(const [id,choice]of Object.entries(choices))if(!this.terminals[id]||!Number.isInteger(choice)||choice<0||choice>=this.config.opportunities)throw new RangeError('Invalid choice');
-    this.tick++;this.events=[];const p=this.phase,f=this.frame;
-    if(p===0){
-      if(this.config.continuous)for(const t of this.terminals)if(this.rng()<this.config.arrival)this.inject(t.id);
-      const readers=this.terminals.filter(t=>!t.info);this.metrics.serviceMessages++;
-      this.event(null,'broadcast',`Сеть объявляет: ${this.config.opportunities} вариантов доступа; ответ в следующем окне; правила повтора.`,{direction:'down',targets:readers.map(t=>t.id)});
-      for(const t of this.terminals){
-        if(!t.info){t.info=true;t.service++;t.state=t.queue.length?State.NEEDED:State.INFO;t.last='Известны окна доступа, ответа и общие правила повтора.';}
-        else if(t.state===State.DATA)t.state=State.KNOWN;
-      }
-    }
-    if(p===1){
-      const bins=Array.from({length:this.config.opportunities},()=>[]);
-      for(const t of this.terminals){
-        if(!t.info||this.network[t.id].known||!t.queue.length||![State.INFO,State.NEEDED,State.BACKOFF].includes(t.state))continue;
-        if(f<t.retryFrame){this.event(t.id,'wait',`Ожидание повтора: ещё ${t.retryFrame-f} кадров.`);continue;}
-        const choice=choices[t.id]??Math.floor(this.rng()*this.config.opportunities);
-        t.attempts++;this.metrics.attempts++;t.state=State.RESPONSE;t.responseDue=this.tick+1;
-        this.service(t,'attempt',`Попытка №${t.attempts} в общем варианте ${choice+1}.`,'up',choice);bins[choice].push(t);
-      }
-      bins.forEach((group,choice)=>{
-        if(group.length>1){this.metrics.conflicts++;this.event(null,'collision',`Вариант ${choice+1}: совпали ${group.map(t=>`Т${t.id+1}`).join(' и ')}. Запросы не различены.`,{resource:choice,targets:group.map(t=>t.id)});}
-        if(group.length===1){const t=group[0],n=this.network[t.id];n.detected=true;n.context=`В${t.id+1}`;n.choice=choice;this.metrics.successes++;this.metrics.successfulAttempts+=t.attempts;}
-      });
-    }
-    if(p===2)for(const t of this.terminals){
-      if(t.state!==State.RESPONSE||t.responseDue!==this.tick)continue;const n=this.network[t.id];
-      if(n.detected){t.context=n.context;t.serviceGrant=this.tick+1;t.state=State.CONTEXT;this.service(t,'response',`Ответ для варианта ${n.choice+1}: контекст ${n.context} и служебная ячейка следующего окна.`,'down');}
-      else{const wait=this.config.backoff?Math.floor(this.rng()*this.config.backoff):0;t.retryFrame=f+1+wait;t.state=State.BACKOFF;this.event(t.id,'timeout',`Окно ответа истекло. Ответа нет; задержка ${wait} кадр(а). Следующая попытка — в кадре ${t.retryFrame+1}.`);}
-    }
-    if(p===3)for(const t of this.terminals)if(t.state===State.CONTEXT&&t.serviceGrant===this.tick){this.network[t.id].known=true;t.state=State.KNOWN;t.serviceGrant=null;this.service(t,'identity',`Индивидуальные сведения переданы в служебной ячейке ${t.context}; сеть различает терминал.`,'up');}
-    if(p===4)for(const t of this.terminals)if(this.network[t.id].known&&t.queue.length){this.network[t.id].reported=t.queue.length;t.state=State.REQUESTED;this.service(t,'request',`Адресный запрос: размер очереди ${t.queue.length}.`,'up');}
-    if(p===5){
-      const assigned=new Map();let cell=0,start=this.cursor;
-      while(cell<this.config.capacity){
-        let found=false;
-        for(let k=0;k<this.terminals.length&&cell<this.config.capacity;k++){
-          const i=(start+k)%this.terminals.length,t=this.terminals[i],n=this.network[i];
-          if(!n.known||t.state!==State.REQUESTED||n.reported<=(assigned.get(i)?.length??0))continue;
-          const list=assigned.get(i)??[];list.push({cell:cell++,tick:this.tick+1});assigned.set(i,list);this.cursor=(i+1)%this.terminals.length;found=true;
-        }
-        if(!found)break;
-      }
-      for(const [id,grants]of assigned){const t=this.terminals[id];t.grants=grants;t.state=State.GRANTED;if(t.firstGrant===null){t.firstGrant=this.tick;this.metrics.grantDelays.push(this.tick-t.firstDemand);}this.service(t,'grant',`Назначение: ${grants.map(g=>`Д${g.cell+1}`).join(', ')} в окне данных кадра ${f+1}; другим терминалам эти ячейки запрещены.`,'down');}
-    }
-    if(p===6){this.metrics.availableCells+=this.config.capacity;for(const t of this.terminals)if(t.grants.length)this.transmit(t.id);this.samples.push({frame:f+1,queue:this.backlog(),arrivals:this.metrics.arrivals,delivered:this.metrics.delivered});this.samples=this.samples.slice(-1001);}
-    this.slots.push({tick:this.tick,frame:f,phase:p,events:this.events.map(e=>({...e}))});this.slots=this.slots.slice(-200);return this.events;
-  }
-  backlog(){return this.terminals.reduce((sum,t)=>sum+t.queue.length,0);}
-  summary(){const m=this.metrics,mean=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:null;return {...m,queue:this.backlog(),meanAttempts:m.successes?m.successfulAttempts/m.successes:null,meanGrantDelay:mean(m.grantDelays),meanDeliveryDelay:mean(m.deliveryDelays),utilization:m.availableCells?m.delivered/m.availableCells:null};}
 }
