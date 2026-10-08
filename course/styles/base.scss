@@ -3,6 +3,24 @@ $grid-body-width: 1080px;
 $grid-margin-width: 200px;
 
 /*-- scss:rules --*/
+#quarto-header .quarto-navbar-tools a[href*="/intro-to-networking/issues/new"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  min-height: 2.25rem;
+  border-radius: .3rem;
+  color: var(--ink);
+}
+#quarto-header .quarto-navbar-tools a[href*="/intro-to-networking/issues/new"]:is(:hover, :focus-visible) {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+#quarto-header .quarto-navbar-tools a[href*="/intro-to-networking/issues/new"]:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
 :root {
   --page-bg: #f8faf9;
   --surface: #ffffff;

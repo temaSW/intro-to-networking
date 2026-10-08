@@ -1,5 +1,20 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+  const tools = document.querySelectorAll('.quarto-navbar-tools a[href*="/intro-to-networking/issues/new"]');
+  for (const link of tools) {
+    link.querySelector('i')?.setAttribute('aria-hidden', 'true');
+    const url = new URL(link.href);
+    if (url.searchParams.get('template') === 'bug_report.yml') {
+      const updatePage = () => {
+        url.searchParams.set('page', window.location.href);
+        link.href = url.href;
+      };
+      updatePage();
+      window.addEventListener('hashchange', updatePage);
+      window.addEventListener('popstate', updatePage);
+    }
+  }
+
   const toc = document.querySelector('#quarto-margin-sidebar > #TOC');
   if (!toc) return;
 
