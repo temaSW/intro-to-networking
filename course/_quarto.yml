@@ -32,6 +32,12 @@ website:
         aria-label: "Предложить улучшение"
         target: _blank
         rel: noopener noreferrer
+      - icon: question-circle
+        href: https://github.com/temaSW/intro-to-networking/issues/new?template=question.yml
+        text: "Задать вопрос"
+        aria-label: "Задать вопрос"
+        target: _blank
+        rel: noopener noreferrer
     left:
       - text: "О курсе"
         href: index.qmd

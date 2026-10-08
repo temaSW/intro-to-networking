@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
   for (const link of tools) {
     link.querySelector('i')?.setAttribute('aria-hidden', 'true');
     const url = new URL(link.href);
-    if (url.searchParams.get('template') === 'bug_report.yml') {
+    if (['bug_report.yml', 'question.yml'].includes(url.searchParams.get('template'))) {
       const updatePage = () => {
         url.searchParams.set('page', window.location.href);
         link.href = url.href;
