@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     '1FAIpQLSeF4BRW5MGA_C1SvuoBoP2nhr4O8fRkI7xRpUPRTcFhe3KEXA': 'entry.633006356',
   };
   const updates = [];
-  for (const link of document.querySelectorAll('.quarto-navbar-tools a[href^="https://docs.google.com/forms/d/e/"]')) {
+  for (const link of document.querySelectorAll('.quarto-navbar-tools a[href^="https://docs.google.com/forms/d/e/"], a[data-course-feedback][href^="https://docs.google.com/forms/d/e/"]')) {
     const form = new URL(link.href);
     const entry = pageFields[form.pathname.split('/')[4]];
     if (!entry) continue;

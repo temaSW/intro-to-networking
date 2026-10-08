@@ -20,7 +20,7 @@ const forms = [
   ['1FAIpQLSeF4BRW5MGA_C1SvuoBoP2nhr4O8fRkI7xRpUPRTcFhe3KEXA', '633006356'],
 ];
 const config = fs.readFileSync('course/_quarto.yml', 'utf8');
-const links = forms.map(([id]) => ({
+const links = [...forms, ...forms].map(([id]) => ({
   href: `https://docs.google.com/forms/d/e/${id}/viewform`,
   events: {},
   querySelector: () => ({setAttribute: () => {}}),
@@ -32,16 +32,20 @@ assert.equal((config.match(/rel: noopener noreferrer/g) || []).length, 3);
 const window = {location: {href: 'https://temasw.github.io/intro-to-networking/lectures/index.html?x=1&text=%D1%82#начало'},
   events: {}, addEventListener(event, callback) { this.events[event] = callback; }};
 const document = {addEventListener(event, callback) { callback(); },
-  querySelectorAll: () => links, querySelector: () => null};
+  querySelectorAll: (selector) => {
+    assert.ok(selector.includes('.quarto-navbar-tools'));
+    assert.ok(selector.includes('a[data-course-feedback]'));
+    return links;
+  }, querySelector: () => null};
 const source = fs.readFileSync('course/_includes/navigation.html', 'utf8')
   .replace(/^<script>\s*/, '').replace(/\s*<\/script>\s*$/, '');
 vm.runInNewContext(source, {document, window, URL});
 function check() {
   links.forEach((link, i) => {
     const url = new URL(link.href);
-    assert.equal(url.pathname, `/forms/d/e/${forms[i][0]}/viewform`);
+    assert.equal(url.pathname, `/forms/d/e/${forms[i % forms.length][0]}/viewform`);
     assert.equal(url.searchParams.get('usp'), 'pp_url');
-    assert.equal(url.searchParams.get(`entry.${forms[i][1]}`), window.location.href);
+    assert.equal(url.searchParams.get(`entry.${forms[i % forms.length][1]}`), window.location.href);
     assert.equal([...url.searchParams.keys()].length, 2);
   });
 }

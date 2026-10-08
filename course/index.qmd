@@ -152,25 +152,30 @@ format:
 
 ## Обратная связь
 
-Нашли неточность или придумали, как сделать объяснение понятнее? Сообщения помогают исправлять материалы и выбирать полезные дополнения к курсу. Для этого в правом верхнем углу главной есть две кнопки:
+Нашли неточность, придумали улучшение или хотите разобраться в материале? Сообщения помогают исправлять курс, выбирать полезные дополнения и уточнять объяснения. В правом верхнем углу каждой страницы есть три кнопки, которые открывают Google Forms:
 
 ```{=html}
 <figure class="home-feedback-guide">
-<img src="assets/feedback-buttons.svg" alt="Жук — сообщить об ошибке; лампочка — предложить улучшение." width="440" height="155" loading="lazy">
+<img src="assets/feedback-buttons.svg" alt="Красный жук — сообщить об ошибке; золотистая лампочка — предложить улучшение; синий вопросительный знак — задать вопрос." width="440" height="220" loading="lazy">
 <figcaption>Эти значки находятся рядом с переключателем темы и поиском.</figcaption>
 </figure>
 <div class="home-feedback-options">
 <section aria-labelledby="feedback-error">
 <h3 id="feedback-error"><i class="bi bi-bug" aria-hidden="true"></i> Сообщить об ошибке</h3>
 <p>Опечатка, неверная формула, неработающая ссылка или модель ведёт себя не так, как описано. Укажите страницу, что произошло и какой результат ожидался. Для модели добавьте параметры и шаги воспроизведения.</p>
-<a data-issue-template="bug_report.yml" href="https://github.com/temaSW/intro-to-networking/issues/new?template=bug_report.yml" target="_blank" rel="noopener noreferrer">Открыть форму ошибки →</a>
+<a data-course-feedback="error" href="https://docs.google.com/forms/d/e/1FAIpQLScbsWOaqw31Cs30H-o3cjq4DoBKEsViXSzSD4I5BL1WjgEKfg/viewform" target="_blank" rel="noopener noreferrer">Открыть форму ошибки →</a>
 </section>
 <section aria-labelledby="feedback-improvement">
 <h3 id="feedback-improvement"><i class="bi bi-lightbulb" aria-hidden="true"></i> Предложить улучшение</h3>
 <p>Не хватает примера, хочется исследовать другой сценарий или есть идея для объяснения. Укажите тему и расскажите, какую задачу решит дополнение и что предлагаете изменить.</p>
-<a data-issue-template="feature_request.yml" href="https://github.com/temaSW/intro-to-networking/issues/new?template=feature_request.yml" target="_blank" rel="noopener noreferrer">Открыть форму предложения →</a>
+<a data-course-feedback="improvement" href="https://docs.google.com/forms/d/e/1FAIpQLSc70niaI42Az7F9qNkiEeF9JAoNoPknDjI07u4-hGrBYuqM-Q/viewform" target="_blank" rel="noopener noreferrer">Открыть форму предложения →</a>
+</section>
+<section aria-labelledby="feedback-question">
+<h3 id="feedback-question"><i class="bi bi-question-circle" aria-hidden="true"></i> Задать вопрос</h3>
+<p>Неясен шаг объяснения, условие задачи или результат эксперимента. Укажите страницу и конкретный фрагмент, расскажите, что уже понятно и где возникает затруднение.</p>
+<a data-course-feedback="question" href="https://docs.google.com/forms/d/e/1FAIpQLSeF4BRW5MGA_C1SvuoBoP2nhr4O8fRkI7xRpUPRTcFhe3KEXA/viewform" target="_blank" rel="noopener noreferrer">Открыть форму вопроса →</a>
 </section>
 </div>
 ```
 
-Формы открываются на GitHub; для отправки нужен аккаунт. Обсуждения публичны — не включайте персональные данные и закрытые материалы. Предложения рассматриваются по мере развития курса.
+В формах автоматически указывается ссылка на текущую страницу. Не включайте персональные данные и закрытые материалы. Ответы поступают преподавателю; исправления и предложения рассматриваются по мере развития курса.
