@@ -1,18 +1,31 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  const tools = document.querySelectorAll('.quarto-navbar-tools a[href*="/intro-to-networking/issues/new"]');
-  for (const link of tools) {
+  const pageFields = {
+    '1FAIpQLScbsWOaqw31Cs30H-o3cjq4DoBKEsViXSzSD4I5BL1WjgEKfg': 'entry.2027801067',
+    '1FAIpQLSc70niaI42Az7F9qNkiEeF9JAoNoPknDjI07u4-hGrBYuqM-Q': 'entry.614899729',
+    '1FAIpQLSeF4BRW5MGA_C1SvuoBoP2nhr4O8fRkI7xRpUPRTcFhe3KEXA': 'entry.633006356',
+  };
+  const updates = [];
+  for (const link of document.querySelectorAll('.quarto-navbar-tools a[href^="https://docs.google.com/forms/d/e/"]')) {
+    const form = new URL(link.href);
+    const entry = pageFields[form.pathname.split('/')[4]];
+    if (!entry) continue;
     link.querySelector('i')?.setAttribute('aria-hidden', 'true');
-    const url = new URL(link.href);
-    if (['bug_report.yml', 'question.yml'].includes(url.searchParams.get('template'))) {
-      const updatePage = () => {
-        url.searchParams.set('page', window.location.href);
-        link.href = url.href;
-      };
-      updatePage();
-      window.addEventListener('hashchange', updatePage);
-      window.addEventListener('popstate', updatePage);
+    const updatePage = () => {
+      const url = new URL(form.href);
+      url.searchParams.set('usp', 'pp_url');
+      url.searchParams.set(entry, window.location.href);
+      link.href = url.href;
+    };
+    updatePage();
+    updates.push(updatePage);
+    // Refresh before keyboard/click, middle-click, and the native context menu.
+    for (const event of ['click', 'auxclick', 'pointerdown', 'mousedown', 'contextmenu', 'focus']) {
+      link.addEventListener(event, updatePage);
     }
+  }
+  for (const event of ['hashchange', 'popstate', 'pageshow']) {
+    window.addEventListener(event, () => updates.forEach(update => update()));
   }
 
   const toc = document.querySelector('#quarto-margin-sidebar > #TOC');

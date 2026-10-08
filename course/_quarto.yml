@@ -18,22 +18,22 @@ website:
   search: true
   page-navigation: true
   navbar:
-    tools-collapse: true
+    tools-collapse: false
     tools:
       - icon: bug
-        href: https://github.com/temaSW/intro-to-networking/issues/new?template=bug_report.yml
+        href: https://docs.google.com/forms/d/e/1FAIpQLScbsWOaqw31Cs30H-o3cjq4DoBKEsViXSzSD4I5BL1WjgEKfg/viewform
         text: "Сообщить об ошибке"
         aria-label: "Сообщить об ошибке"
         target: _blank
         rel: noopener noreferrer
       - icon: lightbulb
-        href: https://github.com/temaSW/intro-to-networking/issues/new?template=feature_request.yml
+        href: https://docs.google.com/forms/d/e/1FAIpQLSc70niaI42Az7F9qNkiEeF9JAoNoPknDjI07u4-hGrBYuqM-Q/viewform
         text: "Предложить улучшение"
         aria-label: "Предложить улучшение"
         target: _blank
         rel: noopener noreferrer
       - icon: question-circle
-        href: https://github.com/temaSW/intro-to-networking/issues/new?template=question.yml
+        href: https://docs.google.com/forms/d/e/1FAIpQLSeF4BRW5MGA_C1SvuoBoP2nhr4O8fRkI7xRpUPRTcFhe3KEXA/viewform
         text: "Задать вопрос"
         aria-label: "Задать вопрос"
         target: _blank
