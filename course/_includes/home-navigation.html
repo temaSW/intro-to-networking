@@ -2,29 +2,6 @@
 // Keep Quarto's native search and theme controls. Only the landing page loads this.
 document.addEventListener('DOMContentLoaded', () => {
   const tools = document.querySelector('#quarto-header .quarto-navbar-tools');
-  const routes = [
-    ['.bi-bug', 'bug_report.yml', 'Сообщить об ошибке'],
-    ['.bi-lightbulb', 'feature_request.yml', 'Предложить улучшение'],
-  ];
-  for (const [icon, template, label] of routes) {
-    const link = tools?.querySelector(icon)?.closest('a');
-    if (!link) continue;
-    const links = [link, ...document.querySelectorAll(`a[data-issue-template="${template}"]`)];
-    const update = () => {
-      const url = new URL('https://github.com/temaSW/intro-to-networking/issues/new');
-      url.searchParams.set('template', template);
-      url.searchParams.set('page', window.location.href);
-      for (const target of links) target.href = url.href;
-    };
-    link.title = label;
-    link.setAttribute('aria-label', label);
-    link.querySelector('i').setAttribute('aria-hidden', 'true');
-    update();
-    for (const target of links) {
-      for (const event of ['focus', 'pointerdown', 'click', 'auxclick', 'contextmenu']) target.addEventListener(event, update);
-    }
-    for (const event of ['hashchange', 'popstate', 'pageshow']) window.addEventListener(event, update);
-  }
   const theme = tools?.querySelector('.quarto-color-scheme-toggle');
   if (theme) {
     theme.title = 'Переключить светлую / тёмную тему';

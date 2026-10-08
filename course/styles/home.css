@@ -1,7 +1,6 @@
 /* Loaded only by index.qmd; reuse the course palette in both themes. */
 .course-home #title-block-header { display: none; }
-.course-home #quarto-header :is(.navbar-brand-container, #navbarCollapse, .navbar-toggler),
-.course-home #quarto-header a:has(.bi-question-circle) { display: none !important; }
+.course-home #quarto-header :is(.navbar-brand-container, #navbarCollapse, .navbar-toggler) { display: none !important; }
 .course-home #quarto-header .navbar { box-shadow: none; }
 .course-home #quarto-header .navbar-container { justify-content: flex-end; gap: .5rem; max-width: 1120px; margin-inline: auto; padding: .4rem 1rem; }
 .course-home #quarto-header .quarto-navbar-tools { display: flex; align-items: center; gap: .4rem; margin: 0; order: 0; }
@@ -51,10 +50,13 @@
 .course-home .home-feedback-guide { background: #f0f5f4; border: 1px solid var(--line); border-radius: .4rem; padding: 1rem; margin: 1.5rem 0; max-width: 34rem; }
 .course-home .home-feedback-guide img { display: block; width: 100%; height: auto; }
 .course-home .home-feedback-guide figcaption { color: #486067; margin-top: .5rem; }
-.course-home .home-feedback-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; }
+.course-home .home-feedback-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.5rem; }
 .course-home .home-feedback-options h3 { font-size: 1.15rem; margin-top: 0; }
 .course-home .home-feedback-options h3 i { color: var(--accent); margin-right: .3rem; }
 .course-home .home-feedback-options a { display: inline-block; padding-block: .6rem; }
+@media (max-width: 760px) {
+  .course-home .home-feedback-options { grid-template-columns: 1fr; }
+}
 @media (max-width: 575px) {
   .course-home .home-materials { grid-template-columns: 1fr; }
   .course-home .home-feedback-options { grid-template-columns: 1fr; }
@@ -62,3 +64,7 @@
   .course-home table th:first-child { width: 42%; }
   .course-home .home-hours-table th:first-child { width: 82%; }
 }
+
+.course-home #quarto-header .quarto-navbar-tools a[href^="https://docs.google.com/forms/d/e/"] { width: 44px; min-height: 44px; height: 44px; color: var(--feedback-color); background: var(--feedback-bg); }
+
+.course-home main.content section.level2 p { text-align: justify; hyphens: auto; }
