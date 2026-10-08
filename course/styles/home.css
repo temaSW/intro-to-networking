@@ -35,12 +35,14 @@
 .course-home .home-text-link { display: inline-block; margin-top: .8rem; font-weight: 650; }
 .course-home table th:first-child { width: 38%; }
 .course-home .home-hours { display: flex; gap: 3px; height: 1.4rem; border-radius: .25rem; overflow: hidden; margin: 1.2rem 0; }
-.course-home .hours-lectures { background: var(--accent); }
-.course-home .hours-practice { background: var(--muted); }
-.course-home .hours-labs { background: var(--focus); }
-.course-home .hours-self { background: var(--line); }
-.course-home .hours-exam { background: var(--ink); }
-.course-home .hours-key { display: inline-block; width: .7rem; height: .7rem; border-radius: .1rem; margin-right: .65rem; }
+.course-home { --hours-lectures: #075c67; --hours-practice: #3569b7; --hours-labs: #b35b16; --hours-self: #8e5cb1; --hours-exam: #718329; }
+.course-home.quarto-dark { --hours-lectures: #6ccbd3; --hours-practice: #83a9f2; --hours-labs: #f5aa60; --hours-self: #ba93df; --hours-exam: #b8cc68; }
+.course-home .hours-lectures { background: var(--hours-lectures); }
+.course-home .hours-practice { background: var(--hours-practice); }
+.course-home .hours-labs { background: var(--hours-labs); }
+.course-home .hours-self { background: var(--hours-self); }
+.course-home .hours-exam { background: var(--hours-exam); }
+.course-home .hours-key { display: inline-block; width: .85rem; height: .85rem; border-radius: .1rem; margin-right: .65rem; }
 .course-home .home-hours-table th:first-child { width: 82%; }
 .course-home .home-hours-table tbody th { font-weight: 400; background: transparent; }
 .course-home .home-hours-table :is(th, td):last-child { text-align: right; }
@@ -67,4 +69,4 @@
 
 .course-home #quarto-header .quarto-navbar-tools a[href^="https://docs.google.com/forms/d/e/"] { width: 44px; min-height: 44px; height: 44px; color: var(--feedback-color); background: var(--feedback-bg); }
 
-.course-home main.content section.level2 p { text-align: justify; hyphens: auto; }
+.course-home main.content section.level2 :is(p, li) { max-width: none; text-align: justify; hyphens: auto; }
