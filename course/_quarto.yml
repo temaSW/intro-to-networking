@@ -18,6 +18,20 @@ website:
   search: true
   page-navigation: true
   navbar:
+    tools-collapse: true
+    tools:
+      - icon: bug
+        href: https://github.com/temaSW/intro-to-networking/issues/new?template=bug_report.yml
+        text: "Сообщить об ошибке"
+        aria-label: "Сообщить об ошибке"
+        target: _blank
+        rel: noopener noreferrer
+      - icon: lightbulb
+        href: https://github.com/temaSW/intro-to-networking/issues/new?template=feature_request.yml
+        text: "Предложить улучшение"
+        aria-label: "Предложить улучшение"
+        target: _blank
+        rel: noopener noreferrer
     left:
       - text: "О курсе"
         href: index.qmd
