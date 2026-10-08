@@ -1,0 +1,34 @@
+name: Ошибка
+description: Опечатка, ошибка в материале или проблема с демонстрацией
+title: "[Ошибка]: "
+body:
+  - type: input
+    id: page
+    attributes:
+      label: Страница или файл
+      description: Ссылка на страницу курса или путь к файлу.
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Что не так?
+      description: Приведите проблемный фрагмент или шаги воспроизведения со значениями параметров.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Ожидаемый результат или предлагаемое исправление
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Браузер и устройство
+      description: Для проблем с отображением или демонстрацией.
+  - type: textarea
+    id: attachments
+    attributes:
+      label: Скриншоты и дополнительные сведения
+      description: Не прикладывайте персональные данные и закрытые материалы.
