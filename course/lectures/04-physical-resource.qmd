@@ -30,6 +30,7 @@ $T_b$ — длительность бита, $f_c$ — несущая часто
 Модель использует прямоугольные битовые импульсы; ось частоты отсчитывается от несущей. Реальный спектр также зависит от формирования импульсов и фильтрации.
 
 <div class="lecture-interactive" data-lecture-interactive="spectrum"></div>
+<p class="interactive-source"><a href="https://github.com/temaSW/intro-to-networking/blob/main/course/interactives/lecture-04-spectrum-ui.js">Исходник</a></p>
 
 
 ## Сколько бит несёт состояние сигнала?
@@ -131,6 +132,7 @@ $$\eta\leq\frac{C}{B}=\log_2(1+\mathrm{SNR}),$$
 <div class="scene-overline">Различимость состояний</div>
 <div class="scene-model">
 <div class="lecture-interactive" data-lecture-interactive="constellation"></div>
+<p class="interactive-source"><a href="https://github.com/temaSW/intro-to-networking/blob/main/course/interactives/lecture-04-ui.js">Исходник</a></p>
 </div>
 </div>
 
@@ -281,6 +283,7 @@ $k$ — число информационных битов; $n$ — число �
 <div class="scene-overline">Кодирование и ошибки</div>
 <div class="scene-model">
 <div class="lecture-interactive" data-lecture-interactive="ber"></div>
+<p class="interactive-source"><a href="https://github.com/temaSW/intro-to-networking/blob/main/course/interactives/lecture-04-ui.js">Исходник</a></p>
 </div>
 </div>
 

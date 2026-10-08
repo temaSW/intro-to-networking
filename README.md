@@ -75,7 +75,7 @@ python scripts/check.py
 
 Workflow [Check site](https://github.com/temaSW/intro-to-networking/actions/workflows/check.yml) запускается при push, pull request и вручную. GitHub Actions устанавливает Python 3.11, Quarto 1.10.18, `pytest` и `numpy`, запускает тесты и выполняет `python scripts/check.py` для сборки всего сайта.
 
-После успешной проверки ветки `main` при push или ручном запуске workflow загружает `course/_site/` как артефакт Pages и публикует его через `actions/deploy-pages`. Pull request и другие ветки проходят проверку без публикации. Для форка настройте GitHub Pages на публикацию через GitHub Actions и укажите собственный `site-url`.
+Сначала Gitleaks проверяет историю Git и рабочие исходники. После сборки он проверяет весь `course/_site/` до загрузки артефакта. Только успешные проверки ветки `main` при push или ручном запуске разрешают публикацию через `actions/deploy-pages`. Pull request и другие ветки проходят проверку без публикации. Для форка настройте GitHub Pages на публикацию через GitHub Actions и укажите собственный `site-url`. [Локальный hook, сканирование и настройки безопасности](docs/security.md).
 
 ## Открыть курс на телефоне
 

@@ -12,5 +12,6 @@ format:
 Параметры сохраняются при переключении режимов. Численные настройки относятся к учебным моделям и не описывают конкретную линию связи.
 
 <div data-channel-playground></div>
+<p class="interactive-source"><a href="https://github.com/temaSW/intro-to-networking/blob/main/course/interactives/channel-playground-ui.js">Исходник</a></p>
 
 <script type="module" src="../interactives/channel-playground-ui.js?v=20261006-ray-motion"></script>

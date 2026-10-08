@@ -39,12 +39,14 @@ format:
 В битовый поток вставлена преамбула из 15 единиц. Синий сигнал — принятый поток, оранжевый пунктир — известная преамбула. Сдвигайте её слайдером и следите за корреляцией внизу. Сильно ли отличается полное совпадение от сдвига на один бит? Уменьшите ОСШ и сравните соседние положения с шумом.
 
 <div class="ta-demo" data-correlation-illustration="ones"></div>
+<p class="interactive-source"><a href="https://github.com/temaSW/intro-to-networking/blob/main/course/interactives/transmission-agreement-ui.js">Исходник</a></p>
 
 ### ПСП в битовом потоке: где совпадает весь рисунок?
 
 Известная ПСП показана оранжевым пунктиром поверх принятого битового потока. Перемещайте её слайдером: при совпадении переходы совмещаются, а маркер внизу попадает на корреляционный пик. Затем уменьшите ОСШ и проследите, как шум меняет сигнал и корреляцию.
 
 <div class="ta-demo" data-correlation-illustration="bits"></div>
+<p class="interactive-source"><a href="https://github.com/temaSW/intro-to-networking/blob/main/course/interactives/transmission-agreement-ui.js">Исходник</a></p>
 
 <details><summary>Что именно показано и вывод</summary>
 
@@ -81,6 +83,7 @@ format:
 > Как связаны ошибка частоты, время и угол поворота? Почему неточная оценка помогает сначала, но не удерживает созвездие бесконечно?
 
 <div class="ta-demo" data-agreement="frequency"></div>
+<p class="interactive-source"><a href="https://github.com/temaSW/intro-to-networking/blob/main/course/interactives/transmission-agreement-ui.js">Исходник</a></p>
 
 <details><summary>Как читать модель и сформулировать вывод</summary>
 
@@ -151,6 +154,7 @@ format:
 > При N = M все ли устройства получат по одному варианту? Как изменятся успехи при росте N и при увеличении числа окон задержки?
 
 <div class="ta-demo" data-agreement="access"></div>
+<p class="interactive-source"><a href="https://github.com/temaSW/intro-to-networking/blob/main/course/interactives/transmission-agreement-ui.js">Исходник</a></p>
 
 <details><summary>Вероятность, ограничения и вывод</summary>
 
@@ -215,6 +219,7 @@ format:
 > Когда оценка между пилотами перестаёт описывать канал? Сколько ресурса остаётся данным при более частых пилотах?
 
 <div class="ta-demo" data-agreement="pilots"></div>
+<p class="interactive-source"><a href="https://github.com/temaSW/intro-to-networking/blob/main/course/interactives/transmission-agreement-ui.js">Исходник</a></p>
 
 <details><summary>Как читать модель и сформулировать вывод</summary>
 

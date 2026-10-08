@@ -33,6 +33,7 @@ format:
 
 ::: {.column-page .course-interactive}
 <div class="lecture-interactive" data-channel-playground data-channel-mode="attenuation" data-channel-layout="lecture"></div>
+<p class="interactive-source"><a href="https://github.com/temaSW/intro-to-networking/blob/main/course/interactives/channel-playground-ui.js">Исходник</a></p>
 :::
 
 ## Межсимвольные искажения
@@ -48,6 +49,7 @@ $B$ — полоса канала. Битовая скорость — числ�
 </details>
 
 <div class="lecture-interactive" data-channel-playground data-channel-mode="bandwidth" data-channel-layout="lecture"></div>
+<p class="interactive-source"><a href="https://github.com/temaSW/intro-to-networking/blob/main/course/interactives/channel-playground-ui.js">Исходник</a></p>
 
 ## Чем различаются шум и внешняя помеха?
 
@@ -62,6 +64,7 @@ $B$ — полоса канала. Битовая скорость — числ�
 </details>
 
 <div class="lecture-interactive" data-channel-playground data-channel-mode="noise" data-channel-layout="lecture"></div>
+<p class="interactive-source"><a href="https://github.com/temaSW/intro-to-networking/blob/main/course/interactives/channel-playground-ui.js">Исходник</a></p>
 
 ## Всегда ли дополнительный луч усиливает сигнал?
 
@@ -76,6 +79,7 @@ $B$ — полоса канала. Битовая скорость — числ�
 </details>
 
 <div class="lecture-interactive" data-channel-playground data-channel-mode="multipath" data-channel-layout="lecture"></div>
+<p class="interactive-source"><a href="https://github.com/temaSW/intro-to-networking/blob/main/course/interactives/channel-playground-ui.js">Исходник</a></p>
 
 ## Одинаково ли канал изменяет сигналы на разных частотах?
 
@@ -90,6 +94,7 @@ $B$ — полоса канала. Битовая скорость — числ�
 </details>
 
 <div class="lecture-interactive" data-channel-playground data-channel-mode="coherence" data-channel-layout="lecture"></div>
+<p class="interactive-source"><a href="https://github.com/temaSW/intro-to-networking/blob/main/course/interactives/channel-playground-ui.js">Исходник</a></p>
 
 ## Частотное рассогласование
 
@@ -102,6 +107,7 @@ $B$ — полоса канала. Битовая скорость — числ�
 </details>
 
 <div class="lecture-interactive" data-channel-playground data-channel-mode="shift" data-channel-layout="lecture"></div>
+<p class="interactive-source"><a href="https://github.com/temaSW/intro-to-networking/blob/main/course/interactives/channel-playground-ui.js">Исходник</a></p>
 
 ## Успеет ли уровень сигнала измениться за время передачи?
 
@@ -120,6 +126,7 @@ $B$ — полоса канала. Битовая скорость — числ�
 </details>
 
 <div class="lecture-interactive" data-channel-playground data-channel-mode="spread" data-channel-layout="lecture"></div>
+<p class="interactive-source"><a href="https://github.com/temaSW/intro-to-networking/blob/main/course/interactives/channel-playground-ui.js">Исходник</a></p>
 
 ## Какие среды бывают?
 
@@ -138,6 +145,7 @@ $B$ — полоса канала. Битовая скорость — числ�
 **Дисперсия** — различие задержек частотных составляющих или мод распространения.
 
 <div class="lecture-interactive" data-channel-playground data-channel-mode="media" data-channel-layout="lecture"></div>
+<p class="interactive-source"><a href="https://github.com/temaSW/intro-to-networking/blob/main/course/interactives/channel-playground-ui.js">Исходник</a></p>
 
 </details>
 :::

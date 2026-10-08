@@ -97,6 +97,7 @@ flowchart LR
 <div class="scene-overline">Общий ресурс</div>
 <div class="scene-model">
 <div class="lecture-interactive" data-bottleneck-interactive></div>
+<p class="interactive-source"><a href="https://github.com/temaSW/intro-to-networking/blob/main/course/interactives/bottleneck-ui.js">Исходник</a></p>
 </div>
 </div>
 

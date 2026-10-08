@@ -110,6 +110,7 @@ format:
 <div class="scene-overline">Квантование отсчёта</div>
 <div class="scene-model">
 <div class="companding-line-widget" data-companding-widget></div>
+<p class="interactive-source"><a href="https://github.com/temaSW/intro-to-networking/blob/main/course/interactives/companding-line-ui.js">Исходник</a></p>
 </div>
 </div>
 
@@ -133,6 +134,7 @@ format:
 <div class="scene-overline">Биты → сигнал в линии</div>
 <div class="scene-model">
 <div class="companding-line-widget" data-line-widget></div>
+<p class="interactive-source"><a href="https://github.com/temaSW/intro-to-networking/blob/main/course/interactives/companding-line-ui.js">Исходник</a></p>
 </div>
 </div>
 
@@ -162,6 +164,7 @@ format:
 <div class="scene-overline">NRZ и RZ</div>
 <div class="scene-model">
 <div data-line-spectrum="nrz,rz"></div>
+<p class="interactive-source"><a href="https://github.com/temaSW/intro-to-networking/blob/main/course/interactives/line-spectrum-ui.js">Исходник</a></p>
 </div>
 </div>
 
@@ -185,6 +188,7 @@ format:
 <div class="scene-overline">Чередование полярности</div>
 <div class="scene-model">
 <div data-line-spectrum="amiNrz,amiRz"></div>
+<p class="interactive-source"><a href="https://github.com/temaSW/intro-to-networking/blob/main/course/interactives/line-spectrum-ui.js">Исходник</a></p>
 </div>
 </div>
 
@@ -226,6 +230,7 @@ format:
 <div class="scene-overline">HDB-3 и Manchester</div>
 <div class="scene-model">
 <div data-line-spectrum="hdb,manchester"></div>
+<p class="interactive-source"><a href="https://github.com/temaSW/intro-to-networking/blob/main/course/interactives/line-spectrum-ui.js">Исходник</a></p>
 </div>
 </div>
 
@@ -251,6 +256,7 @@ format:
 <div class="scene-overline">Скремблирование</div>
 <div class="scene-model">
 <div class="scrambler-widget" data-scrambler-widget></div>
+<p class="interactive-source"><a href="https://github.com/temaSW/intro-to-networking/blob/main/course/interactives/scrambler-ui.js">Исходник</a></p>
 </div>
 </div>
 
