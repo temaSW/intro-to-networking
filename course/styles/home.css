@@ -49,19 +49,24 @@
 .course-home .home-reading h3 { margin-top: 1.5rem; font-size: 1.1rem; }
 .course-home .home-reading p { color: var(--muted); }
 .course-home .home-reading li { margin-bottom: .8rem; }
-.course-home .home-feedback-guide { background: #f0f5f4; border: 1px solid var(--line); border-radius: .4rem; padding: 1rem; margin: 1.5rem 0; max-width: 34rem; }
-.course-home .home-feedback-guide img { display: block; width: 100%; height: auto; }
-.course-home .home-feedback-guide figcaption { color: #486067; margin-top: .5rem; }
-.course-home .home-feedback-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.5rem; }
-.course-home .home-feedback-options h3 { font-size: 1.15rem; margin-top: 0; }
-.course-home .home-feedback-options h3 i { color: var(--accent); margin-right: .3rem; }
-.course-home .home-feedback-options a { display: inline-block; padding-block: .6rem; }
-@media (max-width: 760px) {
-  .course-home .home-feedback-options { grid-template-columns: 1fr; }
+.course-home .home-feedback-table { margin-block: 1.5rem; }
+.course-home .home-feedback-table caption { caption-side: top; color: var(--muted); }
+.course-home .home-feedback-table th:first-child,
+.course-home .home-feedback-table .feedback-icon-column { width: 5rem; }
+.course-home .home-feedback-table .feedback-form-column { width: 24%; }
+.course-home .home-feedback-table td { vertical-align: top; }
+.course-home .home-feedback-table td p { margin: .5rem 0 0; }
+.course-home .home-feedback-table a { display: inline-block; padding-block: .5rem; }
+.course-home .home-feedback-icon { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: .3rem; font-size: 1.5rem; color: var(--feedback-color); background: var(--feedback-bg); }
+@media (max-width: 575px) {
+  .course-home .home-feedback-table { font-size: .85rem; }
+  .course-home .home-feedback-table th:first-child,
+  .course-home .home-feedback-table .feedback-icon-column { width: 4rem; }
+  .course-home .home-feedback-table .feedback-form-column { width: 26%; }
+  .course-home .home-feedback-table :is(th, td) { padding-inline: .3rem; }
 }
 @media (max-width: 575px) {
   .course-home .home-materials { grid-template-columns: 1fr; }
-  .course-home .home-feedback-options { grid-template-columns: 1fr; }
   .course-home .home-title { overflow-wrap: anywhere; }
   .course-home table th:first-child { width: 42%; }
   .course-home .home-hours-table th:first-child { width: 82%; }
