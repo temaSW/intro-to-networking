@@ -47,6 +47,7 @@ $$f_s-f_{\max}>f_{\max}\quad\Longrightarrow\quad f_s>2f_{\max}.$$
 Меняйте верхнюю частоту сигнала и частоту дискретизации. Цветные прямоугольники показывают **границы полос**, а не форму или уровень реального спектра. При перекрытии появляется красная область.
 
 <div class="ks-widget" data-sampling="spectrum"></div>
+<p class="interactive-source"><a href="https://github.com/temaSW/intro-to-networking/blob/main/course/interactives/sampling-ui.js">Исходник</a></p>
 
 Попробуйте поставить $f_{\max}=1{,}2\ \text{кГц}$ и уменьшить $f_s$ от $3{,}4$ до $2\ \text{кГц}$. При каком значении копии впервые коснутся друг друга?
 
@@ -59,6 +60,7 @@ $$f_s-f_{\max}>f_{\max}\quad\Longrightarrow\quad f_s>2f_{\max}.$$
 Вертикальные импульсы показывают отсчёты: их высота и направление соответствуют значению сигнала в момент измерения. Сплошная линия — исходный сигнал, пунктирная — синусоида с частотой, которая видна по отсчётам. Измените $f_s$ и найдите момент, когда линии перестанут расходиться между импульсами.
 
 <div class="ks-widget" data-sampling="tone"></div>
+<p class="interactive-source"><a href="https://github.com/temaSW/intro-to-networking/blob/main/course/interactives/sampling-ui.js">Исходник</a></p>
 
 Для отдельной синусоиды это наглядный пример неоднозначности. Условие теоремы относится ко **всем** сигналам в заданной полосе, а не только к одной синусоиде.
 

@@ -3,6 +3,11 @@ $grid-body-width: 1080px;
 $grid-margin-width: 200px;
 
 /*-- scss:rules --*/
+.interactive-source {
+  margin-block: .35rem 1rem;
+  font-size: .85rem;
+}
+
 #quarto-header .quarto-navbar-tools a[href^="https://docs.google.com/forms/d/e/"] {
   display: inline-flex;
   align-items: center;

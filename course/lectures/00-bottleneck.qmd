@@ -8,5 +8,6 @@ subtitle: "Самостоятельная модель к лекции 00"
 Сначала предположите, какой общий сегмент ограничит передачу при росте числа пользователей, затем измените параметры и сравните результат.
 
 <div class="lecture-interactive" data-bottleneck-interactive></div>
+<p class="interactive-source"><a href="https://github.com/temaSW/intro-to-networking/blob/main/course/interactives/bottleneck-ui.js">Исходник</a></p>
 
 <script type="module" src="../interactives/bottleneck-ui.js"></script>

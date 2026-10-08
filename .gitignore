@@ -10,3 +10,21 @@ design/
 /OPISiS course.7z
 
 *.kicad_prl
+
+# Local credentials; safe templates remain reviewable and are still scanned.
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.key
+*.pem
+*.p12
+*.pfx
+id_rsa
+id_ed25519
+credentials.json
+*.credentials.json
+.netrc
+_netrc
+*.secrets.json
+*.secrets.toml

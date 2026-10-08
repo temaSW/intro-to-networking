@@ -10,6 +10,7 @@ format:
 
 ```{=html}
 <div class="audio-channel-demo" data-audio-channel-demo data-manifest="../assets/audio-channel-coding/manifest.json"></div>
+<p class="interactive-source"><a href="https://github.com/temaSW/intro-to-networking/blob/main/course/interactives/audio-channel-coding/ui.js">Исходник</a></p>
 <noscript>Для воспроизведения и переключения режимов включите JavaScript.</noscript>
 <script type="module" src="../interactives/audio-channel-coding/ui.js"></script>
 ```

@@ -60,4 +60,5 @@ format:
   <div class="scroll-demo-card"><h3 data-demo-heading>Весь путь</h3><p data-demo-question>От устройства до сервера.</p></div>
   <div class="scroll-demo-legend">UE → радиоканал → БС → агрегация → транспорт → сервер</div>
 </div>
+<p class="interactive-source"><a href="https://github.com/temaSW/intro-to-networking/blob/main/course/experiments/scroll-route.qmd">Исходник</a></p>
 ```
