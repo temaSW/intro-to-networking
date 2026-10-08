@@ -1,0 +1,23 @@
+name: Предложение
+description: Новый материал, демонстрация или улучшение курса
+title: "[Предложение]: "
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: Какую задачу решит улучшение?
+      description: Укажите тему курса или страницу и объясните, чего сейчас не хватает.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Что предлагаете изменить?
+      description: Опишите материал, пример или поведение демонстрации.
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: Примеры и источники
+      description: При наличии добавьте ссылки на стандарты, статьи или другие материалы.
