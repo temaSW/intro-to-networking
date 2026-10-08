@@ -26,27 +26,33 @@ $grid-margin-width: 200px;
   outline: 2px solid var(--focus);
   outline-offset: 2px;
 }
-#quarto-header a[href*="/forms/d/e/1FAIpQLScbsWOaqw31Cs30H-o3cjq4DoBKEsViXSzSD4I5BL1WjgEKfg/"] {
+#quarto-header a[href*="/forms/d/e/1FAIpQLScbsWOaqw31Cs30H-o3cjq4DoBKEsViXSzSD4I5BL1WjgEKfg/"],
+.home-feedback-icon[data-feedback-icon="error"] {
   --feedback-color: #a52e28;
   --feedback-bg: #fff0ed;
 }
-#quarto-header a[href*="/forms/d/e/1FAIpQLSc70niaI42Az7F9qNkiEeF9JAoNoPknDjI07u4-hGrBYuqM-Q/"] {
+#quarto-header a[href*="/forms/d/e/1FAIpQLSc70niaI42Az7F9qNkiEeF9JAoNoPknDjI07u4-hGrBYuqM-Q/"],
+.home-feedback-icon[data-feedback-icon="improvement"] {
   --feedback-color: #795500;
   --feedback-bg: #fff5d6;
 }
-#quarto-header a[href*="/forms/d/e/1FAIpQLSeF4BRW5MGA_C1SvuoBoP2nhr4O8fRkI7xRpUPRTcFhe3KEXA/"] {
+#quarto-header a[href*="/forms/d/e/1FAIpQLSeF4BRW5MGA_C1SvuoBoP2nhr4O8fRkI7xRpUPRTcFhe3KEXA/"],
+.home-feedback-icon[data-feedback-icon="question"] {
   --feedback-color: #2459ad;
   --feedback-bg: #edf3ff;
 }
-.quarto-dark #quarto-header a[href*="/forms/d/e/1FAIpQLScbsWOaqw31Cs30H-o3cjq4DoBKEsViXSzSD4I5BL1WjgEKfg/"] {
+.quarto-dark #quarto-header a[href*="/forms/d/e/1FAIpQLScbsWOaqw31Cs30H-o3cjq4DoBKEsViXSzSD4I5BL1WjgEKfg/"],
+.quarto-dark .home-feedback-icon[data-feedback-icon="error"] {
   --feedback-color: #ff9a8c;
   --feedback-bg: #432a2a;
 }
-.quarto-dark #quarto-header a[href*="/forms/d/e/1FAIpQLSc70niaI42Az7F9qNkiEeF9JAoNoPknDjI07u4-hGrBYuqM-Q/"] {
+.quarto-dark #quarto-header a[href*="/forms/d/e/1FAIpQLSc70niaI42Az7F9qNkiEeF9JAoNoPknDjI07u4-hGrBYuqM-Q/"],
+.quarto-dark .home-feedback-icon[data-feedback-icon="improvement"] {
   --feedback-color: #f2cf69;
   --feedback-bg: #393323;
 }
-.quarto-dark #quarto-header a[href*="/forms/d/e/1FAIpQLSeF4BRW5MGA_C1SvuoBoP2nhr4O8fRkI7xRpUPRTcFhe3KEXA/"] {
+.quarto-dark #quarto-header a[href*="/forms/d/e/1FAIpQLSeF4BRW5MGA_C1SvuoBoP2nhr4O8fRkI7xRpUPRTcFhe3KEXA/"],
+.quarto-dark .home-feedback-icon[data-feedback-icon="question"] {
   --feedback-color: #9bbfff;
   --feedback-bg: #23344a;
 }
