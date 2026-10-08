@@ -1,0 +1,64 @@
+/* Loaded only by index.qmd; reuse the course palette in both themes. */
+.course-home #title-block-header { display: none; }
+.course-home #quarto-header :is(.navbar-brand-container, #navbarCollapse, .navbar-toggler),
+.course-home #quarto-header a:has(.bi-question-circle) { display: none !important; }
+.course-home #quarto-header .navbar { box-shadow: none; }
+.course-home #quarto-header .navbar-container { justify-content: flex-end; gap: .5rem; max-width: 1120px; margin-inline: auto; padding: .4rem 1rem; }
+.course-home #quarto-header .quarto-navbar-tools { display: flex; align-items: center; gap: .4rem; margin: 0; order: 0; }
+.course-home #quarto-header #quarto-search { order: 1; margin: 0; }
+.course-home #quarto-header .quarto-color-scheme-toggle { order: -1; }
+.course-home #quarto-header .quarto-navigation-tool,
+.course-home #quarto-header .aa-DetachedSearchButton { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: .4rem; color: var(--ink); background: var(--surface-alt); }
+.course-home #quarto-header .quarto-navigation-tool:is(:hover, :focus-visible) { color: var(--accent); box-shadow: inset 0 0 0 1px currentColor; }
+.course-home #quarto-content { max-width: 1120px; margin-inline: auto; }
+.course-home main.content { grid-column: page-start / page-end; padding-inline: 0; }
+.course-home .home-cover { padding-top: clamp(1.5rem, 4vw, 3.5rem); }
+.course-home main.content .home-cover p { max-width: none; }
+.course-home .home-overline { color: var(--accent); font-size: .8rem; font-weight: 750; letter-spacing: .13em; text-transform: uppercase; margin-bottom: 1.1rem; }
+.course-home main.content h1.home-title { font-size: clamp(2rem, 4.3vw, 3.65rem); line-height: 1.08; max-width: 29ch; margin: 0 0 1.25rem; }
+.course-home .home-subtitle { color: var(--muted); font-size: clamp(1.1rem, 1.8vw, 1.4rem); max-width: 46ch; }
+.course-home .home-start { display: inline-flex; align-items: center; min-height: 48px; padding: .7rem 1.25rem; margin: .5rem 0 1.5rem; background: var(--accent); color: var(--page-bg); border: 1px solid var(--accent); border-radius: .4rem; text-decoration: none; font-weight: 700; }
+.course-home .home-start:is(:hover, :focus-visible) { background: var(--ink); color: var(--page-bg); }
+.course-home .home-banner { display: block; width: 100%; height: auto; border-radius: .5rem; margin-top: .5rem; }
+.course-home main.content section.level2 { margin-top: clamp(2.5rem, 5vw, 4rem); padding-top: 1.5rem; }
+.course-home main.content section.level2 > h2:first-child { margin: 0 0 1.4rem; border: 0; }
+.course-home .home-materials { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.course-home .home-material { display: flex; flex-direction: column; align-items: flex-start; gap: .7rem; padding: clamp(1.1rem, 2.4vw, 1.8rem); background: var(--surface); border: 1px solid var(--line); border-radius: .5rem; color: var(--muted); text-decoration: none; }
+.course-home .home-material:is(:hover, :focus-visible) { border-color: var(--accent); background: var(--accent-soft); }
+.course-home .home-material > i { font-size: 1.7rem; color: var(--accent); }
+.course-home .home-material-title { font-size: 1.25rem; font-weight: 700; color: var(--ink); line-height: 1.25; }
+.course-home .home-material-action { color: var(--accent); font-size: .9rem; font-weight: 650; margin-top: auto; padding-top: .5rem; }
+.course-home .home-topics ol { list-style: none; padding: 0; counter-reset: topic; }
+.course-home .home-topics li { position: relative; max-width: none; padding: .9rem 0 .9rem 3.5rem; counter-increment: topic; border-bottom: 1px solid var(--line); }
+.course-home .home-topics li::before { content: "0" counter(topic); position: absolute; top: 1rem; left: 0; color: var(--accent); font: 600 1.2rem ui-monospace, monospace; }
+.course-home .home-topics li p { margin-bottom: .35rem; color: var(--muted); }
+.course-home .home-topics strong { color: var(--ink); font-size: 1.12rem; overflow-wrap: anywhere; hyphens: auto; }
+.course-home .home-text-link { display: inline-block; margin-top: .8rem; font-weight: 650; }
+.course-home table th:first-child { width: 38%; }
+.course-home .home-hours { display: flex; gap: 3px; height: 1.4rem; border-radius: .25rem; overflow: hidden; margin: 1.2rem 0; }
+.course-home .hours-lectures { background: var(--accent); }
+.course-home .hours-practice { background: var(--muted); }
+.course-home .hours-labs { background: var(--focus); }
+.course-home .hours-self { background: var(--line); }
+.course-home .hours-exam { background: var(--ink); }
+.course-home .hours-key { display: inline-block; width: .7rem; height: .7rem; border-radius: .1rem; margin-right: .65rem; }
+.course-home .home-hours-table th:first-child { width: 82%; }
+.course-home .home-hours-table tbody th { font-weight: 400; background: transparent; }
+.course-home .home-hours-table :is(th, td):last-child { text-align: right; }
+.course-home .home-reading h3 { margin-top: 1.5rem; font-size: 1.1rem; }
+.course-home .home-reading p { color: var(--muted); }
+.course-home .home-reading li { margin-bottom: .8rem; }
+.course-home .home-feedback-guide { background: #f0f5f4; border: 1px solid var(--line); border-radius: .4rem; padding: 1rem; margin: 1.5rem 0; max-width: 34rem; }
+.course-home .home-feedback-guide img { display: block; width: 100%; height: auto; }
+.course-home .home-feedback-guide figcaption { color: #486067; margin-top: .5rem; }
+.course-home .home-feedback-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; }
+.course-home .home-feedback-options h3 { font-size: 1.15rem; margin-top: 0; }
+.course-home .home-feedback-options h3 i { color: var(--accent); margin-right: .3rem; }
+.course-home .home-feedback-options a { display: inline-block; padding-block: .6rem; }
+@media (max-width: 575px) {
+  .course-home .home-materials { grid-template-columns: 1fr; }
+  .course-home .home-feedback-options { grid-template-columns: 1fr; }
+  .course-home .home-title { overflow-wrap: anywhere; }
+  .course-home table th:first-child { width: 42%; }
+  .course-home .home-hours-table th:first-child { width: 82%; }
+}

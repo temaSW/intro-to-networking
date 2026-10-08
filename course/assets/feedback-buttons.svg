@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 155" role="img" aria-labelledby="title desc">
+  <title id="title">Две кнопки обратной связи</title>
+  <desc id="desc">Жук — сообщить об ошибке. Лампочка — предложить улучшение. Обе кнопки находятся в правом верхнем углу главной страницы.</desc>
+  <style>
+    .button { fill: #f0f5f4; stroke: #075c67; }
+    .icon, .arrow { fill: none; stroke: #075c67; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    text { fill: #183037; font: 600 17px system-ui, sans-serif; text-anchor: middle; }
+  </style>
+  <rect class="button" x="76" y="12" width="64" height="64" rx="8"/>
+  <g class="icon" transform="translate(88 23)">
+    <path d="M14 12V8a6 6 0 0 1 12 0v4M12 12h16v15a8 8 0 0 1-16 0Z M20 12v23M14 5l-4-4M26 5l4-4M12 16H6M28 16h6M12 23H5M28 23h7M13 30l-6 6M27 30l6 6"/>
+  </g>
+  <rect class="button" x="300" y="12" width="64" height="64" rx="8"/>
+  <g class="icon" transform="translate(312 22)">
+    <path d="M14 30v-4C3 15 9 3 20 3s17 12 6 23v4ZM14 34h12M17 38h6M16 15l4 5 4-5M20 20v10"/>
+  </g>
+  <path class="arrow" d="M108 84v20m-5-5 5 5 5-5M332 84v20m-5-5 5 5 5-5"/>
+  <text x="108" y="132">Сообщить об ошибке</text>
+  <text x="332" y="132">Предложить улучшение</text>
+</svg>
