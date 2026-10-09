@@ -10,6 +10,7 @@ design/
 /OPISiS course.7z
 
 *.kicad_prl
+.Rproj.user
 
 # Local credentials; safe templates remain reviewable and are still scanned.
 .env
