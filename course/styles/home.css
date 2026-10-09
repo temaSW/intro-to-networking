@@ -14,9 +14,17 @@
 .course-home .home-cover { padding-top: clamp(1.5rem, 4vw, 3.5rem); }
 .course-home main.content .home-cover p { max-width: none; }
 .course-home .home-overline { color: var(--accent); font-size: .8rem; font-weight: 750; letter-spacing: .13em; text-transform: uppercase; margin-bottom: 1.1rem; }
-.course-home main.content h1.home-title { font-size: clamp(2rem, 4.3vw, 3.65rem); line-height: 1.08; max-width: 29ch; margin: 0 0 1.25rem; }
-.course-home .home-subtitle { color: var(--muted); font-size: clamp(1.1rem, 1.8vw, 1.4rem); max-width: 46ch; }
-.course-home .home-start { display: inline-flex; align-items: center; min-height: 48px; padding: .7rem 1.25rem; margin: .5rem 0 1.5rem; background: var(--accent); color: var(--page-bg); border: 1px solid var(--accent); border-radius: .4rem; text-decoration: none; font-weight: 700; }
+.course-home main.content h1.home-title { font-size: clamp(2rem, 4.3vw, 3.65rem); line-height: 1.08; max-width: none; text-align: left; margin: 0 0 1.25rem; }
+.course-home .home-subtitle { color: var(--muted); font-size: clamp(1.1rem, 1.8vw, 1.4rem); max-width: none; text-align: left; }
+.course-home .home-actions { display: flex; justify-content: space-between; align-items: stretch; gap: 1rem; margin: 1.5rem 0; }
+.course-home :is(.home-start, .home-repository) { display: inline-flex; align-items: center; justify-content: center; gap: .6rem; min-height: 48px; padding: .7rem 1.25rem; margin: 0; border: 1px solid var(--accent); border-radius: .4rem; text-decoration: none; font-weight: 700; }
+.course-home .home-start { background: var(--accent); color: var(--page-bg); }
+.course-home .home-repository { color: var(--accent); background: var(--surface); }
+.course-home .home-repository:is(:hover, :focus-visible) { color: var(--ink); background: var(--accent-soft); }
+@media (max-width: 575px) {
+  .course-home .home-actions { flex-direction: column; }
+  .course-home :is(.home-start, .home-repository) { font-size: .9rem; padding-inline: .8rem; }
+}
 .course-home .home-start:is(:hover, :focus-visible) { background: var(--ink); color: var(--page-bg); }
 .course-home .home-banner { display: block; width: 100%; height: auto; border-radius: .5rem; margin-top: .5rem; }
 .course-home main.content section.level2 { margin-top: clamp(2.5rem, 5vw, 4rem); padding-top: 1.5rem; }
