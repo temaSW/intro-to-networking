@@ -1,31 +1,10 @@
 <figure class="course-demo node-path">
-  <ol class="node-path-stages">
-    <li class="node-path-endpoint">
-      <strong>Смартфон</strong>
-      <svg viewBox="0 0 120 80" role="img" aria-label="Передатчик смартфона"><rect x="40" y="5" width="40" height="70" rx="6"/><path d="M48 17 H72 V60 H48 Z M57 68 H63"/></svg>
-      <span class="node-data">Д</span><span>Данные подготовлены к радиопередаче</span>
-    </li>
-    <li class="node-path-link">
-      <strong>Радиоканал</strong>
-      <svg viewBox="0 0 120 80" role="img" aria-label="Радиосигнал первого участка"><path class="node-wave" d="M5 40 Q12 8 20 40 T35 40 T50 40 T65 40 T80 40 T95 40 T110 40"/><path d="M5 67 H111 l-8 -5 m8 5 -8 5"/></svg>
-      <span>Физический сигнал первого участка</span>
-    </li>
-    <li class="node-path-boundary">
-      <strong>Базовая станция</strong>
-      <svg viewBox="0 0 120 80" role="img" aria-label="Приёмная и передающая функции узла"><path d="M20 25 V68 M9 68 L20 36 L31 68 M9 13 Q20 3 31 13 M4 5 Q20 -5 36 5 M20 25 H57"/><rect x="57" y="18" width="51" height="50" rx="4"/><path d="M66 30 H98 M66 43 H98 M66 56 H98"/></svg>
-      <span class="node-data">Д</span><span>Конец радиоучастка · обработка данных · выходной интерфейс</span>
-    </li>
-    <li class="node-path-link">
-      <strong>Оптоволокно</strong>
-      <svg viewBox="0 0 120 80" role="img" aria-label="Новый оптический сигнал второго участка"><path class="node-wave" d="M5 52 H15 V22 H30 V52 H45 V22 H60 V52 H85 V22 H100 V52 H115"/><path d="M5 67 H111 l-8 -5 m8 5 -8 5"/></svg>
-      <span>Новая физическая передача на следующем участке</span>
-    </li>
-    <li class="node-path-endpoint">
-      <strong>Другой сетевой узел</strong>
-      <svg viewBox="0 0 120 80" role="img" aria-label="Приёмник следующего узла"><rect x="25" y="15" width="70" height="50" rx="4"/><path d="M37 28 H83 M37 40 H83 M37 52 H83"/></svg>
-      <span class="node-data">Д</span><span>Приём по правилам второго участка</span>
-    </li>
-  </ol>
-  <div class="node-path-onward">Далее — оставшийся путь через сеть → удалённый сервер</div>
-  <figcaption>Метка Д прослеживает одно пользовательское содержимое. Кривые условно обозначают разные физические сигналы; их форма и масштаб не воспроизводят конкретные интерфейсы.</figcaption>
+<ol class="node-path-stages">
+<li><strong>Смартфон С</strong><span>Отправляет данные серверу Д</span></li>
+<li class="node-path-link"><strong>Участок С → У</strong><span>Кадр принят узлом У</span></li>
+<li class="node-path-boundary"><strong>Узел У</strong><span>Получатель кадра · промежуточный участник сетевого пути</span></li>
+<li class="node-path-link"><strong>Продолжение через В</strong><span>Следующие участки и узлы</span></li>
+<li><strong>Сервер Д</strong><span>Адресат переносимых данных</span></li>
+</ol>
+<figcaption>Текущий канальный участок заканчивается у У. Сетевое назначение данных находится дальше по пути.</figcaption>
 </figure>
