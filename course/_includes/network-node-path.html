@@ -1,10 +1,7 @@
-<figure class="course-demo node-path">
-<ol class="node-path-stages">
-<li><strong>Смартфон С</strong><span>Отправляет данные серверу Д</span></li>
-<li class="node-path-link"><strong>Участок С → У</strong><span>Кадр принят узлом У</span></li>
-<li class="node-path-boundary"><strong>Узел У</strong><span>Получатель кадра · промежуточный участник сетевого пути</span></li>
-<li class="node-path-link"><strong>Продолжение через В</strong><span>Следующие участки и узлы</span></li>
-<li><strong>Сервер Д</strong><span>Адресат переносимых данных</span></li>
-</ol>
-<figcaption>Текущий канальный участок заканчивается у У. Сетевое назначение данных находится дальше по пути.</figcaption>
+<figure class="course-demo node-topology">
+<div class="node-topology-grid">
+<div class="node-topology-first"><strong>Уже выполненный участок</strong><div class="node-topology-neighbours"><span>Смартфон С</span><span aria-hidden="true">→</span><span>Узел У</span></div></div>
+<div class="node-topology-branches"><div><strong>Выход 1 → узел В → сервер Д</strong><span>Известное продолжение к Д</span></div><div><strong>Выход 2 → узел Г → сервер Е</strong><span>Известное продолжение к Е</span></div></div>
+</div>
+<figcaption>Данные уже дошли до У. Для получения сервером остаётся пройти соответствующее продолжение пути.</figcaption>
 </figure>

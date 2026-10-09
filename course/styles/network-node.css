@@ -1,42 +1,10 @@
 /* Reusable frame/packet, path and onward-resource diagrams. */
-.node-path-stages {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: var(--demo-gap);
-  padding: 0;
-  margin: 0;
-  list-style: none;
-}
-.node-path-stages > li {
-  display: flex;
-  flex-direction: column;
-  gap: .6rem;
-  padding: .8rem;
-  border: 1px solid var(--line);
-  border-radius: .4rem;
-  background: var(--surface);
-  text-align: center;
-}
-.node-path-stages > li > span { color: var(--muted); font-size: .9rem; line-height: 1.45; }
-.node-path-stages > li.node-path-boundary { border-color: var(--accent); background: var(--accent-soft); }
-.node-path-stages > li.node-path-link { background: var(--surface-alt); }
-.node-data { display: block; padding: .4rem; border: 1px solid var(--accent); border-radius: .3rem; background: var(--accent-soft); color: var(--ink); }
-:is(.node-path, .node-decision, .node-packet-anatomy, .node-representation, .node-aggregation) figcaption {
+:is(.node-representation, .node-aggregation) figcaption {
   margin-top: 1rem;
   color: var(--muted);
   font-size: .9rem;
   line-height: 1.45;
 }
-main.content .node-decision { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .7fr) minmax(0, 1.3fr); gap: var(--demo-gap); align-items: center; }
-.node-decision > figcaption { grid-column: 1 / -1; }
-.node-decision-input, .node-decision-centre, .node-decision-outputs > div {
-  display: grid; gap: .6rem; padding: .8rem; border: 1px solid var(--line); border-radius: .4rem; background: var(--surface); text-align: center;
-}
-.node-decision-centre { border-color: var(--accent); background: var(--accent-soft); }
-.node-decision-input, .node-decision-centre { position: relative; }
-.node-decision-input::after, .node-decision-centre::after { content: "→"; position: absolute; left: calc(100% + .1rem); top: 45%; color: var(--accent); }
-.node-decision-outputs { display: grid; gap: var(--demo-gap); }
-.node-decision-outputs > div > span { color: var(--muted); }
 .node-packet { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); border: 2px solid var(--accent); border-radius: .3rem; overflow: hidden; }
 .node-network-header, .node-payload { display: flex; flex-direction: column; gap: .25rem; padding: .7rem; }
 .node-network-header { background: var(--accent-soft); border-right: 1px solid var(--accent); }
@@ -53,13 +21,52 @@ main.content .node-representation { display: grid; gap: 1rem; }
 .node-aggregation-output > span { color: var(--muted); }
 .node-aggregation-arrows { width: 100%; height: auto; fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
 @media (max-width: 760px) {
-  .node-path-stages, main.content .node-decision, .node-representation-row, .node-aggregation-flow { grid-template-columns: minmax(0, 1fr); }
-  .node-decision-input::after, .node-decision-centre::after { content: "↓"; top: 100%; left: 50%; transform: translateX(-50%); line-height: var(--demo-gap); }
-  .node-decision > figcaption { grid-column: auto; }
+  .node-representation-row, .node-aggregation-flow { grid-template-columns: minmax(0, 1fr); }
   .node-representation-row > .node-packet { margin-inline: 0; }
   .node-aggregation-arrows { width: 3rem; height: 3rem; justify-self: center; transform: rotate(90deg); }
 }
 @media (max-width: 575px) {
   .node-packet { grid-template-columns: minmax(0, 1fr); }
   .node-network-header { border-right: 0; border-bottom: 1px solid var(--accent); }
+}
+
+/* The first completed link and explicitly supplied directions. */
+.node-topology-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: var(--demo-gap); align-items: center; }
+.node-topology-first { padding: 1rem; border: 1px solid var(--accent); border-radius: .4rem; background: var(--accent-soft); text-align: center; }
+.node-topology-neighbours { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: .8rem; margin-top: .8rem; }
+.node-topology-branches { display: grid; gap: .8rem; }
+.node-topology-branches > div { display: grid; gap: .3rem; padding: .8rem; border: 1px solid var(--line); border-radius: .4rem; background: var(--surface); }
+.node-topology-branches span { color: var(--muted); }
+.node-topology figcaption { margin-top: 1rem; color: var(--muted); font-size: .9rem; }
+
+/* Scoped, independent step-by-step demonstrations. */
+.node-demo-controls, .node-demo-navigation { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1rem; margin-bottom: 1rem; }
+.node-demo-controls label { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+.node-demo :is(button,select) { min-height: 44px; padding: .45rem .7rem; border: 1px solid var(--accent); border-radius: .3rem; background: var(--surface); color: var(--ink); font: inherit; }
+.node-demo button { cursor: pointer; }
+.node-demo button:disabled { color: var(--muted); border-color: var(--line); cursor: default; }
+.node-demo :is(button,select):focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+.node-demo-status { color: var(--muted); }
+.node-demo-view { display: grid; gap: 1rem; }
+main.content .node-demo p { text-align: start; }
+main.content .node-demo-step-title { margin: 0; font-weight: 700; text-align: start; }
+main.content .node-demo-question { margin: 0; padding: .6rem .8rem; border-left: 3px solid var(--accent); background: var(--accent-soft); }
+.node-demo-raw { display: grid; gap: .6rem; padding: 1rem; border: 1px solid var(--line); border-radius: .3rem; background: var(--surface-alt); text-align: center; }
+.node-demo-raw > span { font-size: 1.3rem; }
+.node-demo-directions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--demo-gap); margin-top: 1rem; }
+.node-demo-direction { display: grid; gap: .4rem; padding: .8rem; border: 1px solid var(--line); border-radius: .4rem; background: var(--surface); }
+.node-demo-direction.is-chosen { border: 2px solid var(--accent); background: var(--accent-soft); }
+.node-demo-choice { font-weight: 700; }
+.node-demo-result { padding: .8rem; margin-block: 1rem; border: 2px solid var(--accent); border-radius: .4rem; background: var(--accent-soft); }
+.node-demo-comparison { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--demo-gap); }
+.node-demo-comparison > div { display: grid; gap: .6rem; }
+main.content .node-demo-onward { margin-top: 1rem; text-align: start; }
+@media (max-width: 760px) {
+  .node-topology-grid, .node-demo-comparison, .node-demo-directions { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 575px) {
+  .node-demo-controls :is(label,select) { width: 100%; }
+  .node-demo-navigation { justify-content: space-between; }
+  .node-demo-status { order: -1; width: 100%; }
+  .node-demo-navigation button { flex: 1 1 100%; }
 }
