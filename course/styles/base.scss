@@ -469,8 +469,8 @@ main .zoomable-image { cursor: zoom-in; }
 .interactive-metrics p { margin: .25rem 0 .65rem; }
 .interactive-note { color: var(--muted); font-size: .9rem; }
 .spectrum-plot svg { display: block; width: 100%; height: auto; border: 1px solid var(--line); background: var(--surface); }
-:is(.lecture-interactive, .lecture-lightbox, .channel-playground, .multipath-scheme) { --signal-ideal: #3569b7; --signal-received: #b35b16; --signal-error: #a52e28; --curve-qpsk: var(--accent); --curve-qpsk-high: #3569b7; --curve-qam16: #b35b16; --curve-qam16-high: #718329; --curve-qam64: #8e5cb1; }
-.quarto-dark :is(.lecture-interactive, .lecture-lightbox, .channel-playground, .multipath-scheme) { --signal-ideal: #83a9f2; --signal-received: #f5aa60; --signal-error: #ff9a8c; --curve-qpsk-high: #83a9f2; --curve-qam16: #f5aa60; --curve-qam16-high: #b8cc68; --curve-qam64: #ba93df; }
+:is(.lecture-interactive, .lecture-lightbox, .channel-playground, .multipath-scheme, .ta-demo) { --signal-ideal: #3569b7; --signal-received: #b35b16; --signal-error: #a52e28; --curve-qpsk: var(--accent); --curve-qpsk-high: #3569b7; --curve-qam16: #b35b16; --curve-qam16-high: #718329; --curve-qam64: #8e5cb1; }
+.quarto-dark :is(.lecture-interactive, .lecture-lightbox, .channel-playground, .multipath-scheme, .ta-demo) { --signal-ideal: #83a9f2; --signal-received: #f5aa60; --signal-error: #ff9a8c; --curve-qpsk-high: #83a9f2; --curve-qam16: #f5aa60; --curve-qam16-high: #b8cc68; --curve-qam64: #ba93df; }
 .interactive-controls input { accent-color: var(--accent); }
 .lecture-interactive :is(.spectrum-plot, .ber-plot) { max-width: 100%; overflow-x: auto; border-radius: .35rem; }
 .spectrum-summary { padding: .6rem .2rem; font-weight: 600; }
