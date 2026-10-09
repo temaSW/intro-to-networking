@@ -44,46 +44,116 @@ export function timing({ppm = 100, elapsed = 2500, tracking = false} = {}) {
   const points = Array.from({length:12}, (_, i) => { const k = elapsed+i; return {k, t:tracking ? k+.5 : (k+.5)/ratio}; });
   return {points, drift:offset(elapsed), ratio, curve:Array.from({length:101}, (_,i)=>[i*100,offset(i*100)])};
 }
-export function frequency({hz = 10, ms = 40, compensate = false, estimateError = 0} = {}) {
-  // Two known references 2 ms apart: phase difference is unambiguous in the ±50 Hz range.
-  const phase = Math.atan2(Math.sin(2*Math.PI*hz*.002),Math.cos(2*Math.PI*hz*.002));
-  const estimate = phase / (2*Math.PI*.002) + estimateError;
-  const residual = hz - (compensate ? estimate : 0);
-  const angle = 2*Math.PI*residual*ms/1000;
-  const reference = [[1,1],[-1,1],[-1,-1],[1,-1]].map(([x,y])=>[x/Math.sqrt(2),y/Math.sqrt(2)]);
-  const received = reference.map(([x,y])=>[x*Math.cos(angle)-y*Math.sin(angle),x*Math.sin(angle)+y*Math.cos(angle)]);
-  return {reference,received,estimate,residual,angle,phaseCurve:Array.from({length:101},(_,i)=>[i,360*residual*i/1000])};
-}
-function classify(choices, count) {
-  const bins = Array.from({length:count},()=>[]);
-  choices.forEach(([id, option])=>bins[option].push(id));
-  return {bins, successes:bins.filter(b=>b.length===1).flat(), collided:bins.filter(b=>b.length>1).flat(), conflicts:bins.filter(b=>b.length>1).length};
-}
-export function access({n = 24, m = 16, windows = 4, seed = 1} = {}) {
-  const rng = random(seed);
-  const first = classify(Array.from({length:n},(_,id)=>[id,Math.floor(rng()*m)]),m);
-  // Failed devices independently select a future window AND an option inside it.
-  const retry = classify(first.collided.map(id=>[id,Math.floor(rng()*windows)*m+Math.floor(rng()*m)]),m*windows);
-  const probability = (1-1/m)**(n-1);
-  return {first,retry,probability,expected:n*probability,successes:first.successes.length+retry.successes.length};
-}
-export function pilots({spacing = 8, period = 40, seed = 11} = {}) {
-  const rng = random(seed), levels = [-1,-1/3,1/3,1];
-  const channel = Array.from({length:97},(_,t)=>1+.4*Math.sin(2*Math.PI*t/period)+.15*Math.cos(2*Math.PI*t/(period*1.7)));
-  const positions = Array.from({length:Math.floor(96/spacing)+1},(_,i)=>i*spacing);
-  const mask = new Set(positions);
-  const transmitted = channel.map((_,t)=>mask.has(t) ? 1 : levels[Math.floor(rng()*4)]);
-  const received = channel.map((h,t)=>h*transmitted[t]+.03*(rng()*2-1));
-  const estimates = channel.map((_,t)=>{
-    const left = Math.min(Math.floor(t/spacing),positions.length-1), right = Math.min(left+1,positions.length-1);
-    if (left===right) return received[positions[left]];
-    const fraction = (t-positions[left])/(positions[right]-positions[left]);
-    return received[positions[left]]*(1-fraction)+received[positions[right]]*fraction;
+// Complex values are [I,Q]; these helpers operate on samples, not display state.
+const add=(a,b)=>[a[0]+b[0],a[1]+b[1]];
+const mul=(a,b)=>[a[0]*b[0]-a[1]*b[1],a[0]*b[1]+a[1]*b[0]];
+const conj=a=>[a[0],-a[1]];
+export const magnitude=a=>Math.hypot(...a);
+const rotation=angle=>[Math.cos(angle),Math.sin(angle)];
+const divide=(a,b)=>{const e=Math.max(1e-12,b[0]**2+b[1]**2);return mul(a,conj(b)).map(v=>v/e);};
+const gaussian=rng=>Math.sqrt(-2*Math.log(Math.max(rng(),1e-12)))*Math.cos(2*Math.PI*rng());
+const qpsk=[[1,1],[-1,1],[-1,-1],[1,-1]].map(p=>p.map(v=>v/Math.sqrt(2)));
+const nearest=(p,list)=>list.reduce((best,v,i)=>magnitude([p[0]-v[0],p[1]-v[1]])<magnitude([p[0]-list[best][0],p[1]-list[best][1]])?i:best,0);
+const evm=(received,transmitted,indices)=>Math.sqrt(indices.reduce((sum,i)=>sum+(received[i][0]-transmitted[i][0])**2+(received[i][1]-transmitted[i][1])**2,0)/Math.max(1,indices.length));
+export function frequency({hz=35,snr=Infinity,length=32,seed=13}={}) {
+  const dt=.001,rng=random(seed),sigma=Number.isFinite(snr)?Math.sqrt(10**(-snr/10)/2):0;
+  const known=Array.from({length},(_,i)=>qpsk[(i*3+Math.floor(i/3))%4]);
+  const receive=(p,t)=>add(mul(p,rotation(2*Math.PI*hz*t)),[sigma*gaussian(rng),sigma*gaussian(rng)]);
+  const referenceReceived=known.map((p,i)=>receive(p,i*dt));
+  const stripped=referenceReceived.map((p,i)=>mul(p,conj(known[i])));
+  const correlation=stripped.slice(1).reduce((sum,p,i)=>add(sum,mul(p,conj(stripped[i]))),[0,0]);
+  const estimate=Math.atan2(correlation[1],correlation[0])/(2*Math.PI*dt);
+  const transmitted=Array.from({length:48},(_,i)=>qpsk[(i*7+Math.floor(i/5))%4]);
+  const times=transmitted.map((_,i)=>(length+i)*dt);
+  const received=transmitted.map((p,i)=>receive(p,times[i]));
+  const corrected=received.map((p,i)=>mul(p,rotation(-2*Math.PI*estimate*times[i])));
+  let last=0,unwrapped=0;
+  const phase=stripped.map((p,i)=>{
+    const angle=Math.atan2(p[1],p[0]);
+    if(i===0)unwrapped=angle;else unwrapped+=Math.atan2(Math.sin(angle-last),Math.cos(angle-last));
+    last=angle;return [i*dt*1000,unwrapped*180/Math.PI];
   });
-  const recovered = received.map((y,t)=>y/estimates[t]);
-  const data = channel.map((_,t)=>t).filter(t=>!mask.has(t));
-  const decide = v=>levels.reduce((a,b)=>Math.abs(v-b)<Math.abs(v-a)?b:a);
-  const errors = values=>data.filter(t=>decide(values[t])!==transmitted[t]).length;
-  return {channel,positions,transmitted,received,estimates,recovered,data,overhead:positions.length/97,
-    rmse:Math.sqrt(channel.reduce((a,h,t)=>a+(h-estimates[t])**2,0)/97),rawErrors:errors(received),errors:errors(recovered)};
+  const indices=transmitted.map((_,i)=>i);
+  const errors=values=>indices.filter(i=>nearest(values[i],qpsk)!==nearest(transmitted[i],qpsk)).length;
+  return {dt,known,referenceReceived,reference:qpsk,transmitted,received,corrected,phase,estimate,residual:hz-estimate,
+    estimatedPhase:phase.map(([t])=>[t,360*estimate*t/1000]),rawEvm:evm(received,transmitted,indices),evm:evm(corrected,transmitted,indices),rawErrors:errors(received),errors:errors(corrected)};
+}
+function classify(choices,count) {
+  const bins=Array.from({length:count},()=>[]);
+  choices.forEach(([id,option])=>bins[option].push(id));
+  return {bins,successes:bins.filter(b=>b.length===1).flat(),collided:bins.filter(b=>b.length>1).flat(),conflicts:bins.filter(b=>b.length>1).length};
+}
+export function access({n=8,m=6,seed=1}={}) {
+  const rng=random(seed),choices=Array.from({length:n},(_,id)=>[id,Math.floor(rng()*m)]);
+  const first=classify(choices,m),probability=(1-1/m)**(n-1);
+  return {choices,first,probability,expected:n*probability,empty:first.bins.filter(b=>!b.length).length,share:first.successes.length/n};
+}
+export function allocation({demands=[4,8,12],rows=4,columns=8,reserved=2}={}) {
+  const total=rows*columns,capacity=total-reserved,granted=demands.map(()=>0);
+  let remaining=capacity;
+  // One element per nonempty request each round: a transparent teaching rule, not an optimized scheduler.
+  while(remaining>0) {
+    let changed=false;
+    demands.forEach((request,i)=>{if(remaining>0&&granted[i]<request){granted[i]++;remaining--;changed=true;}});
+    if(!changed)break;
+  }
+  const cells=Array(reserved).fill(-2);
+  granted.forEach((count,i)=>cells.push(...Array(count).fill(i)));
+  while(cells.length<total)cells.push(-1);
+  const assignments=demands.map((_,id)=>cells.flatMap((v,index)=>v===id?[{time:index%columns+1,frequency:Math.floor(index/columns)+1}]:[]));
+  return {total,capacity,reserved,cells,granted,assignments,unmet:demands.map((v,i)=>v-granted[i]),unused:remaining};
+}
+export function constellation(mode='QPSK') {
+  const count=mode==='BPSK'?2:mode==='QPSK'?4:16,bitsPerSymbol=Math.log2(count);
+  const levels=[-3,-1,3,1];
+  return Array.from({length:count},(_,n)=>({bits:n.toString(2).padStart(bitsPerSymbol,'0'),point:mode==='BPSK'?[n?1:-1,0]:mode==='QPSK'?[(n&2)?1/Math.sqrt(2):-1/Math.sqrt(2),(n&1)?1/Math.sqrt(2):-1/Math.sqrt(2)]:[levels[n>>2]/Math.sqrt(10),levels[n&3]/Math.sqrt(10)]}));
+}
+export function modulate(bits,mode) {
+  const alphabet=constellation(mode),width=alphabet[0].bits.length;
+  return Array.from({length:Math.ceil(bits.length/width)},(_,i)=>alphabet[parseInt(bits.slice(i*width,(i+1)*width).padEnd(width,'0'),2)].point);
+}
+export function demodulate(symbols,mode) {
+  const alphabet=constellation(mode),locations=alphabet.map(a=>a.point);
+  return symbols.map(p=>alphabet[nearest(p,locations)].bits).join('');
+}
+export function bootstrapFrame(mode='QPSK') {
+  const modes=['BPSK','QPSK','16-QAM'],message='ACCESS=4;DATA=OK';
+  const payloadBits=Array.from(message,c=>c.charCodeAt(0).toString(2).padStart(8,'0')).join('');
+  const payload=modulate(payloadBits,mode);
+  const headerBits=modes.indexOf(mode).toString(2).padStart(2,'0')+payload.length.toString(2).padStart(8,'0');
+  return {mode,message,payloadBits,payload,headerBits,header:modulate(headerBits,'BPSK'),syncLength:15,totalSymbols:15+10+payload.length};
+}
+export function readBootstrap(header) {
+  const bits=demodulate(header,'BPSK');
+  return {mode:['BPSK','QPSK','16-QAM'][parseInt(bits.slice(0,2),2)],symbols:parseInt(bits.slice(2),2)};
+}
+export function decodePayload(payload,mode) {
+  const bits=demodulate(payload,mode);
+  const text=Array.from({length:Math.floor(bits.length/8)},(_,i)=>{
+    const n=parseInt(bits.slice(i*8,i*8+8),2);return n>=32&&n<=126?String.fromCharCode(n):'·';
+  }).join('');
+  return {bits,text};
+}
+export function pilots({spacing=8,center=24,depth=.8,width=5,snr=Infinity,seed=11}={}) {
+  const count=64,rng=random(seed),sigma=Number.isFinite(snr)?Math.sqrt(10**(-snr/10)/2):0;
+  const positions=Array.from({length:Math.floor(63/spacing)+1},(_,i)=>i*spacing);
+  if(positions.at(-1)!==63)positions.push(63);
+  const mask=new Set(positions),data=Array.from({length:count},(_,i)=>i).filter(k=>!mask.has(k));
+  const channel=Array.from({length:count},(_,k)=>{
+    const amplitude=1-depth*Math.exp(-(((k-center)/width)**2)),phase=1.2*Math.sin(k/11)+.55*k/63;
+    return rotation(phase).map(v=>v*amplitude);
+  });
+  const dataSymbols=channel.map(()=>qpsk[Math.floor(rng()*4)]);
+  const transmitted=dataSymbols.map((p,k)=>mask.has(k)?[1,0]:p);
+  const received=channel.map((h,k)=>add(mul(h,transmitted[k]),[sigma*gaussian(rng),sigma*gaussian(rng)]));
+  const observations=positions.map(k=>divide(received[k],transmitted[k]));
+  const estimates=channel.map((_,k)=>{
+    let right=positions.findIndex(p=>p>=k);if(right===0)return observations[0].slice();
+    const left=right-1,fraction=(k-positions[left])/(positions[right]-positions[left]);
+    return observations[left].map((v,j)=>v*(1-fraction)+observations[right][j]*fraction);
+  });
+  const recovered=received.map((y,k)=>divide(y,estimates[k]));
+  const errors=values=>data.filter(k=>nearest(values[k],qpsk)!==nearest(transmitted[k],qpsk)).length;
+  return {channel,positions,observations,transmitted,received,estimates,recovered,data,reference:qpsk,overhead:positions.length/count,
+    rmse:evm(estimates,channel,Array.from({length:count},(_,i)=>i)),rawEvm:evm(received,transmitted,data),evm:evm(recovered,transmitted,data),rawErrors:errors(received),errors:errors(recovered)};
 }

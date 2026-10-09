@@ -11,6 +11,7 @@ function plot(title,series,{xmin=0,xmax=100,ymin=-1.5,ymax=1.5,xlabel='',ylabel=
   }).join('');
   const paths=series.map((s,i)=>{
     const color=s.color||colors[i%4];
+    if(s.stems)return s.points.map(([a,c])=>`<path stroke="${color}" stroke-width="2" d="M${x(a)} ${y(0)}V${y(c)}"/><circle cx="${x(a)}" cy="${y(c)}" r="2.5" fill="${color}"/>`).join('');
     return s.dots?s.points.map(([a,c])=>`<circle ${s.id?`data-series="${s.id}"`:""} cx="${x(a)}" cy="${y(c)}" r="${s.radius||4}" fill="${color}"/>`).join(''):
       `<path ${s.id?`data-series="${s.id}"`:""} fill="none" stroke="${color}" stroke-width="2.5" ${s.dash?'stroke-dasharray="6 4"':''} d="${s.points.map(([a,c],j)=>`${j?'L':'M'}${x(a)},${y(c)}`).join(' ')}"/>`;
   }).join('');
@@ -24,65 +25,82 @@ const range=(key,label,min,max,step,value,unit='')=>{
   const id=`ta-control-${++controlId}`;
   return `<label for="${id}">${label} <output for="${id}" data-output="${key}">${value} ${unit}</output><input id="${id}" aria-label="${label}" type="range" data-key="${key}" min="${min}" max="${max}" step="${step}" value="${value}" data-unit="${unit}"></label>`;
 };
-const checkbox=(key,label)=>`<label class="ta-check"><input type="checkbox" data-key="${key}"> ${label}</label>`;
+const select=(key,label,options,value)=>{
+  const id=`ta-control-${++controlId}`;
+  return `<label for="${id}">${label}<select id="${id}" data-key="${key}">${options.map(v=>`<option ${v===value?'selected':''}>${v}</option>`).join('')}</select></label>`;
+};
+const escape=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const device=id=>String.fromCharCode(65+id);
 function mount(root) {
   const kind=root.dataset.agreement;
-  let seed=1;
+  let seed=1,attempted=false,headerRead=false;
   const configurations={
-    timing:`${range('ppm','Ошибка частоты приёмника',-500,500,10,100,'ppm')}${range('elapsed','Символов после начальной настройки',0,10000,100,2500)}${checkbox('tracking','Компенсация измеренной ошибки такта')}`,
-    frequency:`${range('hz','Ошибка несущей',-50,50,1,10,'Гц')}${range('ms','Время после начальной настройки фазы',0,100,1,40,'мс')}${checkbox('compensate','Компенсация по оценке')}${range('estimateError','Ошибка оценки частоты',-5,5,.1,0,'Гц')}`,
-    access:`${range('n','Число устройств N',1,160,1,24)}${range('m','Вариантов обращения M',2,32,1,16)}${range('windows','Окон случайной задержки при повторе',1,8,1,4)}<button type="button" data-attempt>Другая попытка</button>`,
-    pilots:`${range('spacing','Расстояние между пилотами',2,24,1,8,'символов')}${range('period','Период изменения канала',8,80,1,40,'символов')}`,
+    frequency:`${range('hz','Реальное рассогласование Δf',-80,80,1,35,'Гц')}${range('snr','ОСШ',0,40,1,40,'дБ')}${range('length','Длина известного фрагмента',8,64,8,32,'символа')}`,
+    bootstrap:`${select('mode','Модуляция продолжения',['BPSK','QPSK','16-QAM'],'QPSK')}${select('guess','Предположение приёмника без заголовка',['BPSK','QPSK','16-QAM'],'BPSK')}<button type="button" data-guess>Прочитать без начального описания</button><button type="button" data-bootstrap>Прочитать начальное описание</button>`,
+    access:`${range('n','Число устройств N',1,16,1,8)}${range('m','Вариантов обращения M',2,12,1,6)}<button type="button" data-attempt>Новая попытка</button>`,
+    allocation:`${range('users','Число пользователей',2,4,1,3)}${range('rows','Частотных частей ресурса',2,6,1,4)}${[4,8,12,6].map((v,i)=>range('demand'+i,'Запрос '+device(i),0,24,1,v,'элементов')).join('')}`,
+    pilots:`${range('center','Положение провала',8,55,1,24,'поднесущая')}${range('depth','Глубина провала',0,.95,.05,.8)}${range('spacing','Шаг пилотов',2,16,1,8,'поднесущих')}${range('snr','ОСШ',0,40,1,40,'дБ')}`,
   };
-  if(!configurations[kind]) return;
+  if(!configurations[kind])return;
   root.innerHTML=`<div class="ta-controls">${configurations[kind]}</div><div class="ta-result"></div>`;
   const target=root.querySelector('.ta-result');
   function draw() {
     const chartWidth=Math.max(320,Math.min(760,target.clientWidth||760));
     const pairWidth=window.matchMedia('(max-width:600px)').matches?chartWidth:Math.max(320,chartWidth/2);
-    const chart=(title,series,options={})=>plot(title,series,{width:kind==='frequency'?pairWidth:chartWidth,...options});
+    const chart=(title,series,options={})=>plot(title,series,{width:options.full?chartWidth:pairWidth,...options});
     const params={seed};
     root.querySelectorAll('[data-key]').forEach(el=>{
-      params[el.dataset.key]=el.type==='checkbox'?el.checked:el.tagName==='SELECT'?el.value:Number(el.value);
+      params[el.dataset.key]=el.tagName==='SELECT'?el.value:Number(el.value);
       const output=root.querySelector(`[data-output="${el.dataset.key}"]`);
-      if(output) output.textContent=`${fmt(Number(el.value))} ${el.dataset.unit||''}`;
+      if(output)output.textContent=el.dataset.key==='snr'&&el.value==='40'?'Без шума':`${fmt(Number(el.value))} ${el.dataset.unit||''}`;
     });
+    if(params.snr===40)params.snr=Infinity;
     let content='',stats='';
-    if(kind==='timing') {
-      const d=model.timing(params),base=params.elapsed;
-      const waveform=Array.from({length:1201},(_,i)=>{const t=base+i/100;return [t-base,Math.tanh(8*Math.sin(Math.PI*(t-base)))];});
-      const samples=d.points.map(({t})=>[t-base,Math.tanh(8*Math.sin(Math.PI*(t-base)))]);
-      stats=metric('Относительная ошибка',`${fmt(params.ppm/10000,3)} %`)+metric('Накопленная ошибка без коррекции',`${fmt(d.drift,3)} T`)+metric('После компенсации',params.tracking?'0 T (идеальная оценка)':'Компенсация выключена');
-      content=chart('Импульсы передатчика и моменты отсчёта',[{name:'Чередующиеся символы',points:waveform},{name:'Отсчёты приёмника',points:samples,dots:true}],{xmax:12,xlabel:'Время от начала показанного участка, T'})+
-        chart('Накопление ошибки момента отсчёта',[{name:'Без коррекции',points:d.curve},{name:'С компенсацией',points:d.curve.map(([x])=>[x,0]),dash:true}],{xmax:10000,ymin:-5.1,ymax:5.1,xlabel:'Символов после настройки',ylabel:'Ошибка / T',marks:[{at:base}]});
-    }
+    const constellationChart=(title,cloud,reference=model.constellation('QPSK').map(a=>a.point))=>{
+      const limit=Math.max(1.5,...cloud.map(p=>Math.max(...p.map(Math.abs))))*1.05;
+      return chart(title,[{name:'Исходное созвездие · для проверки',points:reference,dots:true,radius:7,color:colors[0]},{name:'Полученные символы',points:cloud,dots:true,radius:3,color:colors[1]}],{xmin:-limit,xmax:limit,ymin:-limit,ymax:limit,xlabel:'I',ylabel:'Q',square:true});
+    };
     if(kind==='frequency') {
       const d=model.frequency(params);
-      stats=metric('Оценённое смещение',`${fmt(d.estimate)} Гц`)+metric('Остаточное смещение',`${fmt(d.residual)} Гц`)+metric('Накопленная фаза',`${fmt(d.angle*180/Math.PI)}°`);
-      content=`<div class="ta-pair">${chart('Созвездие в выбранный момент',[{name:'Переданные точки',points:d.reference,dots:true,radius:7},{name:'Принятые точки',points:d.received,dots:true}],{xmin:-1.5,xmax:1.5,ymin:-1.5,ymax:1.5,xlabel:'I',ylabel:'Q',square:true})}${chart('Изменение фазы во времени',[{name:'Фаза после выбранной коррекции',points:d.phaseCurve}],{xmax:100,ymin:-1800,ymax:1800,xlabel:'Время, мс',ylabel:'Фаза, °',marks:[{at:params.ms}]})}</div>`;
+      stats=metric('Оценка по опоре Δf̂',`${fmt(d.estimate,2)} Гц`)+metric('Остаточная ошибка · для проверки',`${fmt(d.residual,2)} Гц`)+metric('Ошибки до → после',`${d.rawErrors} → ${d.errors} из 48`);
+      const phaseLimit=Math.max(30,...d.phase.map(p=>Math.abs(p[1])),...d.estimatedPhase.map(p=>Math.abs(p[1])))*1.1;
+      content=`<div class="ta-pair">${chart('1. Известный опорный фрагмент',[{name:'Передали · I известной опоры',points:d.known.map((p,i)=>[i,p[0]]),stems:true},{name:'Приняли · I опоры',points:d.referenceReceived.map((p,i)=>[i,p[0]]),dots:true}],{xmax:params.length-1,ymin:-2,ymax:2,xlabel:'Символ опорного фрагмента',ylabel:'I'})}${chart('2. Убираем известные символы → измеряем поворот',[{name:'Измеренная фаза r·s*',points:d.phase,dots:true,radius:3},{name:'Поворот по оценке Δf̂',points:d.estimatedPhase,dash:true}],{xmax:(params.length-1),ymin:-phaseLimit,ymax:phaseLimit,xlabel:'Время опоры, мс',ylabel:'Фаза, °'})}</div><div class="ta-pair">${constellationChart('3. Данные до компенсации',d.received,d.reference)}${constellationChart('4. Те же данные после компенсации',d.corrected,d.reference)}</div><p>Расстояние до переданных точек, СКЗ: ${fmt(d.rawEvm,3)} → ${fmt(d.evm,3)}. Коррекция использует оценку по опоре, а не значение слайдера Δf.</p>`;
+    }
+    if(kind==='bootstrap') {
+      const frame=model.bootstrapFrame(params.mode),info=headerRead?model.readBootstrap(frame.header):null;
+      const guess=attempted?model.decodePayload(frame.payload,params.guess):null;
+      const decoded=info?model.decodePayload(frame.payload.slice(0,info.symbols),info.mode):null;
+      const errorCount=bits=>Array.from({length:Math.max(bits.length,frame.payloadBits.length)},(_,i)=>bits[i]!==frame.payloadBits[i]).filter(Boolean).length;
+      const result=(title,result)=>`<div class="ta-decode"><strong>${title}</strong>${result?`<code>${escape(result.text)}</code><small>Получено ${result.bits.length} бит; несовпадений с переданным: ${errorCount(result.bits)}.</small>`:'<p>Продолжение ещё не прочитано.</p>'}</div>`;
+      content=`<div class="ta-frame" role="group" aria-label="Структура учебного кадра"><div><strong>SYNC</strong><small>15 символов<br>Известный рисунок</small></div><div><strong>Начальное описание</strong><small>10 символов BPSK<br>Фиксированное место и формат</small></div><div><strong>Системная информация / данные</strong><small>${frame.payload.length} символов<br>Выбранная модуляция</small></div></div><p>Начальное описание всегда BPSK: <code>${frame.headerBits.slice(0,2)} | ${frame.headerBits.slice(2)}</code> — 2 бита модуляции и 8 бит числа символов продолжения.</p><div class="ta-pair">${result('Без начального описания · предположение '+params.guess,guess)}${result('После чтения начального описания',decoded)}</div><p>${info?`Из реально декодированных битов заголовка: <strong>${info.mode}, ${info.symbols} символов продолжения</strong>. По этим полям настроен второй декодер.`:'Приёмник пока не знает, какой вариант выбрал передатчик. Если предположение случайно верно, биты совпадут; гарантировать это без описания нельзя.'}</p><details><summary>Посмотреть символы и биты передачи</summary>${constellationChart('Символы продолжения',frame.payload,model.constellation(frame.mode).map(a=>a.point))}<p>Передали: <code>${frame.message}</code></p><p>Первые 32 бита: <code>${frame.payloadBits.slice(0,32)}</code></p>${guess?`<p>Без описания: <code>${guess.bits.slice(0,32)}</code></p>`:''}${decoded?`<p>С описанием: <code>${decoded.bits.slice(0,32)}</code></p>`:''}</details>`;
     }
     if(kind==='access') {
       const d=model.access(params);
-      stats=metric('Успех в первом обращении',d.first.successes.length)+metric('Конфликтующих вариантов',d.first.conflicts)+metric('Устройств в конфликтах',d.first.collided.length)+metric('Вероятность успеха устройства',`${fmt(d.probability*100,1)} %`)+metric('Среднее число успехов',fmt(d.expected,1))+metric('После первого обращения и повтора',`${d.successes} из ${params.n}`);
-      const bins=list=>`<div class="ta-bins">${list.map((ids,i)=>`<div class="ta-bin ${ids.length>1?'ta-conflict':ids.length===1?'ta-success':''}"><span>${i+1}</span><strong>${ids.length}</strong><small>${ids.length>1?'конфликт':ids.length?'успех':'свободно'}</small></div>`).join('')}</div>`;
-      content=`<p><strong>Первое обращение:</strong> в каждом варианте показано число выбравших его устройств.</p>${bins(d.first.bins)}<p><strong>Повтор только неуспешных устройств:</strong> случайный выбор будущего окна и варианта внутри него.</p>${Array.from({length:params.windows},(_,i)=>`<details ${i===0?'open':''}><summary>Окно задержки ${i+1}</summary>${bins(d.retry.bins.slice(i*params.m,(i+1)*params.m))}</details>`).join('')}<p>После повтора в конфликтах осталось ${d.retry.collided.length} устройств. Им нужны следующие попытки; увеличение задержки уменьшает конкуренцию, но увеличивает ожидание.</p>`;
+      stats=metric('Успешные устройства',d.first.successes.length)+metric('Варианты с конфликтом',d.first.conflicts)+metric('Неиспользованные варианты',d.empty)+metric('Доля успешных устройств',`${fmt(d.share*100,1)} %`);
+      content=`<p><strong>Каждое устройство выбирает один вариант:</strong></p><div class="ta-device-choices" role="group" aria-label="Устройства и выбранные варианты">${d.choices.map(([id,choice])=>`<span>${device(id)} → ${choice+1} · ${d.first.bins[choice].length===1?'успех':'конфликт'}</span>`).join('')}</div><p><strong>Результат общего обращения:</strong></p><div class="ta-bins">${d.first.bins.map((ids,i)=>`<div class="ta-bin ${ids.length>1?'ta-conflict':ids.length===1?'ta-success':''}"><span>Вариант ${i+1}</span><strong>${ids.map(device).join(', ')||'—'}</strong><small>${ids.length>1?'конфликт':ids.length?'успех':'пусто'}</small></div>`).join('')}</div><p>Устройства в конфликтах: ${d.first.collided.map(device).join(', ')||'нет'}. «Новая попытка» создаёт другой независимый выбор всех N устройств для сравнения; это не автоматический повтор только неуспешных.</p>`;
+    }
+    if(kind==='allocation') {
+      for(let i=0;i<4;i++){const input=root.querySelector(`[data-key="demand${i}"]`);input.disabled=i>=params.users;input.closest('label').hidden=i>=params.users;}
+      const demands=Array.from({length:params.users},(_,i)=>params['demand'+i]),d=model.allocation({demands,rows:params.rows});
+      stats=metric('Всего элементов',d.total)+metric('Служебный обмен',d.reserved)+metric('Выделено данным',d.granted.reduce((a,v)=>a+v,0))+metric('Осталось в очередях',d.unmet.reduce((a,v)=>a+v,0));
+      const cells=d.cells.map((v,i)=>`<span class="ta-resource-cell ${v>=0?'ta-user-'+v:v===-2?'ta-reserved':''}" aria-label="Время ${i%8+1}, частота ${Math.floor(i/8)+1}: ${v>=0?device(v):v===-2?'служебный обмен':'свободно'}">${v>=0?device(v):v===-2?'Сл':'·'}</span>`);
+      const rows=Array.from({length:params.rows},(_,r)=>`<strong>f${r+1}</strong>${cells.slice(r*8,(r+1)*8).join('')}`).join('');
+      content=`<div class="ta-allocation-view"><div><strong>Потребности → назначения</strong>${demands.map((v,i)=>`<p><strong>${device(i)}</strong>: запрос ${v} → выделено ${d.granted[i]}<br><small>В очереди: ${d.unmet[i]}</small></p>`).join('')}</div><div class="ta-resource-grid" role="group" aria-label="Распределение ресурса по времени и частоте"><strong>f / t</strong>${Array.from({length:8},(_,i)=>`<strong>${i+1}</strong>`).join('')}${rows}</div></div><ol class="ta-exchange"><li><strong>Запросы к системе:</strong> ${demands.map((v,i)=>`${device(i)}: ${v} элементов`).join('; ')}.</li><li><strong>Решение системы:</strong> распределить ${d.capacity} элементов данных по текущим запросам.</li><li><strong>Назначения пользователям:</strong> ${d.assignments.map((a,i)=>`${device(i)} → ${a.length?a.map(v=>`t${v.time}/f${v.frequency}`).join(', '):'нет ресурса'}`).join('; ')}.</li></ol><p>Сл — элементы для служебного обмена; · — свободные. Время идёт слева направо, частотные части — сверху вниз. Новое назначение действует в следующем кадре.</p>`;
     }
     if(kind==='pilots') {
-      const d=model.pilots(params);
-      stats=metric('Доля пилотов',`${fmt(d.overhead*100,1)} %`)+metric('Среднеквадратичная ошибка оценки',fmt(d.rmse,3))+metric('Ошибки данных без коррекции',`${d.rawErrors} / ${d.data.length}`)+metric('Ошибки после коррекции',`${d.errors} / ${d.data.length}`);
-      content=chart('Истинное воздействие канала и оценка по пилотам',[{name:'Истинное усиление h(t)',points:points(d.channel)},{name:'Оценка между пилотами',points:points(d.estimates)},{name:'Наблюдения пилотов',points:d.positions.map(t=>[t,d.received[t]]),dots:true,color:colors[2]}],{xmax:96,ymin:.3,ymax:1.7,xlabel:'Номер символа',ylabel:'Усиление'})+
-        chart('Неизвестные данные: переданные и восстановленные уровни',[{name:'Переданные уровни (для проверки)',points:d.data.map(t=>[t,d.transmitted[t]]),dots:true,radius:5},{name:'После деления на оценку канала',points:d.data.map(t=>[t,d.recovered[t]]),dots:true,radius:3}],{xmax:96,ymin:-2.5,ymax:2.5,xlabel:'Номер символа',ylabel:'Амплитуда'});
+      const d=model.pilots(params),mag=values=>values.map(model.magnitude);
+      stats=metric('Пилоты / данные',`${d.positions.length} / ${d.data.length}`)+metric('Ресурс пилотов',`${fmt(d.overhead*100,1)} %`)+metric('СКЗ ошибки оценки H',fmt(d.rmse,3))+metric('СКЗ ошибки символов',`${fmt(d.rawEvm,3)} → ${fmt(d.evm,3)}`)+metric('Ошибки данных до → после',`${d.rawErrors} → ${d.errors} из ${d.data.length}`);
+      const spectrum=(title,values,extra=[])=>chart(title,[{name:'Данные',points:d.data.map(k=>[k,model.magnitude(values[k])]),stems:true},{name:'Пилоты',points:d.positions.map(k=>[k,model.magnitude(values[k])]),stems:true,color:colors[2]},...extra],{xmax:63,ymin:0,ymax:Math.max(1.5,...mag(values))*1.05,xlabel:'Поднесущая k',ylabel:'Модуль'});
+      content=`<div class="ta-subcarriers" role="group" aria-label="Пилоты и данные на 64 поднесущих">${Array.from({length:64},(_,k)=>`<span class="${d.positions.includes(k)?'ta-pilot':''}" title="Поднесущая ${k}: ${d.positions.includes(k)?'пилот':'данные'}">${d.positions.includes(k)?'П':'Д'}</span>`).join('')}</div><p>П — известный пилот +1; Д — неизвестный символ QPSK. На каждом k свой комплексный коэффициент H[k].</p><div class="ta-pair">${spectrum('1. Переданный спектр |X[k]|',d.transmitted)}${chart('2. Канал |H[k]|: измерения → интерполяция',[{name:'Истинный H · для проверки',points:points(mag(d.channel))},{name:'Интерполяция Ĥ',points:points(mag(d.estimates)),dash:true},{name:'Y / X на пилотах',points:d.positions.map((k,i)=>[k,model.magnitude(d.observations[i])]),dots:true,color:colors[2]}],{xmax:63,ymin:0,ymax:Math.max(1.2,...mag(d.estimates))*1.05,xlabel:'Поднесущая k',ylabel:'Модуль'})}${spectrum('3. Принятый спектр |Y[k]|',d.received)}${spectrum('4. После эквализации |Y[k] / Ĥ[k]|',d.recovered,[{name:'Переданный уровень |X| = 1',points:[[0,1],[63,1]],dash:true,color:colors[3]}])}</div><details><summary>Фаза: созвездия до и после эквализации</summary><div class="ta-pair">${constellationChart('Данные до эквализации',d.data.map(k=>d.received[k]),d.reference)}${constellationChart('Данные после эквализации',d.data.map(k=>d.recovered[k]),d.reference)}</div></details><p>Восстановление использует только оценки на пилотах и их интерполяцию. Истинный H и переданные данные нужны для проверки результата.</p>`;
     }
-    target.innerHTML=`<div class="ta-metrics" aria-live="polite" aria-atomic="true">${stats}</div>${content}`;
+    target.innerHTML=`<div class="ta-metrics" aria-live="polite">${stats}</div>${content}`;
   }
-  root.addEventListener('input',draw);
+  root.addEventListener('input',event=>{if(kind==='bootstrap'){headerRead=false;attempted=false;}draw();});
   root.querySelector('[data-attempt]')?.addEventListener('click',()=>{seed++;draw();});
-  draw();
-  let lastWidth=root.clientWidth;
-  const observer=new ResizeObserver(()=>{
-    if(root.clientWidth!==lastWidth) { lastWidth=root.clientWidth; draw(); }
-  });
-  observer.observe(root);
+  root.querySelector('[data-guess]')?.addEventListener('click',()=>{attempted=true;draw();});
+  root.querySelector('[data-bootstrap]')?.addEventListener('click',()=>{headerRead=true;draw();});
+  draw();let lastWidth=root.clientWidth;
+  new ResizeObserver(()=>{if(root.clientWidth!==lastWidth){lastWidth=root.clientWidth;draw();}}).observe(root);
 }
 document.querySelectorAll('[data-agreement]').forEach(mount);
 

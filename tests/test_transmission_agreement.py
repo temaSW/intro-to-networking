@@ -54,51 +54,111 @@ assert.equal(m.correlationIllustration('bits',{samplesPerBit:8}).scores[18*8],1)
 """)
 
 
-def test_clock_error_accumulates_and_frequency_correction_stops_rotation():
+def test_known_fragment_estimates_frequency_and_compensates_data():
     run_js("""
-assert.equal(m.timing({ppm:0,elapsed:10000}).drift,0);
-assert(Math.abs(m.timing({ppm:100,elapsed:5000}).drift+.5)<.001);
-assert(m.timing({ppm:-100}).drift>0);
-const tracked=m.timing({ppm:500,elapsed:10000,tracking:true});
-tracked.points.forEach(p=>assert.equal(p.t,p.k+.5));
-for(const hz of [-50,-10,0,10,50]) {
- const d=m.frequency({hz,ms:100,compensate:true});
- assert(Math.abs(d.residual)<1e-10);
- d.received.forEach((p,i)=>p.forEach((v,j)=>assert(Math.abs(v-d.reference[i][j])<1e-10)));
+for(const hz of [-80,-35,0,35,80]) for(const length of [8,32,64]) {
+ const d=m.frequency({hz,length});
+ assert(Math.abs(d.estimate-hz)<1e-10);
+ assert(d.evm<1e-10);
+ assert.equal(d.errors,0);
 }
-assert(Math.abs(m.frequency({hz:10,ms:25}).angle-Math.PI/2)<1e-10);
-assert.equal(m.frequency({hz:10,compensate:true,estimateError:2}).residual,-2);
+const d=m.frequency({hz:35,length:32,snr:15});
+assert(d.evm<d.rawEvm);
+assert(d.errors<d.rawErrors);
+assert(d.evm>0);
+assert.deepEqual(d,m.frequency({hz:35,length:32,snr:15}));
+for(const snr of [0,5,20]) m.frequency({snr}).corrected.flat().forEach(v=>assert(Number.isFinite(v)));
 """)
 
 
-def test_access_preserves_devices_and_matches_expected_success_rate():
+def test_bootstrap_is_demodulated_and_controls_the_payload_decoder():
     run_js("""
-assert.equal(m.access({n:1}).probability,1);
-assert.equal(m.access({n:1}).successes,1);
+for(const mode of ['BPSK','QPSK','16-QAM']) {
+ const frame=m.bootstrapFrame(mode),header=m.readBootstrap(frame.header);
+ assert.equal(frame.header.length,10);
+ assert.equal(header.mode,mode);
+ assert.equal(header.symbols,frame.payload.length);
+ const decoded=m.decodePayload(frame.payload.slice(0,header.symbols),header.mode);
+ assert.equal(decoded.bits,frame.payloadBits);
+ assert.equal(decoded.text,frame.message);
+ for(const guess of ['BPSK','QPSK','16-QAM']) {
+  const bits=m.decodePayload(frame.payload,guess).bits;
+  assert.equal(bits===frame.payloadBits,guess===mode);
+ }
+ assert.equal(frame.totalSymbols,15+10+frame.payload.length);
+}
+// A header field change changes the receiver configuration; it does not read frame.mode.
+const frame=m.bootstrapFrame('QPSK');
+frame.header[0]=[1,0];frame.header[1]=[-1,0];
+assert.equal(m.readBootstrap(frame.header).mode,'16-QAM');
+""")
+
+
+def test_access_conserves_devices_and_distinguishes_empty_collision_success():
+    run_js("""
+assert.equal(m.access({n:1}).share,1);
 let sum=0;
-for(let seed=1;seed<=4000;seed++) {
- const d=m.access({n:24,m:16,windows:4,seed});
- assert.equal(d.first.successes.length+d.first.collided.length,24);
- assert.equal(d.retry.successes.length+d.retry.collided.length,d.first.collided.length);
- assert.equal(new Set(d.retry.bins.flat()).size,d.first.collided.length);
- assert(d.successes<=24);
+for(let seed=1;seed<=3000;seed++) {
+ const d=m.access({n:16,m:8,seed});
+ assert.equal(d.first.successes.length+d.first.collided.length,16);
+ assert.equal(new Set(d.first.bins.flat()).size,16);
+ assert.equal(d.first.bins.filter(b=>b.length===1).length+d.first.conflicts+d.empty,8);
+ assert.equal(d.share,d.first.successes.length/16);
+ d.choices.forEach(([id,choice])=>assert(d.first.bins[choice].includes(id)));
  sum+=d.first.successes.length;
 }
-assert(Math.abs(sum/4000-m.access({n:24,m:16}).expected)<.2);
+assert(Math.abs(sum/3000-m.access({n:16,m:8}).expected)<.15);
 """)
 
 
-def test_pilot_density_trades_resource_for_estimation_quality():
+def test_allocation_conserves_resource_and_grants_only_requested_cells():
     run_js("""
-const dense=m.pilots({spacing:2,period:40}), sparse=m.pilots({spacing:20,period:40});
+for(const demands of [[0,0,0],[4,8,12],[24,24,24,24],[0,24]]) for(const rows of [2,4,6]) {
+ const d=m.allocation({demands,rows});
+ assert.equal(d.cells.length,rows*8);
+ assert.equal(d.granted.reduce((a,v)=>a+v,0)+d.unused+d.reserved,d.total);
+ assert.equal(d.granted.reduce((a,v)=>a+v,0),Math.min(d.capacity,demands.reduce((a,v)=>a+v,0)));
+ const used=new Set();
+ demands.forEach((v,id)=>{
+  assert(d.granted[id]<=v);
+  assert.equal(d.granted[id]+d.unmet[id],v);
+  assert.equal(d.assignments[id].length,d.granted[id]);
+  d.assignments[id].forEach(({time,frequency})=>{
+   const index=(frequency-1)*8+time-1;
+   assert.equal(d.cells[index],id);assert(!used.has(index));used.add(index);
+  });
+ });
+}
+assert.deepEqual(m.allocation({demands:[24,24,24],rows:4}).granted,[10,10,10]);
+""")
+
+
+def test_ofdm_pilots_estimate_complex_channel_and_equalize_data():
+    run_js("""
+const dense=m.pilots({spacing:2,depth:.9}),sparse=m.pilots({spacing:16,depth:.9});
 assert(dense.overhead>sparse.overhead);
 assert(dense.rmse<sparse.rmse);
-assert(dense.errors<=sparse.errors);
-for(const spacing of [2,8,24]) for(const period of [8,40,80]) {
- const d=m.pilots({spacing,period});
- assert.equal(d.positions.length+d.data.length,97);
- d.positions.forEach(t=>assert.equal(d.transmitted[t],1));
- d.recovered.forEach(v=>assert(Number.isFinite(v)));
+assert(dense.evm<sparse.evm);
+assert(dense.evm<dense.rawEvm);
+const noisyDense=m.pilots({spacing:2,snr:10}),noisySparse=m.pilots({spacing:16,snr:10});
+noisyDense.data.filter(k=>noisySparse.data.includes(k)).forEach(k=>{
+ assert.deepEqual(noisyDense.transmitted[k],noisySparse.transmitted[k]);
+ assert.deepEqual(noisyDense.received[k],noisySparse.received[k]);
+});
+for(const spacing of [2,8,16]) for(const snr of [Infinity,0,10]) {
+ const d=m.pilots({spacing,snr,depth:.95});
+ assert.equal(d.positions.length+d.data.length,64);
+ assert.equal(d.positions[0],0);assert.equal(d.positions.at(-1),63);
+ d.positions.forEach((k,i)=>{
+  assert.deepEqual(d.transmitted[k],[1,0]);
+  // Pilot is +1: Y/X is exactly received Y, including noise.
+  assert.deepEqual(d.observations[i],d.received[k]);
+  if(snr===Infinity) d.estimates[k].forEach((v,j)=>assert(Math.abs(v-d.channel[k][j])<1e-12));
+ });
+ d.recovered.flat().forEach(v=>assert(Number.isFinite(v)));
  assert(d.errors<=d.data.length);
 }
+// With a pilot on every carrier, the model estimates H exactly (no noise).
+const exact=m.pilots({spacing:1});
+assert(exact.rmse<1e-12);
 """)
