@@ -17,16 +17,38 @@ DATA = ROOT / "course" / "data" / "lecture-04" / "nr-mcs-table-4.csv"
 W, H = 900, 500
 INK, MUTED, GRID, ACCENT, ORANGE, BG = "#172b32", "#4d6268", "#b8c9ca", "#075b6a", "#b05515", "#f7f8f6"
 
+# Embedded SVG images inherit color-scheme from the site's selected Quarto theme.
+# Keep the generated figures aligned with course/styles/base.scss.
+PALETTE = {
+    INK: ("ink", "#183037", "#ecf4f1"),
+    MUTED: ("muted", "#486067", "#bfd0d0"),
+    GRID: ("line", "#c8d8d8", "#49676c"),
+    ACCENT: ("accent", "#075c67", "#91dce0"),
+    ORANGE: ("focus", "#a84b12", "#ffc178"),
+    BG: ("surface", "#ffffff", "#182830"),
+    "#e9f1f0": ("surface-alt", "#f0f5f4", "#20353c"),
+    "#dcecef": ("accent-soft", "#e3f1ef", "#21464c"),
+    "#c8e1c8": ("group-green", "#e6edd7", "#303f24"),
+    "#fae2bc": ("group-orange", "#fff0e0", "#493624"),
+    "#e4d4ee": ("group-purple", "#efe8f5", "#383047"),
+    "#ffd3cf": ("group-red", "#fff0ed", "#432a2a"),
+}
+
 
 def esc(value: object) -> str:
     return str(value).replace("&", "&amp;").replace("<", "&lt;")
 
 
 def svg(body: str, title: str) -> str:
-    return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" role="img" aria-labelledby="title desc">
+    markup = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" role="img" aria-labelledby="title desc">
   <title id="title">{esc(title)}</title><desc id="desc">Generated reproducibly by scripts/lecture-04/generate_assets.py.</desc>
   <rect width="100%" height="100%" fill="{BG}"/>
   <style>text{{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;fill:{INK}}}.muted{{fill:{MUTED};font-size:15px}}.axis{{stroke:{INK};stroke-width:2}}.grid{{stroke:{GRID};stroke-width:1}}.label{{font-size:16px}}.title{{font-size:20px;font-weight:700}}</style>{body}</svg>'''
+    for color, (name, _, _) in PALETTE.items():
+        markup = markup.replace(color, f"var(--{name})")
+    light = ";".join(f"--{name}:{light}" for name, light, _ in PALETTE.values())
+    dark = ";".join(f"--{name}:{dark}" for name, _, dark in PALETTE.values())
+    return markup.replace("<style>", f"<style>:root{{{light}}}@media(prefers-color-scheme:dark){{:root{{{dark}}}}}", 1)
 
 
 def write(name: str, body: str, title: str) -> None:

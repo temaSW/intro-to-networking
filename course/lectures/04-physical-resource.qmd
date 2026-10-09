@@ -1,11 +1,12 @@
 ---
-title: "Тема 04. Физический ресурс и полезная скорость"
+title: "Тема 02. Физический ресурс и скорость передачи"
 subtitle: "От состояний сигнала к ресурсу пользователя"
+body-classes: lecture-overview
 ---
 
 Смартфон передаёт данные по общему радиоканалу. Качество приёма и число активных пользователей меняются.
 
-> От каких физических и организационных решений зависит полезная скорость одного пользователя?
+> От каких физических и организационных решений зависит скорость передачи данных одного пользователя?
 
 ## Как передать бит в полосе канала?
 
@@ -15,11 +16,11 @@ subtitle: "От состояний сигнала к ресурсу пользо
 
 $T_b$ — длительность бита, $f_c$ — несущая частота.
 
-::: {.column-page .keying-figures}
+::: {.keying-figures}
 
-<picture class="keying-slide"><source media="(max-width: 760px)" srcset="../assets/lecture-04/keying-ask-mobile.svg"><img src="../assets/lecture-04/keying-ask.svg" alt="ASK: амплитуда сигнала и его спектр"></picture>
-<picture class="keying-slide"><source media="(max-width: 760px)" srcset="../assets/lecture-04/keying-fsk-mobile.svg"><img src="../assets/lecture-04/keying-fsk.svg" alt="FSK: частота сигнала и его спектр"></picture>
-<picture class="keying-slide"><source media="(max-width: 760px)" srcset="../assets/lecture-04/keying-psk-mobile.svg"><img src="../assets/lecture-04/keying-psk.svg" alt="PSK: фаза сигнала и его спектр"></picture>
+<picture class="keying-slide course-demo"><source media="(max-width: 760px)" srcset="../assets/lecture-04/keying-ask-mobile.svg"><img src="../assets/lecture-04/keying-ask.svg" alt="ASK: амплитуда сигнала и его спектр"></picture>
+<picture class="keying-slide course-demo"><source media="(max-width: 760px)" srcset="../assets/lecture-04/keying-fsk-mobile.svg"><img src="../assets/lecture-04/keying-fsk.svg" alt="FSK: частота сигнала и его спектр"></picture>
+<picture class="keying-slide course-demo"><source media="(max-width: 760px)" srcset="../assets/lecture-04/keying-psk-mobile.svg"><img src="../assets/lecture-04/keying-psk.svg" alt="PSK: фаза сигнала и его спектр"></picture>
 
 :::
 
@@ -29,9 +30,30 @@ $T_b$ — длительность бита, $f_c$ — несущая часто
 
 Модель использует прямоугольные битовые импульсы; ось частоты отсчитывается от несущей. Реальный спектр также зависит от формирования импульсов и фильтрации.
 
-<div class="lecture-interactive" data-lecture-interactive="spectrum"></div>
-<p class="interactive-source"><a href="https://github.com/temaSW/intro-to-networking/blob/main/course/interactives/lecture-04-spectrum-ui.js">Исходник</a></p>
+<div class="lecture-interactive course-demo" data-lecture-interactive="spectrum"></div>
 
+<details>
+<summary>Как связаны полоса, битовая скорость и частота дискретизации?</summary>
+
+**Длительность бита и полоса передачи.** Битовая скорость $R_b$ (бит/с) связана с длительностью бита:
+
+$$R_b=\frac{1}{T_b}.$$
+
+В показанной модели двоичных ASK и PSK прямоугольный импульс даёт первые нули спектральной огибающей на частотах $f_c\pm1/T_b$. Поэтому ширина главного лепестка между первыми нулями:
+
+$$B_{\text{гл}}=\frac{2}{T_b}=2R_b.$$
+
+При сокращении $T_b$ вдвое битовая скорость и ширина главного лепестка удваиваются. Это **не полная полоса спектра**: у прямоугольных импульсов есть боковые лепестки за первыми нулями. При FSK нужно также учитывать разнос двух частот; при другой форме импульсов связь полосы и скорости меняется.
+
+**От исходного сигнала к потоку битов.** Для исходного сигнала с частотами от нуля до $B_{\text{ист}}$ условие дискретизации из темы 01 — $f_s>2B_{\text{ист}}$, где $f_s$ — частота дискретизации (отсчётов/с). Если один отсчёт кодируется $n$ битами, то для одного канала без сжатия, служебных и избыточных битов:
+
+$$R_b=n f_s,\qquad T_b=\frac{1}{n f_s}.$$
+
+Для передачи этого потока двоичными ASK или PSK с прямоугольными импульсами получаем $B_{\text{гл}}=2n f_s$. Таким образом, полоса **исходного сигнала** задаёт необходимую частоту дискретизации, разрядность — битовую скорость, а способ модуляции и форма импульсов — полосу **передаваемого сигнала**. Частота дискретизации не равна битовой скорости: каждый отсчёт содержит несколько битов.
+
+Для самостоятельного изучения: [Analog Devices — MT-002, выбор частоты дискретизации](https://www.analog.com/media/en/training-seminars/tutorials/mt-002.pdf).
+
+</details>
 
 ## Сколько бит несёт состояние сигнала?
 
@@ -57,7 +79,7 @@ $T_b$ — длительность бита, $f_c$ — несущая часто
 
 #### Код Грея
 
-<figure class="gray-code-figure">
+<figure class="gray-code-figure course-demo" tabindex="0" aria-label="Созвездие с метками Грея; на узком экране доступна прокрутка">
 <svg class="gray-code-strip" viewBox="0 0 700 550" role="img" aria-label="Полное созвездие 16-QAM с четырёхбитными метками Грея. Соседние точки 01|01 и 11|01 отличаются одним битом">
   <title>Код Грея на всех шестнадцати точках 16-QAM</title>
   <rect width="700" height="550" fill="var(--surface)"/>
@@ -131,8 +153,7 @@ $$\eta\leq\frac{C}{B}=\log_2(1+\mathrm{SNR}),$$
 <div class="interactive-scene">
 <div class="scene-overline">Различимость состояний</div>
 <div class="scene-model">
-<div class="lecture-interactive" data-lecture-interactive="constellation"></div>
-<p class="interactive-source"><a href="https://github.com/temaSW/intro-to-networking/blob/main/course/interactives/lecture-04-ui.js">Исходник</a></p>
+<div class="lecture-interactive course-demo" data-lecture-interactive="constellation"></div>
 </div>
 </div>
 
@@ -243,6 +264,54 @@ $s=0$ — проверка пройдена; $s=1$ — правило чётно
 <text x="506" y="132" class="frame-bits">0</text>
 </svg>
 
+> Как приёмнику одновременно получить три бита, если они приходят по очереди?
+
+<details>
+<summary>Что означает задержка z⁻¹?</summary>
+
+Блок $z^{-1}$ запоминает входной бит и выдаёт его через **один битовый интервал** $T_b$. Поэтому на его выходе находится предыдущий бит, а после двух таких блоков — бит, пришедший два интервала назад. Соединённые последовательно блоки задержки образуют **сдвиговый регистр**: при поступлении нового бита сохранённые значения продвигаются на одну позицию. Для чтения этой схемы не нужно знать устройство триггеров или z-преобразование.
+
+Обозначение $r[n]$ означает текущий принятый бит, $r[n-1]$ — предыдущий, $r[n-2]$ — ещё на один интервал старше. Квадратные скобки здесь нумеруют битовые интервалы.
+
+</details>
+
+<figure class="course-demo repetition-circuit">
+<div class="repetition-circuit-scroll" tabindex="0" aria-label="Два блока задержки собирают три последовательных бита; на узком экране доступна прокрутка">
+<svg class="control-schematic" viewBox="0 0 900 370" role="img" aria-labelledby="repetition-decoder-title repetition-decoder-desc">
+<title id="repetition-decoder-title">Приём слова 010: текущий бит и два сохранённых бита</title>
+<desc id="repetition-decoder-desc">Показан момент прихода третьего бита слова 010. Сейчас принят 0; после первой задержки доступен предыдущий бит 1, после второй — первый бит 0. Все три значения поступают в блок решения большинством, который выдаёт 0.</desc>
+<text x="240" y="35" text-anchor="middle">Сейчас</text><text x="470" y="35" text-anchor="middle">1 интервал назад</text><text x="690" y="35" text-anchor="middle">2 интервала назад</text>
+<g class="gate-label"><text x="240" y="82">0</text><text x="470" y="82" class="diagram-error">1</text><text x="690" y="82">0</text></g>
+<g class="logic-gate"><rect x="290" y="110" width="120" height="90"/><rect x="520" y="110" width="120" height="90"/><rect x="360" y="265" width="260" height="70"/></g>
+<g class="diagram-wire"><path d="M155 155 H290 M410 155 H520 M640 155 H750 M240 155 V300 H360 M470 155 V265 M690 155 V300 H620 M620 315 H805"/></g>
+<g class="junction"><circle cx="240" cy="155" r="4"/><circle cx="470" cy="155" r="4"/><circle cx="690" cy="155" r="4"/></g>
+<text x="350" y="146" text-anchor="middle">z<tspan dy="-9" font-size="16">−1</tspan></text><text x="580" y="146" text-anchor="middle">z<tspan dy="-9" font-size="16">−1</tspan></text>
+<text x="350" y="180" text-anchor="middle" class="pin-label">1 интервал</text><text x="580" y="180" text-anchor="middle" class="pin-label">1 интервал</text>
+<text x="25" y="145">Принятые</text><text x="25" y="175">биты</text>
+<text x="490" y="309" text-anchor="middle">Решение большинством</text><text x="820" y="323" class="diagram-emphasis">0</text>
+</svg>
+</div>
+<figcaption>Момент прихода третьего бита слова 010. На отводах одновременно доступны текущий бит и два предыдущих. Решение принимается после каждой полной тройки; границы кодовых слов должны быть известны приёмнику. Линии показывают движение битов, точки — отводы к блоку решения.</figcaption>
+</figure>
+
+<details>
+<summary>Как биты продвигаются через задержки</summary>
+
+| Пришёл бит | Сейчас | После первого z⁻¹ | После второго z⁻¹ |
+|:--|:--:|:--:|:--:|
+| Первый | 0 | — | — |
+| Второй | 1 | 0 | — |
+| Третий | 0 | 1 | 0 |
+
+Знак «—» означает, что в этой позиции ещё нет бита текущего кодового слова. После третьего бита собрана вся тройка. Сам блок задержки не повторяет бит и не исправляет ошибку: он сохраняет предыдущие значения для совместного сравнения.
+
+</details>
+
+<details>
+<summary>Формула решения большинством и таблица истинности</summary>
+
+$\land$ — логическое И: обе величины равны единице. $\lor$ — логическое ИЛИ: хотя бы одна величина равна единице. $\widehat b$ — восстановленный информационный бит.
+
 $$\widehat b=(b'_1\land b'_2)\lor(b'_1\land b'_3)\lor(b'_2\land b'_3).$$
 
 | $b'_1$ | $b'_2$ | $b'_3$ | $\widehat b$ |
@@ -255,6 +324,8 @@ $$\widehat b=(b'_1\land b'_2)\lor(b'_1\land b'_3)\lor(b'_2\land b'_3).$$
 | 1 | 0 | 1 | 1 |
 | 1 | 1 | 0 | 1 |
 | 1 | 1 | 1 | 1 |
+
+</details>
 
 Кодовая скорость:
 
@@ -282,8 +353,7 @@ $k$ — число информационных битов; $n$ — число �
 <div class="interactive-scene">
 <div class="scene-overline">Кодирование и ошибки</div>
 <div class="scene-model">
-<div class="lecture-interactive" data-lecture-interactive="ber"></div>
-<p class="interactive-source"><a href="https://github.com/temaSW/intro-to-networking/blob/main/course/interactives/lecture-04-ui.js">Исходник</a></p>
+<div class="lecture-interactive course-demo" data-lecture-interactive="ber"></div>
 </div>
 </div>
 
@@ -295,38 +365,6 @@ $k$ — число информационных битов; $n$ — число �
 
 Источник таблицы MCS: [ETSI TS 138 214 V17.1.0 / 3GPP TS 38.214, таблица 5.1.3.1-4](https://www.etsi.org/deliver/etsi_ts/138200_138299/138214/17.01.00_60/ts_138214v170100p.pdf).
 
-Для оценки до служебных затрат и повторов:
-
-$$R_u\approx R_s\,\rho_u\,Q_m\,R_c.$$
-
-$R_u$ — полезная скорость пользователя; $R_s$ — символьная скорость; $\rho_u$ — доля общего ресурса пользователя; $Q_m$ — бит на символ; $R_c$ — кодовая скорость.
-
-Если $T_b$ — длительность одного кодового бита, то символ длится $Q_mT_b$, а символьная скорость равна:
-
-$$R_s=\frac{1}{Q_mT_b}.$$
-
-Поэтому ту же полезную скорость можно записать через $T_b$:
-
-$$R_u\approx\frac{\rho_uR_c}{T_b}.$$
-
-
-> Пользователь удаляется от базовой станции, а число активных пользователей растёт. Какие множители формулы могут измениться? Где в рассуждении нужны SNR, планировщик ресурса, множественный доступ и повторы?
-
-
-## Что делать, если ошибки остались?
-
-Декодер не всегда восстанавливает блок успешно. После декодирования контрольная проверка может по-прежнему сообщать об ошибке.
-
-<details>
-<summary>Пояснение: ARQ и HARQ</summary>
-
-**ARQ** (*automatic repeat request*) — повторная передача по запросу. Приёмник подтверждает успешный приём; при обнаруженной ошибке он запрашивает повтор, либо передатчик повторяет блок после истечения времени ожидания подтверждения. Это расходует дополнительное время и ресурс канала.
-
-**HARQ** (*hybrid automatic repeat request*) — сочетание помехоустойчивого кодирования и повторной передачи. Приёмник может сохранять информацию о неудачной попытке и объединять её со следующей: передатчик повторяет кодированные данные или передаёт дополнительную избыточность. Декодер получает больше информации для восстановления того же блока.
-
-</details>
-
-
 ## Если потоков несколько
 
 `Потоки → объединение → общий канал → разделение → потоки`
@@ -336,15 +374,15 @@ $$R_u\approx\frac{\rho_uR_c}{T_b}.$$
 > Как можно объединить данные нескольких пользователей для передачи по общему каналу?
 
 <div class="multiplex-figures">
-  <figure class="multiplex-figure" tabindex="0">
+  <figure class="multiplex-figure course-demo" tabindex="0">
     <img src="../assets/lecture-04/tdm-vs-fdm.webp" alt="При TDM потоки по очереди занимают временные интервалы одного канала; при FDM потоки одновременно занимают разные частотные полосы">
     <figcaption>Временное и частотное мультиплексирование. Изображение: <a href="https://resources.l-p.com/glossary/tdm-time-division-multiplexing-basics-uses-benefits-guide">LINK-PP</a>.</figcaption>
   </figure>
-  <figure class="multiplex-figure fdm-ofdm-container">
+  <figure class="multiplex-figure fdm-ofdm-container course-demo">
 
 {{< include ../_includes/lecture-04-fdm-ofdm.qmd >}}
 
-<figcaption>FDM и OFDM при одинаковом масштабе частоты. Показаны основные лепестки спектров; сравнение полосы схематическое. В OFDM шаг поднесущих равен 1/T, где T — длительность полезной части символа. <a href="https://www.mathworks.com/help/comm/ref/ofdmmod.html">Подробнее об ортогональности поднесущих</a>.</figcaption>
+<figcaption>FDM и OFDM при одинаковом масштабе частоты. Показаны основные лепестки спектров; сравнение полосы схематическое. В OFDM шаг поднесущих равен 1/T, где T — длительность полезной части символа.</figcaption>
   </figure>
 </div>
 
@@ -354,8 +392,29 @@ $$R_u\approx\frac{\rho_uR_c}{T_b}.$$
 
 {{< include ../_includes/lecture-04-access.qmd >}}
 
+## Как оценить скорость передачи пользователя?
+
+Для оценки до служебных затрат и повторов:
+
+$$R_u\approx R_s\,\rho_u\,Q_m\,R_c.$$
+
+$R_u$ — скорость передачи информационных битов пользователя; $R_s$ — символьная скорость; $\rho_u$ — доля общего ресурса пользователя; $Q_m$ — бит на символ; $R_c$ — кодовая скорость.
+
+Если $T_b$ — длительность одного кодового бита, то символ длится $Q_mT_b$, а символьная скорость равна:
+
+$$R_s=\frac{1}{Q_mT_b}.$$
+
+Поэтому ту же скорость передачи можно записать через $T_b$:
+
+$$R_u\approx\frac{\rho_uR_c}{T_b}.$$
+
+
+> Пользователь удаляется от базовой станции, а число активных пользователей растёт. Какие множители формулы могут измениться? Где в рассуждении нужны SNR, планировщик ресурса и множественный доступ?
+
 ::: {.callout-note icon=false appearance="simple"}
 ## 🚀 Что дальше?
+
+{{< include ../_includes/next-topic-channel.html >}}
 
 Мы рассмотрели способы представления битов и совместного использования ресурса. Но между передатчиком и приёмником находится реальная среда. Как затухание, многолучёвость и изменение канала влияют на переданный сигнал?
 
@@ -363,6 +422,6 @@ $$R_u\approx\frac{\rho_uR_c}{T_b}.$$
 
 :::
 
-<script type="module" src="../interactives/lecture-04-ui.js?v=20261006-awgn"></script>
-<script type="module" src="../interactives/lecture-04-spectrum-ui.js?v=20260928-spectrum-wide"></script>
+<script type="module" src="../interactives/lecture-04-ui.js?v=20261010-design"></script>
+<script type="module" src="../interactives/lecture-04-spectrum-ui.js?v=20261010-design"></script>
 <script src="../interactives/image-lightbox.js" defer></script>

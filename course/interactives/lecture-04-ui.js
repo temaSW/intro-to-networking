@@ -7,8 +7,8 @@ function constellationSvg(result) {
   const all = [...result.ideal, ...result.points.map(point => point.received)];
   const extent = Math.max(1.25, ...all.map(point => Math.max(Math.abs(point.x), Math.abs(point.y)))) * 1.08;
   const position = value => 240 + 205 * value / extent;
-  const ideal = result.ideal.map(point => `<circle cx="${position(point.x)}" cy="${position(-point.y)}" r="4" fill="#087e8b"/>`).join("");
-  const received = result.points.map(point => `<circle cx="${position(point.received.x)}" cy="${position(-point.received.y)}" r="2.5" fill="${point.error ? "#c0392b" : "#d58939"}" fill-opacity=".65"/>`).join("");
+  const ideal = result.ideal.map(point => `<circle cx="${position(point.x)}" cy="${position(-point.y)}" r="4" fill="var(--signal-ideal)"/>`).join("");
+  const received = result.points.map(point => `<circle cx="${position(point.received.x)}" cy="${position(-point.received.y)}" r="2.5" fill="${point.error ? "var(--signal-error)" : "var(--signal-received)"}" fill-opacity=".65"/>`).join("");
   return `<svg viewBox="0 0 480 480" role="img" aria-label="Идеальные и принятые точки созвездия"><rect x="0" y="0" width="480" height="480" fill="var(--surface)"/><line x1="20" y1="240" x2="460" y2="240" stroke="var(--line)"/><line x1="240" y1="20" x2="240" y2="460" stroke="var(--line)"/>${received}${ideal}<text x="450" y="232" fill="var(--muted)">I</text><text x="247" y="28" fill="var(--muted)">Q</text></svg>`;
 }
 
@@ -30,14 +30,14 @@ function mountConstellation(root) {
 }
 
 const berSeries = [
-  {id: 1, label: "QPSK · 1/2", color: "#087e8b"},
-  {id: 2, label: "QPSK · 3/4", color: "#4e9daa"},
-  {id: 3, label: "16-QAM · 1/2", color: "#a75c12"},
-  {id: 4, label: "16-QAM · 3/4", color: "#cf8736"},
-  {id: 5, label: "64-QAM · 3/4", color: "#7b59a6"},
-  {id: 6, label: "QPSK · без кода", color: "#087e8b", uncoded: true},
-  {id: 7, label: "16-QAM · без кода", color: "#a75c12", uncoded: true},
-  {id: 8, label: "64-QAM · без кода", color: "#7b59a6", uncoded: true},
+  {id: 1, label: "QPSK · 1/2", color: "var(--curve-qpsk)"},
+  {id: 2, label: "QPSK · 3/4", color: "var(--curve-qpsk-high)"},
+  {id: 3, label: "16-QAM · 1/2", color: "var(--curve-qam16)"},
+  {id: 4, label: "16-QAM · 3/4", color: "var(--curve-qam16-high)"},
+  {id: 5, label: "64-QAM · 3/4", color: "var(--curve-qam64)"},
+  {id: 6, label: "QPSK · без кода", color: "var(--curve-qpsk)", uncoded: true},
+  {id: 7, label: "16-QAM · без кода", color: "var(--curve-qam16)", uncoded: true},
+  {id: 8, label: "64-QAM · без кода", color: "var(--curve-qam64)", uncoded: true},
 ];
 
 function berSvg(rows, selected) {
@@ -72,7 +72,7 @@ async function mountBer(root) {
       const [scheme, modulation, code_rate, snr_db, bit_errors, information_bits, ber] = line.split(",");
       return {scheme: +scheme, modulation, code_rate: +code_rate, snr_db: +snr_db, bit_errors: +bit_errors, information_bits: +information_bits, ber: +ber};
     });
-    root.innerHTML = `<div class="ber-controls" role="group" aria-label="Показать кривые">${berSeries.map(series => `<label><input type="checkbox" value="${series.id}"><span class="ber-swatch ${series.uncoded ? "ber-swatch-uncoded" : ""}" style="--curve-color:${series.color}"></span>${series.label}</label>`).join("")}</div><div class="ber-plot"></div><p class="interactive-note">Кривые скрыты при открытии страницы. Выберите нужные для сравнения. Сплошные линии — после декодирования LDPC; штриховые — без кодирования. Точки с нулём обнаруженных ошибок не показаны.</p>`;
+    root.innerHTML = `<div class="ber-controls" role="group" aria-label="Показать кривые">${berSeries.map(series => `<label><input type="checkbox" value="${series.id}"><span class="ber-swatch ${series.uncoded ? "ber-swatch-uncoded" : ""}" style="--curve-color:${series.color}"></span>${series.label}</label>`).join("")}</div><div class="ber-plot" tabindex="0" aria-label="График BER; на узком экране доступна прокрутка"></div><p class="interactive-note">Кривые скрыты при открытии страницы. Выберите нужные для сравнения. Сплошные линии — после декодирования LDPC; штриховые — без кодирования. Точки с нулём обнаруженных ошибок не показаны.</p>`;
     const draw = () => {
       const selected = [...root.querySelectorAll('input:checked')].map(input => +input.value);
       root.querySelector(".ber-plot").innerHTML = berSvg(rows, selected);
