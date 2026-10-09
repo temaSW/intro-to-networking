@@ -1,0 +1,130 @@
+/* Reusable static diagrams of a link boundary and a shared onward connection. */
+.node-path-stages,
+.node-function-list {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--demo-gap);
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.node-path-stages > li,
+.node-function-list > li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .65rem;
+  padding: .8rem;
+  border: 1px solid var(--line);
+  border-radius: .4rem;
+  background: var(--surface);
+  text-align: center;
+  min-width: 0;
+}
+.node-path-stages > li > span:not(.node-data),
+.node-function-list > li > span:not(.node-data) {
+  color: var(--muted);
+  font-size: .9rem;
+  line-height: 1.45;
+}
+.node-path-stages > li.node-path-boundary {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.node-path-stages svg {
+  display: block;
+  width: 100%;
+  max-width: 7.5rem;
+  height: auto;
+  fill: var(--surface);
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.node-path-stages svg path,
+.node-aggregation-arrows { fill: none; }
+.node-path-stages svg .node-wave { stroke: var(--focus); }
+.node-data {
+  display: inline-block;
+  padding: .2rem .8rem;
+  border: 2px solid var(--accent);
+  border-radius: .3rem;
+  background: var(--accent-soft);
+  color: var(--ink);
+  font-weight: 700;
+  text-align: center;
+}
+.node-path-onward { margin-top: 1rem; text-align: center; color: var(--muted); }
+:is(.node-path, .node-functions, .node-representation, .node-aggregation) figcaption {
+  margin-top: 1rem;
+  color: var(--muted);
+  font-size: .9rem;
+  line-height: 1.45;
+}
+.node-function-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.node-function-list > li:not(:last-child)::after {
+  content: "→";
+  position: absolute;
+  left: calc(100% + .1rem);
+  top: 45%;
+  color: var(--accent);
+}
+.node-representation { display: grid; gap: 1rem; }
+.node-representation-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: 1rem;
+  align-items: center;
+}
+.node-envelope {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .8rem;
+  border: 2px solid var(--line);
+  border-radius: .3rem;
+  background: var(--surface-alt);
+}
+.node-envelope-processing { border-style: dashed; background: var(--surface); }
+.node-envelope-outgoing { border-color: var(--accent); }
+.node-aggregation-flow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 3rem minmax(0, 1fr) 3rem minmax(0, 1fr);
+  gap: .6rem;
+  align-items: center;
+}
+.node-aggregation-inputs, .node-aggregation-output { display: grid; gap: .6rem; }
+.node-aggregation-inputs > span, .node-aggregation-output {
+  padding: .8rem;
+  border: 1px solid var(--line);
+  border-radius: .4rem;
+  background: var(--surface);
+  text-align: center;
+}
+.node-aggregation-output > span { color: var(--muted); }
+.node-aggregation-arrows {
+  width: 100%;
+  height: auto;
+  stroke: var(--accent);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+@media (max-width: 760px) {
+  .node-path-stages, .node-function-list, .node-representation-row, .node-aggregation-flow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .node-path-stages > li.node-path-link { background: var(--surface-alt); }
+  .node-function-list > li:not(:last-child)::after {
+    content: "↓";
+    left: 50%;
+    top: 100%;
+    transform: translateX(-50%);
+    line-height: var(--demo-gap);
+  }
+  .node-aggregation-arrows { width: 3rem; height: 3rem; justify-self: center; transform: rotate(90deg); }
+  .node-envelope { gap: .6rem; }
+}

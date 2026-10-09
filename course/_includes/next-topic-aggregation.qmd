@@ -1,0 +1,12 @@
+```{=html}
+<figure class="course-demo node-aggregation">
+  <div class="node-aggregation-flow" role="group" aria-label="Данные нескольких абонентов сходятся к узлу с общим выходным соединением">
+    <div class="node-aggregation-inputs"><span>Абонент А → Д<sub>А</sub></span><span>Абонент Б → Д<sub>Б</sub></span><span>Абонент В → Д<sub>В</sub></span></div>
+    <svg class="node-aggregation-arrows" viewBox="0 0 80 120" aria-hidden="true"><path d="M4 12 L72 60 M4 60 H72 M4 108 L72 60 M62 51 L72 60 L62 69"/></svg>
+    <div class="node-aggregation-output"><strong>Узел доступа</strong><span>Д<sub>А</sub> · Д<sub>Б</sub> · Д<sub>В</sub></span></div>
+    <svg class="node-aggregation-arrows" viewBox="0 0 80 120" aria-hidden="true"><path d="M4 60 H72 M62 51 L72 60 L62 69"/></svg>
+    <div class="node-aggregation-output"><strong>Общее выходное соединение</strong><span>Ресурс ограничен</span></div>
+  </div>
+  <figcaption>Данные разных абонентов должны продолжить путь через общее соединение. Какая организация передачи потребуется?</figcaption>
+</figure>
+```
