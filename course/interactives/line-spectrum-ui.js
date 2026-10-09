@@ -29,7 +29,7 @@ for (const root of document.querySelectorAll('[data-line-spectrum]')) {
   const keys = root.dataset.lineSpectrum.split(',').map(key => key.trim());
   const comparison = LINE_SPECTRA.comparisons.find(item => item.keys.join(',') === keys.join(','));
   if (!comparison) throw new Error(`Unknown line-code comparison: ${keys.join(',')}`);
-  root.innerHTML = `<figure class="line-spectrum-comparison"><figcaption>${keys.map(key => titles[key]).join(' и ')}</figcaption><p class="line-spectrum-instruction">Входные биты <code>${comparison.pattern}</code> повторяются; каждая вертикальная линия — гармоника полученного сигнала.</p><div class="line-spectrum-scroll">${spectrumSvg(comparison)}</div></figure>`;
+  root.innerHTML = `<figure class="line-spectrum-comparison course-demo"><figcaption>${keys.map(key => titles[key]).join(' и ')}</figcaption><p class="line-spectrum-instruction">Входные биты <code>${comparison.pattern}</code> повторяются; каждая вертикальная линия — гармоника полученного сигнала.</p><div class="line-spectrum-scroll">${spectrumSvg(comparison)}</div></figure>`;
 }
 
 for (const root of document.querySelectorAll('[data-line-spectrum-method]')) {

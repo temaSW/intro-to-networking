@@ -11,7 +11,7 @@ toc-depth: 2
 > Что должно произойти между «Отправить» и появлением фотографии у получателя?
 
 ```{=html}
-<figure class="network-journey">
+<figure class="network-journey course-demo">
   <div class="journey-endpoints"><span><i class="bi bi-phone" aria-hidden="true"></i> Отправитель</span><span>Фотография</span><span>Получатель <i class="bi bi-person" aria-hidden="true"></i></span></div>
   <ol class="journey-nodes">
     <li class="journey-device"><svg class="journey-symbol" viewBox="0 0 96 88" aria-hidden="true"><rect x="29" y="8" width="38" height="68" rx="7"/><path d="M39 15 H57 M41 69 H55"/><rect class="journey-tint" x="34" y="24" width="28" height="33" rx="3"/><path d="M37 50 L45 40 L51 46 L57 36 L61 50"/><circle cx="43" cy="31" r="2"/></svg><strong>Смартфон</strong><span>Приложение и устройство</span></li>
@@ -63,7 +63,7 @@ toc-depth: 2
 **OSI** — эталонная модель взаимодействия открытых систем (*Open Systems Interconnection*). **TCP/IP** — семейство протоколов Интернета; название объединяет протокол управления передачей TCP (*Transmission Control Protocol*) и межсетевой протокол IP (*Internet Protocol*).
 
 ```{=html}
-<figure class="layer-comparison">
+<figure class="layer-comparison course-demo">
   <div class="layer-heading"><strong>OSI · 7 уровней</strong><strong>TCP/IP · 4 уровня</strong></div>
   <div class="layer-pair layer-application">
     <ol class="osi-group" start="7" reversed>
@@ -111,7 +111,7 @@ toc-depth: 2
 > Если приложения обмениваются фотографией, зачем нижележащим уровням добавлять собственную служебную информацию?
 
 ```{=html}
-<figure class="encapsulation-map">
+<figure class="encapsulation-map course-demo">
   <div class="encapsulation-scroll" tabindex="0" role="region" aria-label="Схема инкапсуляции: от данных приложения к кадру. На узком экране доступна горизонтальная прокрутка.">
     <ol class="encapsulation-steps">
       <li><strong>Приложение</strong><div class="pdu-grid"><span class="pdu-field pdu-data">Данные приложения</span><span class="pdu-span pdu-span-data">Данные</span></div></li>
@@ -190,6 +190,8 @@ toc-depth: 2
 
 ::: {.callout-note icon=false appearance="simple"}
 ## 🚀 Что дальше?
+
+{{< include ../_includes/next-topic-baseband.html >}}
 
 Мы наметили путь данных, разделили функции по уровням и познакомились с участниками отрасли. Теперь начнём разбирать этот путь: как исходная информация получает цифровое представление и превращается в сигнал для передачи.
 

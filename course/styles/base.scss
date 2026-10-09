@@ -58,6 +58,12 @@ $grid-margin-width: 200px;
 }
 
 :root {
+  color-scheme: light;
+  --demo-padding: clamp(.8rem, 2vw, 1.3rem);
+  --demo-gap: 1rem;
+  --demo-margin: 1.5rem;
+  --demo-radius: .5rem;
+  --plot-min-width: 38rem;
   --page-bg: #f8faf9;
   --surface: #ffffff;
   --surface-alt: #f0f5f4;
@@ -70,6 +76,7 @@ $grid-margin-width: 200px;
 }
 
 .quarto-dark {
+  color-scheme: dark;
   --page-bg: #101b20;
   --surface: #182830;
   --surface-alt: #20353c;
@@ -135,6 +142,39 @@ main.content code:not(.sourceCode) { color: var(--accent); background: var(--sur
 .lecture-overview main.content section.level2 > h2:first-child { margin-top: 1.35rem; }
 .lecture-overview main.content details { margin-block: 1rem; }
 .lecture-overview main.content blockquote p { text-align: start; }
+.lecture-overview main.content :is(.interactive-note, .interactive-metrics p, .interactive-source, .spectrum-summary, .callout-title p) { text-align: start; hyphens: none; }
+
+/* Shared demonstration frame across topics; diagrams retain their aspect ratio. */
+main.content .course-demo {
+  box-sizing: border-box; width: 100%; max-width: none;
+  margin: var(--demo-margin) 0; padding: var(--demo-padding);
+  border: 1px solid var(--line); border-radius: var(--demo-radius);
+  color: var(--ink); background: var(--surface);
+  --bs-body-color: var(--ink); --bs-secondary-color: var(--muted);
+  --bs-border-color: var(--line); --bs-body-bg: var(--surface);
+  --bs-primary: var(--accent); --bs-secondary-bg: var(--surface-alt);
+  --bs-primary-bg-subtle: var(--accent-soft); --bs-warning: var(--focus);
+}
+main.content .course-demo:is(.ks-widget, .quantization-widget, .companding-line-widget, .scrambler-widget, .lecture-interactive, .line-spectrum-comparison) { background: var(--surface-alt); }
+main.content .quarto-figure figure.figure { padding: var(--demo-padding); border-radius: var(--demo-radius); }
+main.content .course-demo :is(.ks-chart, .q-chart, .segment-chart, .line-wave-scroll, .line-spectrum-scroll, .scrambler-chart-scroll, .spectrum-plot, .ber-plot) {
+  padding: 0; border: 1px solid var(--line); border-radius: .35rem;
+  background: var(--surface); overflow-x: auto;
+}
+main.content .course-demo :is(.ks-chart, .q-chart, .segment-chart, .line-spectrum-scroll, .spectrum-plot, .ber-plot) svg {
+  display: block; width: 100%; max-width: none; height: auto; margin: 0;
+  min-width: var(--plot-min-width); border: 0;
+}
+main.content .course-demo :is(.line-wave-scroll, .scrambler-chart-scroll) svg { width: 100%; max-width: none; height: auto; }
+main.content .course-demo :is(.interactive-output, .q-controls, .ks-controls) { gap: var(--demo-gap); }
+main.content .course-demo .interactive-output { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+main.content .course-demo .interactive-plot svg { max-width: none; }
+main.content .constellation-figures { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--demo-gap); }
+main.content .constellation-figures figure { padding: var(--demo-padding); border-radius: var(--demo-radius); }
+main.content .constellation-figures figure:last-child { grid-column: auto; max-width: none; }
+@media (max-width: 760px) {
+  main.content .constellation-figures, main.content .course-demo .interactive-output { grid-template-columns: 1fr; }
+}
 .map-number { color: var(--muted); font-size: .85rem; font-variant-numeric: tabular-nums; }
 .network-journey, .layer-comparison, .encapsulation-map {
   margin-block: 1.5rem; padding: clamp(.9rem, 2.4vw, 1.8rem);
@@ -242,6 +282,16 @@ table { color: var(--ink); border-color: var(--line); width: 100%; max-width: 10
 table th { background: var(--surface-alt); color: var(--ink); }
 table td, table th { border-color: var(--line); overflow-wrap: anywhere; }
 .callout { background: var(--surface); border-color: var(--line); margin-block: .9rem; }
+.topic-transition-visual { margin-block: 1rem; padding: .5rem; overflow-x: auto; border: 1px solid var(--line); border-radius: .4rem; background: var(--surface); }
+.topic-transition-visual svg { display: block; width: 100%; height: auto; min-width: 34rem; }
+.topic-transition-visual text { fill: var(--ink); font: 20px system-ui, sans-serif; }
+.topic-transition-visual .transition-muted { fill: var(--muted); font-size: 18px; }
+.topic-transition-visual .transition-bits { fill: var(--accent); font: 28px ui-monospace, Consolas, monospace; }
+.transition-line { fill: none; stroke: var(--accent); stroke-width: 2.5; }
+.transition-path { fill: none; stroke: var(--focus); stroke-width: 2; stroke-dasharray: 7 5; }
+.transition-boundary { fill: none; stroke: var(--line); stroke-width: 5; }
+.transition-points { fill: var(--focus); }
+.transition-surface { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.5; }
 
 /* Quarto's column-page and column-screen provide the width; these classes define surfaces. */
 .course-visual, .course-interactive { min-width: 0; margin-block: 1.15rem; padding-inline: clamp(.75rem, 2vw, 2rem); }
@@ -279,6 +329,15 @@ main.content .error-rate-formulas .math.display { margin: .35rem 0; }
 .control-schematic .gate-label { text-anchor: middle; font: 27px ui-monospace, Consolas, monospace; }
 .control-schematic .adder-label text { text-anchor: middle; font: 29px system-ui, sans-serif; }
 .control-schematic .pin-label { font: 17px system-ui, sans-serif; }
+.repetition-circuit-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--demo-gap); }
+main.content .repetition-circuit-label { margin: 0 0 .5rem; text-align: start; font-weight: 700; }
+.repetition-circuit .control-schematic { max-width: none; margin: 0; }
+.repetition-circuit-scroll { overflow-x: auto; }
+.repetition-circuit figcaption { margin-top: .75rem; }
+@media (max-width: 760px) {
+  .repetition-circuit-grid { grid-template-columns: 1fr; }
+  .repetition-circuit-scroll .control-schematic { min-width: 28rem; }
+}
 .coded-frame { max-width: 34rem; }
 .coded-frame .frame-data { fill: var(--surface); }
 .coded-frame .frame-crc { fill: var(--accent-soft); }
@@ -346,7 +405,7 @@ main .zoomable-image { cursor: zoom-in; }
 
 .lecture-interactive { background: var(--surface-alt); border: 1px solid var(--line); border-radius: .5rem; padding: 1rem; margin: 1.1rem 0; }
 .constellation-figures { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-block: 1.5rem; }
-.constellation-figures figure { margin: 0; padding: .8rem; background: var(--surface); border: 1px solid var(--line); overflow: hidden; }
+.constellation-figures figure { margin: 0; padding: .8rem; background: var(--surface); border: 1px solid var(--line); border-radius: .5rem; overflow: hidden; }
 .constellation-figures figure:last-child { grid-column: 1 / -1; max-width: 38rem; width: 100%; justify-self: center; }
 .constellation-figures figcaption { font-weight: 700; margin-bottom: .4rem; }
 .constellation-figures img { display: block; width: 180%; max-width: none; height: auto; margin-left: -40%; }
@@ -404,12 +463,15 @@ main .zoomable-image { cursor: zoom-in; }
 .interactive-controls output { font-weight: 400; color: var(--muted); }
 .interactive-controls button { padding: .4rem .7rem; border: 1px solid var(--accent); border-radius: .3rem; background: var(--surface); color: var(--ink); }
 .interactive-output { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(13rem, .8fr); align-items: start; gap: 1rem; }
-.interactive-plot svg { display: block; width: 100%; max-width: 31rem; height: auto; border: 1px solid var(--line); }
-.interactive-metrics { background: var(--surface); border: 1px solid var(--line); padding: .8rem 1rem; }
+.interactive-plot svg { display: block; width: 100%; max-width: 31rem; height: auto; border: 1px solid var(--line); border-radius: .35rem; }
+.interactive-metrics { background: var(--surface); border: 1px solid var(--line); border-radius: .35rem; padding: .8rem 1rem; }
 .interactive-metrics p { margin: .25rem 0 .65rem; }
 .interactive-note { color: var(--muted); font-size: .9rem; }
 .spectrum-plot svg { display: block; width: 100%; height: auto; border: 1px solid var(--line); background: var(--surface); }
-.quarto-dark .lecture-interactive :is(.interactive-plot, .spectrum-plot, .ber-plot) svg { --surface: #f8faf9; --ink: #17343b; --muted: #47656d; --line: #abc3c6; --accent: #087784; --focus: #a84b12; }
+:is(.lecture-interactive, .lecture-lightbox) { --signal-ideal: #3569b7; --signal-received: #b35b16; --signal-error: #a52e28; --curve-qpsk: var(--accent); --curve-qpsk-high: #3569b7; --curve-qam16: #b35b16; --curve-qam16-high: #718329; --curve-qam64: #8e5cb1; }
+.quarto-dark :is(.lecture-interactive, .lecture-lightbox) { --signal-ideal: #83a9f2; --signal-received: #f5aa60; --signal-error: #ff9a8c; --curve-qpsk-high: #83a9f2; --curve-qam16: #f5aa60; --curve-qam16-high: #b8cc68; --curve-qam64: #ba93df; }
+.interactive-controls input { accent-color: var(--accent); }
+.lecture-interactive :is(.spectrum-plot, .ber-plot) { max-width: 100%; overflow-x: auto; border-radius: .35rem; }
 .spectrum-summary { padding: .6rem .2rem; font-weight: 600; }
 .spectrum-key { display: inline-block; width: 1.4rem; margin: 0 .35rem 0 .8rem; vertical-align: middle; border-top: 3px solid var(--accent); }
 
@@ -495,6 +557,7 @@ main .zoomable-image { cursor: zoom-in; }
 }
 
 @media (max-width: 760px) {
+  .lecture-interactive :is(.spectrum-plot, .ber-plot) svg { min-width: 38rem; }
   .access-figure { overflow-x: auto; }
   .access-figure img { min-width: 42rem; }
   .multiplex-figure { overflow-x: auto; }

@@ -49,7 +49,7 @@ format:
 
 </details>
 
-<div class="ks-widget" data-sampling="tone"></div>
+<div class="ks-widget course-demo" data-sampling="tone"></div>
 
 > Какая из показанных синусоид согласуется с отсчётами? Достаточно ли самих отсчётов, чтобы выбрать исходную?
 
@@ -59,7 +59,7 @@ format:
 
 > Если разрешены только восемь уровней, какое значение может заменить этот отсчёт? Какие другие отсчёты получат то же значение?
 
-<div class="quantization-widget" data-quantization-point></div>
+<div class="quantization-widget course-demo" data-quantization-point></div>
 
 <details><summary>Что происходит с одним отсчётом</summary>
 
@@ -97,7 +97,7 @@ $$\Delta=\frac{2X_{\max}}{2^n},\qquad |e|\leq\frac{\Delta}{2}.$$
 
 Каждый отсчёт сигнала проходит ту же процедуру отдельно. Кружки показывают выбранные уровни; отрезки между исходным значением и уровнем — ошибки квантования.
 
-<div class="quantization-widget" data-quantization="uniform"></div>
+<div class="quantization-widget course-demo" data-quantization="uniform"></div>
 
 </details>
 
@@ -119,13 +119,13 @@ $$\Delta=\frac{2X_{\max}}{2^n},\qquad |e|\leq\frac{\Delta}{2}.$$
 
 </details>
 
-<div class="quantization-widget" data-quantization="compare"></div>
+<div class="quantization-widget course-demo" data-quantization="compare"></div>
 
 <details><summary>Телефонная ИКМ: пример А-характеристики</summary>
 
 В телефонной ИКМ используется сегментная нелинейная шкала. В этой нормированной модели восьмибитное слово содержит знак, трёхбитный номер сегмента и четырёхбитную позицию внутри него. Минимальный шаг обозначен $\Delta_0$. Для двух восьмибитных шкал на одном диапазоне отсчёты $+10\Delta_0$ и $+1530\Delta_0$ показывают, как меняется распределение ошибки.
 
-<div class="companding-line-widget" data-companding-widget></div>
+<div class="companding-line-widget course-demo" data-companding-widget></div>
 
 Числовая шкала нормирована для учебного сравнения. [Рекомендация G.711 Международного союза электросвязи](https://www.itu.int/rec/T-REC-G.711) задаёт телефонную ИКМ. Пример стандарта дополняет общую идею неравномерного квантования.
 
@@ -161,7 +161,7 @@ $$\Delta=\frac{2X_{\max}}{2^n},\qquad |e|\leq\frac{\Delta}{2}.$$
 <div class="interactive-scene">
 <div class="scene-overline">Биты → сигнал в линии</div>
 <div class="scene-model">
-<div class="companding-line-widget" data-line-widget></div>
+<div class="companding-line-widget course-demo" data-line-widget></div>
 <p class="interactive-source"><a href="https://github.com/temaSW/intro-to-networking/blob/main/course/interactives/companding-line-ui.js">Исходник</a></p>
 </div>
 </div>
@@ -275,7 +275,7 @@ HDB-3 и манчестерский код показаны на том же п�
 <div class="interactive-scene">
 <div class="scene-overline">Скремблирование</div>
 <div class="scene-model">
-<div class="scrambler-widget" data-scrambler-widget></div>
+<div class="scrambler-widget course-demo" data-scrambler-widget></div>
 <p class="interactive-source"><a href="https://github.com/temaSW/intro-to-networking/blob/main/course/interactives/scrambler-ui.js">Исходник</a></p>
 </div>
 </div>
@@ -286,7 +286,7 @@ HDB-3 и манчестерский код показаны на том же п�
 
 Сформированный сигнал основной полосы показан до переноса спектра на несущую. Полоса канала расположена около несущей частоты $f_c$.
 
-<div class="baseband-bridge">
+<div class="baseband-bridge course-demo">
 <svg class="baseband-spectrum" viewBox="0 0 620 165" role="img" aria-label="Спектр сигнала основной полосы около нулевой частоты и полоса канала около несущей">
   <line x1="30" y1="130" x2="600" y2="130" stroke="currentColor"/>
   <line x1="310" y1="135" x2="310" y2="18" stroke="currentColor"/>
@@ -302,12 +302,12 @@ HDB-3 и манчестерский код показаны на том же п�
 
 Полученный сигнал занимает определённую полосу частот. Как передать его по каналу с другой полосой и сколько данных можно разместить в доступном физическом ресурсе?
 
-[Тема 04. Физический ресурс и полезная скорость →](04-physical-resource.qmd)
+[Тема 02. Физический ресурс и скорость передачи →](04-physical-resource.qmd)
 
 :::
 
 <script type="module" src="../interactives/companding-line-ui.js?v=20261005-1"></script>
-<script type="module" src="../interactives/line-spectrum-ui.js?v=20260929-5"></script>
+<script type="module" src="../interactives/line-spectrum-ui.js?v=20261010-layout"></script>
 <script type="module" src="../interactives/scrambler-ui.js?v=20260929-2"></script>
 <script src="../interactives/image-lightbox.js" defer></script>
 

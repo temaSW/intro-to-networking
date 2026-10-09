@@ -1,9 +1,9 @@
 <div class="access-figures">
-  <figure class="access-figure" tabindex="0">
+  <figure class="access-figure course-demo" tabindex="0">
     <img src="../assets/lecture-04/multiple-access-methods.png" alt="Сравнение FDMA, TDMA, CDMA и OFDMA: полосы частот, интервалы времени, наложенные кодовые слои и клетки сетки время × частота">
     <figcaption>Четыре схемы разделения ресурса. Иллюстрация из <a href="https://theconversation.com/what-is-3g-and-why-is-it-being-shut-down-an-electrical-engineer-explains-176781">The Conversation</a>, лицензия <a href="https://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0</a>; изображение не изменено.</figcaption>
   </figure>
-  <figure class="access-figure access-figure-mimo" tabindex="0">
+  <figure class="access-figure access-figure-mimo course-demo" tabindex="0">
     <img src="../assets/lecture-04/mu-mimo-comparison.png" alt="Слева одна точка доступа обслуживает устройства по очереди, справа она одновременно передаёт нескольким устройствам по пространственным потокам">
     <figcaption>Сравнение обслуживания одного и нескольких пользователей. Изображение: <a href="https://www.everythingrf.com/community/what-is-mu-mimo">everything RF</a>.</figcaption>
   </figure>
