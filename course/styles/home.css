@@ -27,9 +27,8 @@
 .course-home .home-material > i { font-size: 1.7rem; color: var(--accent); }
 .course-home .home-material-title { font-size: 1.25rem; font-weight: 700; color: var(--ink); line-height: 1.25; }
 .course-home .home-material-action { color: var(--accent); font-size: .9rem; font-weight: 650; margin-top: auto; padding-top: .5rem; }
-.course-home .home-topics ol { list-style: none; padding: 0; counter-reset: topic; }
-.course-home .home-topics li { position: relative; max-width: none; padding: .9rem 0 .9rem 3.5rem; counter-increment: topic; border-bottom: 1px solid var(--line); }
-.course-home .home-topics li::before { content: "0" counter(topic); position: absolute; top: 1rem; left: 0; color: var(--accent); font: 600 1.2rem ui-monospace, monospace; }
+.course-home .home-topics ul { list-style: none; padding: 0; }
+.course-home .home-topics li { max-width: none; padding: .9rem 0; border-bottom: 1px solid var(--line); }
 .course-home .home-topics li p { margin-bottom: .35rem; color: var(--muted); }
 .course-home .home-topics strong { color: var(--ink); font-size: 1.12rem; overflow-wrap: anywhere; hyphens: auto; }
 .course-home .home-text-link { display: inline-block; margin-top: .8rem; font-weight: 650; }
@@ -75,3 +74,4 @@
 .course-home #quarto-header .quarto-navbar-tools a[href^="https://docs.google.com/forms/d/e/"] { width: 44px; min-height: 44px; height: 44px; color: var(--feedback-color); background: var(--feedback-bg); }
 
 .course-home main.content section.level2 :is(p, li) { max-width: none; text-align: justify; hyphens: auto; }
+.course-home main.content .home-topics li > p:first-child { text-align: left; }
