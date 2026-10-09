@@ -1,0 +1,9 @@
+```{=html}
+<figure class="course-demo node-representation">
+  <div class="node-representation-row"><strong>1. Принятый кадр<br>Участок С → У</strong><div class="node-frame"><div class="node-link-header"><strong>Канальное оформление</strong><span>Получатель на участке: У</span></div><div class="node-packet"><div class="node-network-header"><strong>Сетевой заголовок</strong><span>Источник: С</span><span>Назначение: Д</span></div><div class="node-payload">Фрагмент фотографии</div></div></div></div>
+  <div class="node-representation-row"><strong>2. Пакет в узле У<br>Решение о пересылке</strong><div class="node-packet"><div class="node-network-header"><strong>Сетевой заголовок</strong><span>Источник: С</span><span>Назначение: Д</span></div><div class="node-payload">Фрагмент фотографии</div></div></div>
+  <div class="node-representation-row"><strong>3. Новый кадр<br>Участок У → В</strong><div class="node-frame"><div class="node-link-header"><strong>Канальное оформление</strong><span>Получатель на участке: В</span></div><div class="node-packet"><div class="node-network-header"><strong>Сетевой заголовок</strong><span>Источник: С</span><span>Назначение: Д</span></div><div class="node-payload">Фрагмент фотографии</div></div></div></div>
+  <figcaption>Канальный получатель изменился с У на В; сетевой адресат остался Д. Схема показывает вложение блоков и область доставки, а не расположение всех полей конкретного стандарта.</figcaption>
+</figure>
+```
+
