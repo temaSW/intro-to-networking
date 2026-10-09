@@ -28,7 +28,7 @@
 Лекционный интерфейс использует сокращённый набор регуляторов.
 
 ```html
-<div class="lecture-interactive" data-channel-playground
+<div class="lecture-interactive course-demo" data-channel-playground
      data-channel-mode="multipath" data-channel-layout="lecture"></div>
 ```
 
@@ -53,3 +53,7 @@
 `python scripts/check.py`
 
 Описание допущений: `docs/channel-playground.md`.
+
+## Оформление
+
+Лекционный контейнер использует общую рамку `course-demo`. Палитра графиков и схемы многолучёвости наследует переменные `base.scss`; смена темы меняет одновременно кривые и легенды без пересчёта модели. Обычный график сохраняет ширину не менее `--plot-min-width`, созвездие — 24 rem, схема движения — 27 rem. На узком экране прокрутка ограничена фокусируемым `.cp-plot-scroll`. Шкалы и параметры предметных моделей не меняются при адаптации оформления.

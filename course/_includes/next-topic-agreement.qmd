@@ -1,0 +1,32 @@
+```{=html}
+<figure class="course-demo access-exchange" aria-labelledby="access-exchange-caption">
+  <div class="access-topology">
+    <div class="access-hop" role="group" aria-label="Двусторонний обмен устройства с первым сетевым узлом">
+      <strong class="access-hop-title">Обмен с первым сетевым узлом</strong>
+      <div class="access-endpoint">
+        <svg viewBox="0 0 96 88" aria-hidden="true"><rect x="29" y="8" width="38" height="68" rx="7"/><path d="M39 15 H57 M41 69 H55"/><rect class="access-tint" x="34" y="24" width="28" height="33" rx="3"/><path d="M38 35 H58 M38 43 H58 M38 51 H50"/></svg>
+        <strong>Устройство</strong>
+      </div>
+      <div class="access-link">
+        <span>Данные и служебные сигналы</span>
+        <svg class="access-link-horizontal" viewBox="0 0 240 64" aria-hidden="true"><path d="M12 18 H226 l-11 -7 m11 7 -11 7 M228 46 H14 l11 -7 m-11 7 11 7"/></svg>
+        <svg class="access-link-vertical" viewBox="0 0 64 100" aria-hidden="true"><path d="M20 10 V88 l-7 -11 m7 11 7 -11 M44 90 V12 l-7 11 m7 -11 7 11"/></svg>
+        <span>В обоих направлениях</span>
+      </div>
+      <div class="access-endpoint">
+        <svg viewBox="0 0 96 88" aria-hidden="true"><path d="M34 76 L48 37 L62 76 Z M40 61 H56 M44 50 H52"/><circle class="access-tint" cx="48" cy="28" r="5"/><path d="M34 16 Q23 28 34 40 M62 16 Q73 28 62 40 M24 7 Q4 28 24 49 M72 7 Q92 28 72 49"/></svg>
+        <strong>Первый сетевой узел</strong>
+        <span>Точка доступа или базовая станция</span>
+      </div>
+    </div>
+    <div class="access-onward">
+      <svg class="access-network-link" viewBox="0 0 56 64" aria-hidden="true"><path d="M4 18 H50 l-9 -6 m9 6 -9 6 M52 46 H6 l9 -6 m-9 6 9 6"/></svg>
+      <div class="access-endpoint access-network">
+        <svg viewBox="0 0 96 88" aria-hidden="true"><path class="access-tint" d="M23 63 C4 62 3 39 19 34 C15 13 43 7 53 23 C69 10 88 22 85 39 C103 46 91 65 76 63 Z"/><path d="M29 42 L47 30 L67 44 L49 58 Z M47 30 L49 58"/><circle cx="29" cy="42" r="4"/><circle cx="47" cy="30" r="4"/><circle cx="67" cy="44" r="4"/><circle cx="49" cy="58" r="4"/></svg>
+        <strong>Далее в сеть</strong>
+      </div>
+    </div>
+  </div>
+  <figcaption id="access-exchange-caption">Как устройству и первому узлу начать обмен и поддерживать его при изменении канала?</figcaption>
+</figure>
+```

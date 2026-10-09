@@ -10,7 +10,7 @@ const META = {
   spread: ['Время когерентности', 'Будет ли канал меняться по амплитуде, если все лучи имеют одинаковый сдвиг?', 'Начните без отражений. Добавьте лучи с разными направлениями, увеличьте скорость и сравните T с Tс.'],
   media: ['Сравнение сред', 'Какие из наблюдавшихся эффектов будут важны в разных средах?', 'Выберите среду и сопоставьте причины искажений с её физикой.'],
 };
-const COLORS = ['#1479b8', '#d66720', '#8b62c5', '#168a69'];
+const COLORS = ['var(--signal-ideal)', 'var(--signal-received)', 'var(--curve-qam64)', 'var(--accent)'];
 const finite = (v, digits = 2) => Number.isFinite(v) ? v.toLocaleString('ru-RU', {maximumFractionDigits: digits}) : '∞';
 const metric = (title, value) => `<div class="cp-metric"><span>${title}</span><strong>${value}</strong></div>`;
 function drawPlot(title, series, {xmin = 0, xmax = 1, ymin = -1, ymax = 1, xlabel = '', ylabel = '', markers = [], bands = [], horizontalBands = [], yticks, square = false, width = 720} = {}) {
@@ -28,7 +28,7 @@ function drawPlot(title, series, {xmin = 0, xmax = 1, ymin = -1, ymax = 1, xlabe
   }).join('');
   const id = drawPlot.id++;
   const svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${title}"><defs><clipPath id="cp-clip-${id}"><rect x="${L}" y="${T}" width="${W-L-R}" height="${H-T-B}"/></clipPath></defs>${ticks}<g clip-path="url(#cp-clip-${id})">${horizontalBands.map(b=>`<rect x="${L}" y="${y(b.high)}" width="${W-L-R}" height="${y(b.low)-y(b.high)}" class="${b.className}"/><text x="${W-R-5}" y="${y(b.high)+14}" text-anchor="end">${b.label}</text>`).join('')}${bands.map(b => `<rect x="${x(b[0])}" y="${T}" width="${x(b[1])-x(b[0])}" height="${H-T-B}" class="cp-band"/>`).join('')}${curves}${markers.map(m => `<path d="M${x(m.value)} ${T}V${H-B}" class="cp-marker"/><text x="${x(m.value)+4}" y="${T+13}">${m.label}</text>`).join('')}</g><text x="${W/2}" y="${H-3}" text-anchor="middle">${xlabel}</text><text x="${L}" y="14">${ylabel}</text></svg>`;
-  return `<figure class="cp-plot ${square ? 'cp-square' : ''}"><figcaption>${title}</figcaption>${svg}<div class="cp-legend">${series.filter(s => s.label).map((s, i) => `<span><i style="background:${s.color || COLORS[i % COLORS.length]}"></i>${s.label}</span>`).join('')}</div></figure>`;
+  return `<figure class="cp-plot ${square ? 'cp-square' : ''}"><figcaption>${title}</figcaption><div class="cp-plot-scroll" tabindex="0" role="region" aria-label="${title}; на узком экране доступна прокрутка">${svg}</div><div class="cp-legend">${series.filter(s => s.label).map((s, i) => `<span><i style="background:${s.color || COLORS[i % COLORS.length]}"></i>${s.label}</span>`).join('')}</div></figure>`;
 }
 drawPlot.id = 0;
 
@@ -60,7 +60,7 @@ export function mountChannelPlayground(root, options = {}) {
     shared.parameters = p;
     for (const [peer, update] of shared.listeners) if (peer !== root) update();
   }
-  const plot = (title, series, options = {}) => drawPlot(title, series, {width: root.querySelector('.cp-results')?.clientWidth || 720, ...options});
+  const plot = (title, series, options = {}) => drawPlot(title, series, {width: Math.max(608, root.querySelector('.cp-results')?.clientWidth || 720), ...options});
   function pathControls(withAngles = false) {
     return `<fieldset class="cp-paths"><legend>Отражённые лучи</legend><p>Прямой луч: амплитуда 1, задержка 0${withAngles ? `, угол ${finite(p.direction)}°` : ''}.</p>${p.paths.map((path, i) => `<div class="cp-path"><strong>Луч ${i+1}</strong>${slider(`path-${i}-amplitude`, 'Относительная амплитуда', 0, 1, .05, path.amplitude)}${slider(`path-${i}-delay`, 'Задержка', 0, 5, .025, path.delay, 'мкс')}${withAngles ? slider(`path-${i}-angle`, 'Направление прихода', 0, 180, 5, path.angle, '°') : ''}<button type="button" data-remove="${i}">Убрать луч ${i+1}</button></div>`).join('')}<button type="button" data-add ${p.paths.length >= 3 ? 'disabled' : ''}>Добавить отражённый луч</button></fieldset>`;
   }
@@ -73,7 +73,7 @@ export function mountChannelPlayground(root, options = {}) {
         case 'bandwidth': return slider('rate', 'Битовая скорость', 1, 20, .5, p.rate, 'кбит/с') + slider('bandwidth', 'Полоса канала', .1, 20, .1, p.bandwidth, 'кГц') + select('regeneration', 'Регенератор', [['off','Выключен'], ['on','Включён']], p.regeneration);
         case 'noise': return select('disturbance', 'Добавленный сигнал', [['noise','Шум'], ['interference','Внешняя помеха']], p.disturbance) + (p.disturbance === 'noise' ? slider('snr', 'Отношение сигнал/шум Eₛ/N₀', -12, 24, 1, p.snr, 'дБ') : slider('interference', 'Амплитуда помехи / сигнала', 0, 3, .05, p.interference));
         case 'multipath': return pathControls();
-        case 'coherence': return slider('frequencyGap', 'Разнос двух частот', 0, 1, .01, p.f2-p.f1, 'МГц') + slider('path-0-delay', 'Копия приходит позже на', 0, 5, .025, p.paths[0].delay, 'мкс');
+        case 'coherence': return slider('frequencyGap', 'Разнос двух частот', 0, 1, .01, p.f2-p.f1, 'МГц') + slider('signalBandwidth', 'Полоса сигнала', .01, 1.5, .01, p.signalBandwidth, 'МГц') + slider('path-0-delay', 'Копия приходит позже на', 0, 5, .025, p.paths[0].delay, 'мкс');
         case 'shift': return slider('speed', 'Скорость', 0, 60, 1, p.speed, 'м/с') + slider('carrierGHz', 'Несущая', .1, 6, .1, p.carrierGHz, 'ГГц') + slider('offset', 'Рассогласование генераторов', -500, 500, 5, p.offset, 'Гц');
         case 'spread': return slider('speed', 'Скорость движения приёмника', 0, 60, 1, p.speed, 'м/с') + slider('duration', 'Длительность одной передачи', .1, 100, .1, p.duration, 'мс') + slider('probePercent','Момент внутри передачи',0,100,.1,p.probePercent ?? 0,'%');
         case 'media': return '';
@@ -92,7 +92,7 @@ export function mountChannelPlayground(root, options = {}) {
   }
   function views() {
     if (lecture && mode==='spread') return [['time','Одна передача']];
-    return ({attenuation: [['time','Форма']], bandwidth: [['time','Импульсы'],['spectrum','Полоса канала']], noise: [['time','Во времени'],['constellation','Созвездие']], multipath: [['time','Копии и сумма'],['frequency','H(f)']], coherence: [['compare','Два сигнала'],['frequency','Канал по частоте']], shift: [['spectrum','Спектр']], spread: [['time','Уровень во времени'],['spectrum','Сдвиги лучей']], media: []})[mode];
+    return ({attenuation: [['time','Форма']], bandwidth: [['time','Импульсы'],['spectrum','Полоса канала']], noise: [['time','Во времени'],['constellation','Созвездие']], multipath: [['time','Копии и сумма'],['frequency','H(f)']], coherence: [['compare','Два сигнала'],['frequency','Канал по частоте'],['band','Полоса сигнала']], shift: [['spectrum','Спектр']], spread: [['time','Уровень во времени'],['spectrum','Сдвиги лучей']], media: []})[mode];
   }
   function shell() {
     root.classList.toggle('cp-media-mode', lecture && mode==='media');
@@ -119,6 +119,10 @@ export function mountChannelPlayground(root, options = {}) {
     render();
   }
   function render() {
+    if (lecture && mode === 'coherence') {
+      root.querySelector('[data-param=frequencyGap]').closest('label').hidden = view === 'band';
+      root.querySelector('[data-param=signalBandwidth]').closest('label').hidden = view !== 'band';
+    }
     let metrics = '', charts = '', note = '', explanation = '', dataNote = '';
     if (mode === 'attenuation') {
       const a = model.attenuation(p);
@@ -126,7 +130,7 @@ export function mountChannelPlayground(root, options = {}) {
       metrics = metric('После среды', `${finite(a.received)} дБм`) + metric('Сигнал на входе приёмника', `${finite(outputLevel)} дБм`) + metric('Диапазон приёмника', `${p.sensitivity}…${p.receiverMaximum} дБм`) + metric('Ограниченные отсчёты', `${finite(100*clipped/t.length,1)} %`);
       if (p.aid==='amplifier') metrics += metric('Собственный шум на выходе', Number.isFinite(noiseDbm) ? `${finite(noiseDbm)} дБм` : 'Нет');
       {
-        charts = plot('Мощность сигнала во времени', [{x:t,y:inputPower,label:'После среды',color:'#7a8994'}, {x:t,y:outputPower,label:'Вход приёмника',color:COLORS[0],dash:true}, {x:t,y:receiverPower,label:'После ограничения',color:COLORS[1]}],{xmax:12,ymin:-100,ymax:40,yticks:[-100,-65,-25,0,40],xlabel:'Условное время',ylabel:'Мощность, дБм',horizontalBands:[{low:p.receiverMaximum,high:40,className:'cp-overload-band',label:'Перегрузка'}, {low:p.sensitivity,high:p.receiverMaximum,className:'cp-range-band',label:'Динамический диапазон'}, {low:-100,high:p.sensitivity,className:'cp-weak-band',label:'Ниже чувствительности'}]});
+        charts = plot('Мощность сигнала во времени', [{x:t,y:inputPower,label:'После среды',color:'var(--muted)'}, {x:t,y:outputPower,label:'Вход приёмника',color:COLORS[0],dash:true}, {x:t,y:receiverPower,label:'После ограничения',color:COLORS[1]}],{xmax:12,ymin:-100,ymax:40,yticks:[-100,-65,-25,0,40],xlabel:'Условное время',ylabel:'Мощность, дБм',horizontalBands:[{low:p.receiverMaximum,high:40,className:'cp-overload-band',label:'Перегрузка'}, {low:p.sensitivity,high:p.receiverMaximum,className:'cp-range-band',label:'Динамический диапазон'}, {low:-100,high:p.sensitivity,className:'cp-weak-band',label:'Ниже чувствительности'}]});
         const millivolts = 1000 * Math.sqrt(50 * 1e-3 * 10 ** (p.sensitivity/10));
         const upper = receiverLimit * millivolts, limit = upper * 1.25;
         charts += plot('Форма сигнала на входе приёмника', [{x:t,y:output.map(x=>x*millivolts),label:'До ограничения',dash:true}, {x:t,y:receiver.map(x=>x*millivolts),label:'После ограничения'}, {x:[0,12],y:[upper,upper],label:'Максимальная амплитуда',color:COLORS[2],dash:true}, {x:[0,12],y:[-upper,-upper],color:COLORS[2],dash:true}],{xmax:12,ymin:-limit,ymax:limit,yticks:[-upper,0,upper],xlabel:'Условное время',ylabel:'Напряжение, мВ'});
@@ -149,15 +153,16 @@ export function mountChannelPlayground(root, options = {}) {
       metrics = metric('Ошибочные решения в примере', `${n.errors} / ${n.points.length}`) + metric('Передача', 'BPSK · 2 состояния');
       if (view==='constellation') {
         const extent = Math.max(2, ...n.points.flatMap(x=>[Math.abs(x.re),Math.abs(x.im)]));
-        charts = plot('Созвездие и граница решения I = 0', [{points:n.points.filter(x=>!x.error).map(x=>[x.re,x.im]),label:'Верное решение'},{points:n.points.filter(x=>x.error).map(x=>[x.re,x.im]),label:'Ошибка',color:'#d34b55'},{points:[[-1,0],[1,0]],label:'Переданные состояния',color:COLORS[2],radius:6}],{xmin:-extent,xmax:extent,ymin:-extent,ymax:extent,xlabel:'I',ylabel:'Q',markers:[{value:0,label:'Граница'}],square:true});
+        charts = plot('Созвездие и граница решения I = 0', [{points:n.points.filter(x=>!x.error).map(x=>[x.re,x.im]),label:'Верное решение'},{points:n.points.filter(x=>x.error).map(x=>[x.re,x.im]),label:'Ошибка',color:'var(--signal-error)'},{points:[[-1,0],[1,0]],label:'Переданные состояния',color:COLORS[2],radius:6}],{xmin:-extent,xmax:extent,ymin:-extent,ymax:extent,xlabel:'I',ylabel:'Q',markers:[{value:0,label:'Граница'}],square:true});
       } else {const points=n.points.slice(0,24), t=points.map((_,i)=>i), extent=Math.max(2,...points.flatMap(x=>[Math.abs(x.re),Math.abs(x.re-x.tx)]))*1.1;charts=plot('Отсчёты сигнала в моменты решений', [{x:t,y:points.map(x=>x.tx),label:'s: исходные уровни'},{x:t,y:points.map(x=>x.re),label:'r: I приёмника'},{x:t,y:points.map(x=>x.re-x.tx),label:'Добавленная компонента'}],{xmax:23,ymin:-extent,ymax:extent,xlabel:'Номер символа',ylabel:'Амплитуда'});}
       note = `Первые 24 бита: ${n.points.slice(0,24).map(x=>x.bit).join('')}; принято: ${n.points.slice(0,24).map(x=>x.decision).join('')}. Красные точки пересекли границу решения.`;
       dataNote = `Первые 24 бита: ${n.points.slice(0,24).map(x=>x.bit).join('')}; принято: ${n.points.slice(0,24).map(x=>x.decision).join('')}.`;
       explanation = 'Показаны отсчёты комплексной огибающей двоичной фазовой манипуляции (BPSK). Шум — независимые гауссовы добавки в синфазной I и квадратурной Q координатах; отношение сигнал/шум SNR здесь задано как Eₛ/N₀. Внешняя помеха — периодический треугольный сигнал в синфазной координате: точки располагаются на отрезках, а не окружностях. Число ошибок относится только к этому фрагменту.';
     } else if (mode==='multipath' || mode==='coherence') {
       const m=model.multipath(p), c=model.coherence(p), max=m.paths.reduce((v,x)=>v+x.amplitude,0);
-      metrics = mode==='multipath' ? metric('Лучей',m.paths.length) + metric('Амплитуда суммы на частоте сигнала',finite(model.response(m.paths,p.carrier).magnitude)) : metric('Амплитуда первого сигнала',finite(c.h1.magnitude)) + metric('Амплитуда второго сигнала',finite(c.h2.magnitude)) + metric('Полоса когерентности · ориентир',`${finite(c.bc)} МГц`);
-      const hplot=plot('Частотная характеристика общего канала', [{x:m.frequencies,y:m.h,label:'Амплитуда принятого сигнала'}],{xmax:4,ymin:0,ymax:max*1.05,xlabel:'Частота, МГц',ylabel:'Относительная амплитуда',markers:mode==='coherence'?[{value:p.f1,label:'Первая частота'},{value:p.f2,label:'Вторая частота'}]:[{value:p.carrier,label:'Частота сигнала'}]});
+      metrics = mode==='multipath' ? metric('Лучей',m.paths.length) + metric('Амплитуда суммы на частоте сигнала',finite(model.response(m.paths,p.carrier).magnitude)) : metric('Полоса когерентности · ориентир',`${finite(c.bc)} МГц`) + (view === 'band' ? metric('Полоса сигнала',`${finite(p.signalBandwidth)} МГц`) + metric('Bₛ / Bс',finite(c.ratio)) : metric('Амплитуда первого сигнала',finite(c.h1.magnitude)) + metric('Амплитуда второго сигнала',finite(c.h2.magnitude)));
+      const bandView = mode === 'coherence' && view === 'band';
+      const hplot=plot(bandView ? 'Действие канала внутри полосы сигнала' : 'Частотная характеристика общего канала', [{x:m.frequencies,y:m.h,label:'Амплитуда принятого сигнала'}],{xmax:4,ymin:0,ymax:max*1.05,xlabel:'Частота, МГц',ylabel:'Относительная амплитуда',bands:bandView ? [[p.f1-p.signalBandwidth/2,p.f1+p.signalBandwidth/2]] : [],markers:bandView ? [{value:p.f1,label:'Центр полосы'}] : mode==='coherence'?[{value:p.f1,label:'Первая частота'},{value:p.f2,label:'Вторая частота'}]:[{value:p.carrier,label:'Частота сигнала'}]});
       if(mode==='multipath') {
         const copies=plot('Прямой луч и задержанные копии',m.copies.map((copy,i)=>({x:m.time,y:copy,label:i===0?'Прямой луч':`Отражение ${i}`})),{xmax:12,ymin:-1.2,ymax:1.2,xlabel:'Время, мкс',ylabel:'Амплитуда'});
         const sum=plot('Сумма на приёмнике', [{x:m.time,y:m.copies[0],label:'s(t)',dash:true},{x:m.time,y:m.sum,label:'r(t)'}],{xmax:12,ymin:-max,ymax:max,xlabel:'Время, мкс',ylabel:'Амплитуда'});
@@ -188,7 +193,7 @@ export function mountChannelPlayground(root, options = {}) {
         metrics=metric('Момент после начала передачи',`${finite(moment,2)} мс`) + metric('Приёмник прошёл',`${finite(snapshot.displacement*1000,1)} мм`) + metric('Амплитуда суммы сейчас',`${finite(snapshot.amplitude*100,1)} %`);
         const rx=350-(p.speed ? (p.probePercent ?? 0)*2 : 0);
         const motionId=`cp-motion-${drawPlot.id++}`;
-        charts=`<figure class="cp-plot"><figcaption>Приёмник движется навстречу прямому лучу</figcaption><svg viewBox="0 0 430 225" role="img" aria-label="Прямой луч приходит слева, отражённый сверху. Приёмник движется влево: прямой путь сокращается, путь сбоку почти не меняется.">
+        charts=`<figure class="cp-plot"><figcaption>Приёмник движется навстречу прямому лучу</figcaption><div class="cp-plot-scroll cp-motion-scroll" tabindex="0" role="region" aria-label="Направления лучей и движение приёмника; на узком экране доступна прокрутка"><svg viewBox="0 0 430 225" role="img" aria-label="Прямой луч приходит слева, отражённый сверху. Приёмник движется влево: прямой путь сокращается, путь сбоку почти не меняется.">
           <defs><marker id="${motionId}" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="${COLORS[0]}"/></marker><marker id="${motionId}-side" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="${COLORS[2]}"/></marker></defs>
           <text x="20" y="24">Прямой луч приходит слева</text><text x="180" y="48">Отражённый — сверху</text>
           ${[70,90,110,130].map(y=>`<path d="M140 ${y}H390" stroke="${COLORS[2]}" opacity=".15"/>`).join('')}
@@ -198,7 +203,7 @@ export function mountChannelPlayground(root, options = {}) {
           <circle cx="${rx}" cy="110" r="10" fill="${COLORS[1]}"/><text x="${rx}" y="148" text-anchor="middle">Приёмник</text>
           <path d="M350 174H150" stroke="${COLORS[0]}" stroke-width="2" marker-end="url(#${motionId})"/><text x="250" y="196" text-anchor="middle">Направление движения</text>
           <text x="20" y="218">Позиция в начале · пунктирный кружок</text></svg>
-          <div class="cp-legend"><span>Прямой путь сократился на ${finite(-snapshot.pathChanges[0]*1000,1)} мм</span><span>Путь сбоку: почти без изменения</span><span>Длина волны: ${finite(snapshot.wavelength*1000,1)} мм</span></div></figure>`;
+          </div><div class="cp-legend"><span>Прямой путь сократился на ${finite(-snapshot.pathChanges[0]*1000,1)} мм</span><span>Путь сбоку: почти без изменения</span><span>Длина волны: ${finite(snapshot.wavelength*1000,1)} мм</span></div></figure>`;
         charts+=plot('Две приходящие волны и их сумма в выбранный момент',[
           {x:snapshot.cycles,y:snapshot.copies[0],label:'Прямой луч',color:COLORS[0],dash:true},
           {x:snapshot.cycles,y:snapshot.copies[1],label:'Отражённый луч',color:COLORS[2],dash:true},

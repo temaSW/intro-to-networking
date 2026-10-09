@@ -1,20 +1,20 @@
 ```{=html}
-<figure class="multipath-scheme">
+<figure class="multipath-scheme course-demo">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" role="img" aria-labelledby="multipath-scheme-title multipath-scheme-desc">
   <title id="multipath-scheme-title">Прямой и отражённые лучи радиосигнала</title>
   <desc id="multipath-scheme-desc">Передатчик слева, приёмник справа. Один луч соединяет их напрямую, два других проходят через отражающие поверхности сверху и снизу.</desc>
   <defs>
-    <marker id="multipath-arrow-direct" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="#1479b8"/></marker>
-    <marker id="multipath-arrow-top" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="#d66720"/></marker>
-    <marker id="multipath-arrow-bottom" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="#8b62c5"/></marker>
+    <marker id="multipath-arrow-direct" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="var(--signal-ideal)"/></marker>
+    <marker id="multipath-arrow-top" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="var(--signal-received)"/></marker>
+    <marker id="multipath-arrow-bottom" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="var(--curve-qam64)"/></marker>
   </defs>
   <g fill="none" stroke="currentColor" stroke-width="7" opacity=".35">
     <path d="M160 60H440"/><path d="M160 350H440"/>
   </g>
   <g fill="none" stroke-width="3">
-    <path d="M95 200H505" stroke="#1479b8" marker-end="url(#multipath-arrow-direct)"/>
-    <path d="M90 188L300 60L510 188" stroke="#d66720" marker-end="url(#multipath-arrow-top)"/>
-    <path d="M90 212L300 350L510 212" stroke="#8b62c5" stroke-dasharray="8 5" marker-end="url(#multipath-arrow-bottom)"/>
+    <path d="M95 200H505" stroke="var(--signal-ideal)" marker-end="url(#multipath-arrow-direct)"/>
+    <path d="M90 188L300 60L510 188" stroke="var(--signal-received)" marker-end="url(#multipath-arrow-top)"/>
+    <path d="M90 212L300 350L510 212" stroke="var(--curve-qam64)" stroke-dasharray="8 5" marker-end="url(#multipath-arrow-bottom)"/>
   </g>
   <g fill="var(--surface, var(--bs-body-bg, white))" stroke="currentColor" stroke-width="2">
     <circle cx="80" cy="200" r="16"/><circle cx="520" cy="200" r="16"/>

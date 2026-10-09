@@ -469,8 +469,8 @@ main .zoomable-image { cursor: zoom-in; }
 .interactive-metrics p { margin: .25rem 0 .65rem; }
 .interactive-note { color: var(--muted); font-size: .9rem; }
 .spectrum-plot svg { display: block; width: 100%; height: auto; border: 1px solid var(--line); background: var(--surface); }
-:is(.lecture-interactive, .lecture-lightbox) { --signal-ideal: #3569b7; --signal-received: #b35b16; --signal-error: #a52e28; --curve-qpsk: var(--accent); --curve-qpsk-high: #3569b7; --curve-qam16: #b35b16; --curve-qam16-high: #718329; --curve-qam64: #8e5cb1; }
-.quarto-dark :is(.lecture-interactive, .lecture-lightbox) { --signal-ideal: #83a9f2; --signal-received: #f5aa60; --signal-error: #ff9a8c; --curve-qpsk-high: #83a9f2; --curve-qam16: #f5aa60; --curve-qam16-high: #b8cc68; --curve-qam64: #ba93df; }
+:is(.lecture-interactive, .lecture-lightbox, .channel-playground, .multipath-scheme) { --signal-ideal: #3569b7; --signal-received: #b35b16; --signal-error: #a52e28; --curve-qpsk: var(--accent); --curve-qpsk-high: #3569b7; --curve-qam16: #b35b16; --curve-qam16-high: #718329; --curve-qam64: #8e5cb1; }
+.quarto-dark :is(.lecture-interactive, .lecture-lightbox, .channel-playground, .multipath-scheme) { --signal-ideal: #83a9f2; --signal-received: #f5aa60; --signal-error: #ff9a8c; --curve-qpsk-high: #83a9f2; --curve-qam16: #f5aa60; --curve-qam16-high: #b8cc68; --curve-qam64: #ba93df; }
 .interactive-controls input { accent-color: var(--accent); }
 .lecture-interactive :is(.spectrum-plot, .ber-plot) { max-width: 100%; overflow-x: auto; border-radius: .35rem; }
 .spectrum-summary { padding: .6rem .2rem; font-weight: 600; }
@@ -571,4 +571,31 @@ main .zoomable-image { cursor: zoom-in; }
   .states-diagram { grid-template-columns: 1fr; }
   .tf-grid { margin-left: 1.8rem; }
   .lecture-interactive { padding: .8rem; }
+}
+
+/* Reusable access-link diagram: the first hop stays explicit on narrow screens. */
+.access-topology { display: grid; grid-template-columns: minmax(0, 1fr) minmax(10rem, .27fr); gap: var(--demo-gap); align-items: center; }
+.access-hop { display: grid; grid-template-columns: minmax(7rem, 1fr) minmax(8rem, 1.4fr) minmax(9rem, 1fr); gap: 1rem; align-items: center; padding: 1rem; border: 1px solid var(--accent); border-radius: .4rem; background: var(--accent-soft); }
+.access-hop-title { grid-column: 1 / -1; text-align: center; color: var(--accent); }
+.access-endpoint { display: flex; flex-direction: column; align-items: center; gap: .5rem; text-align: center; }
+.access-endpoint > svg { display: block; width: 6rem; height: 5.5rem; fill: var(--surface); stroke: var(--accent); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.access-tint { fill: color-mix(in srgb, var(--accent) 15%, var(--surface)); }
+.access-endpoint > span, .access-link > span { color: var(--muted); font-size: .9rem; line-height: 1.4; }
+.access-link { display: flex; flex-direction: column; align-items: center; gap: .25rem; text-align: center; }
+.access-link > svg, .access-network-link { fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.access-link-horizontal { display: block; width: 100%; height: auto; }
+.access-link-vertical { display: none; }
+.access-onward { display: flex; align-items: center; gap: .6rem; }
+.access-network-link { flex: 0 0 2.5rem; width: 2.5rem; height: auto; }
+.access-network { flex: 1; }
+.access-network > svg { stroke: var(--muted); }
+.access-exchange figcaption { margin-top: 1rem; text-align: center; }
+@media (max-width: 760px) {
+  .access-topology { grid-template-columns: 1fr; }
+  .access-hop { grid-template-columns: 1fr; gap: .8rem; }
+  .access-hop-title { grid-column: auto; }
+  .access-link-horizontal { display: none; }
+  .access-link-vertical { display: block; width: 3rem; height: auto; }
+  .access-onward { flex-direction: column; }
+  .access-network-link { flex: none; transform: rotate(90deg); }
 }
