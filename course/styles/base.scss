@@ -169,11 +169,12 @@ main.content .course-demo :is(.line-wave-scroll, .scrambler-chart-scroll) svg { 
 main.content .course-demo :is(.interactive-output, .q-controls, .ks-controls) { gap: var(--demo-gap); }
 main.content .course-demo .interactive-output { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 main.content .course-demo .interactive-plot svg { max-width: none; }
-main.content .constellation-figures { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--demo-gap); }
+main.content .constellation-figures { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--demo-gap); }
 main.content .constellation-figures figure { padding: var(--demo-padding); border-radius: var(--demo-radius); }
-main.content .constellation-figures figure:last-child { grid-column: auto; max-width: none; }
+main.content .constellation-figures figure:last-child { grid-column: 1 / -1; max-width: 38rem; width: 100%; justify-self: center; }
 @media (max-width: 760px) {
   main.content .constellation-figures, main.content .course-demo .interactive-output { grid-template-columns: 1fr; }
+  main.content .constellation-figures figure:last-child { grid-column: auto; }
 }
 .map-number { color: var(--muted); font-size: .85rem; font-variant-numeric: tabular-nums; }
 .network-journey, .layer-comparison, .encapsulation-map {
