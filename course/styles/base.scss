@@ -176,6 +176,26 @@ main.content .constellation-figures figure:last-child { grid-column: 1 / -1; max
   main.content .constellation-figures, main.content .course-demo .interactive-output { grid-template-columns: 1fr; }
   main.content .constellation-figures figure:last-child { grid-column: auto; }
 }
+/* Modulation application map: bars encode bits per symbol, rather than point count. */
+.modulation-roadmap-heading, .modulation-roadmap-steps li {
+  display: grid; grid-template-columns: minmax(9rem, 1fr) minmax(7rem, 1fr) minmax(10rem, 1.5fr);
+  align-items: center; gap: 1rem;
+}
+.modulation-roadmap-heading { color: var(--muted); font-size: .85rem; padding-bottom: .6rem; }
+main.content .modulation-roadmap-steps { list-style: none; padding: 0; margin: 0; }
+main.content .modulation-roadmap-steps li { padding: .65rem 0; border-top: 1px solid var(--line); text-align: start; }
+.modulation-roadmap-steps li > :last-child { color: var(--muted); font-size: .9rem; line-height: 1.4; }
+.modulation-roadmap-steps li > :last-child strong { color: var(--ink); }
+.modulation-bit-bar { position: relative; display: flex; align-items: center; height: 1.8rem; background: var(--surface-alt); border-radius: .2rem; }
+.modulation-bit-bar::before { content: ''; position: absolute; inset: 0 auto 0 0; width: calc(var(--bits) / 14 * 100%); background: var(--accent-soft); border-right: 2px solid var(--accent); border-radius: .2rem 0 0 .2rem; }
+.modulation-bit-bar b { position: relative; padding-left: .5rem; color: var(--accent); font-variant-numeric: tabular-nums; }
+.modulation-roadmap figcaption { margin-top: .65rem; }
+@media (max-width: 600px) {
+  .modulation-roadmap-heading { grid-template-columns: minmax(0, 1fr) minmax(5rem, .8fr); }
+  .modulation-roadmap-heading > :last-child { display: none; }
+  main.content .modulation-roadmap-steps li { grid-template-columns: minmax(0, 1fr) minmax(5rem, .8fr); gap: .35rem .75rem; }
+  .modulation-roadmap-steps li > :last-child { grid-column: 1 / -1; }
+}
 .map-number { color: var(--muted); font-size: .85rem; font-variant-numeric: tabular-nums; }
 .network-journey, .layer-comparison, .encapsulation-map {
   margin-block: 1.5rem; padding: clamp(.9rem, 2.4vw, 1.8rem);
