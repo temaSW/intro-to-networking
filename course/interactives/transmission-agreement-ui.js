@@ -3,11 +3,11 @@ import {mountAgreementScene} from './transmission-agreement-scenes.js';
 const fmt=(v,d=2)=>v.toLocaleString('ru-RU',{maximumFractionDigits:d});
 const colors=['var(--ta-blue)','var(--ta-orange)','var(--ta-purple)','var(--ta-green)'];
 const metric=(name,value)=>`<div class="ta-metric"><span>${name}</span><strong>${value}</strong></div>`;
-function plot(title,series,{xmin=0,xmax=100,ymin=-1.5,ymax=1.5,xlabel='',ylabel='',marks=[],bands=[],square=false,width=760,height=280}={}) {
+function plot(title,series,{xmin=0,xmax=100,ymin=-1.5,ymax=1.5,xlabel='',ylabel='',marks=[],bands=[],square=false,width=760,height=280,fit=false}={}) {
   const w=square?420:width,h=square?w:height,l=65,r=20,t=20,b=48;
   const x=v=>l+(v-xmin)/(xmax-xmin)*(w-l-r),y=v=>h-b-(v-ymin)/(ymax-ymin)*(h-t-b);
   const ticks=Array.from({length:5},(_,i)=>{
-    const rawX=xmin+(xmax-xmin)*i/4,xx=!square&&Number.isInteger(xmin)&&Number.isInteger(xmax)?Math.round(rawX):rawX,yy=ymin+(ymax-ymin)*i/4;
+    const rawX=xmin+(xmax-xmin)*i/4,xx=!square&&Number.isInteger(xmin)&&Number.isInteger(xmax)&&xmax-xmin>=4?Math.round(rawX):rawX,yy=ymin+(ymax-ymin)*i/4;
     return `<path class="ta-grid" d="M${x(xx)} ${t}V${h-b}M${l} ${y(yy)}H${w-r}"/><text x="${x(xx)}" y="${h-b+20}" text-anchor="middle">${fmt(xx)}</text><text x="${l-8}" y="${y(yy)+4}" text-anchor="end">${fmt(yy)}</text>`;
   }).join('');
   const outside=series.reduce((sum,s)=>sum+s.points.filter(([a,c])=>a<xmin||a>xmax||c<ymin||c>ymax).length,0);
@@ -19,7 +19,8 @@ function plot(title,series,{xmin=0,xmax=100,ymin=-1.5,ymax=1.5,xlabel='',ylabel=
   }).join('');
   const shading=bands.map(({from,to})=>`<rect data-band x="${x(from)}" y="${t}" width="${x(to)-x(from)}" height="${h-t-b}" fill="var(--accent)" opacity=".12"/>`).join('');
   const markers=marks.map(({at,label})=>`<path class="ta-guide" d="M${x(at)} ${t}V${h-b}"/><text x="${x(at)+4}" y="${t+12}">${label||''}</text>`).join('');
-  return `<figure class="ta-plot"><figcaption>${title}</figcaption><div class="ta-plot-scroll ${square?'ta-square':''}" tabindex="0" role="region" aria-label="${title} · график"><svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${title}">${ticks}<svg x="${l}" y="${t}" width="${w-l-r}" height="${h-t-b}" viewBox="${l} ${t} ${w-l-r} ${h-t-b}">${shading}${paths}${markers}</svg><text x="${(l+w-r)/2}" y="${h-5}" text-anchor="middle">${xlabel}</text><text x="${l}" y="14">${ylabel}</text></svg></div><div class="ta-legend">${series.map((s,i)=>`<span><i class="${s.dash?'ta-dashed':s.dots?'ta-dot':''}" style="--series-color:${s.color||colors[i%4]}"></i>${s.name}</span>`).join('')}</div>${outside?`<p class="ta-note">За пределами шкалы: ${outside} точек.</p>`:''}</figure>`;
+  const windowStyle=fit?`style="width:${w-l-r}px;height:${h-t-b}px;min-width:0"`:'';
+  return `<figure class="ta-plot"><figcaption>${title}</figcaption><div class="ta-plot-scroll ${square?'ta-square':''}" tabindex="0" role="region" aria-label="${title} · график"><svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${title}">${ticks}<svg ${windowStyle} x="${l}" y="${t}" width="${w-l-r}" height="${h-t-b}" viewBox="${l} ${t} ${w-l-r} ${h-t-b}">${shading}${paths}${markers}</svg><text x="${(l+w-r)/2}" y="${h-5}" text-anchor="middle">${xlabel}</text><text x="${l}" y="14">${ylabel}</text></svg></div><div class="ta-legend">${series.map((s,i)=>`<span><i class="${s.dash?'ta-dashed':s.dots?'ta-dot':''}" style="--series-color:${s.color||colors[i%4]}"></i>${s.name}</span>`).join('')}</div>${outside?`<p class="ta-note">За пределами шкалы: ${outside} точек.</p>`:''}</figure>`;
 }
 const points=values=>values.map((v,i)=>[i,v]);
 let controlId=0;

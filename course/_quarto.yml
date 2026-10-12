@@ -45,6 +45,8 @@ website:
         href: lectures/index.qmd
       - text: "Практика"
         href: practice/index.qmd
+      - text: "Самостоятельные"
+        href: self-study/index.qmd
       - text: "Лабораторные"
         href: labs/index.qmd
       - text: "Справочник"

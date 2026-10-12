@@ -60,12 +60,15 @@ export function mountAgreementScene(root, {range, select, plot, metric, fmt, esc
     let html='';
     if(kind==='frequency') {
       const d=model.frequency(p), i=p.symbol-1, t=p.length+i;
+      const oscillograms=model.frequencyOscillograms(d,i);
+      const waveWidth=Math.max(260,Math.round(root.querySelector('[data-frequency-oscillograms]')?.clientWidth || (matchMedia('(max-width: 760px)').matches ? root.clientWidth : root.clientWidth*2/3)));
+      const waveform=(title,values,color)=>plot(title,[{name:'Переданный сигнал',points:oscillograms.transmitted,dash:true,color:blue},{name:title,points:values,color}],{xmin:0,xmax:1,ymin:-1.8,ymax:1.8,xlabel:'Время внутри символа, мс',ylabel:'Амплитуда, отн. ед.',width:waveWidth,height:250,fit:true});
       const qpsk=d.reference;
       const cloud=(title,values)=>plot(title,[{name:'Переданное созвездие',points:qpsk,dots:true,radius:6,color:blue},{name:'Полученные символы',points:values,dots:true,radius:3,color:orange}],{square:true,xmin:-1.8,xmax:1.8,ymin:-1.8,ymax:1.8,xlabel:'I',ylabel:'Q'});
       html=`<div class="ta-time-strip"><span>Известная опора · ${p.length} мс</span><span>Данные · 48 мс<progress max="48" value="${p.symbol}" aria-label="Наблюдаемый символ ${p.symbol} из 48"></progress></span></div>
         <p class="ta-scene-caption">Один и тот же символ ${p.symbol} · момент ${t} мс от начала передачи</p>
-        <div class="ta-vector-chain"><figure><figcaption>Передали</figcaption>${vector(d.transmitted[i],d.transmitted[i],blue,'Переданный символ')}</figure><span class="ta-scene-arrow" aria-hidden="true">→</span><figure><figcaption>Приняли</figcaption>${vector(d.received[i],d.transmitted[i],orange,'Принятый символ с поворотом')}</figure><span class="ta-scene-arrow" aria-hidden="true">→</span><figure><figcaption>После компенсации</figcaption>${vector(d.corrected[i],d.transmitted[i],purple,'Символ после обратного поворота по оценке частоты')}</figure></div>
-        <p class="ta-note">Синий пунктир сохраняет направление переданного символа. Оранжевая стрелка — принятый символ; фиолетовая — результат компенсации.</p>
+        <div class="ta-frequency-view"><figure class="ta-vector-single"><figcaption>Приняли</figcaption>${vector(d.received[i],d.transmitted[i],orange,'Принятый символ с поворотом')}</figure><div data-frequency-oscillograms>${waveform('Сигнал до компенсации',oscillograms.received,orange)}</div></div>
+        <p class="ta-note">Оранжевый — принятый сигнал, синий пунктир — переданный. Оба представления показывают тот же символ; для осциллограммы несущая снижена до 4 кГц.</p>
         <div class="ta-metrics">${metric('Поворот без шума к этому моменту',`${fmt(360*p.hz*t/1000,1)}°`)}${metric('Оценка по известной опоре',`${fmt(d.estimate,2)} Гц`)}${metric('Ошибки 48 символов · до → после',`${d.rawErrors} → ${d.errors}`)}</div>
         <details><summary>Как опора даёт оценку; все символы данных</summary>${plot('Измерение поворота известного фрагмента',[{name:'Фаза после удаления известной модуляции',points:d.phase,dots:true,color:orange},{name:'Поворот по оценке',points:d.estimatedPhase,dash:true,color:purple}],{xmax:63,ymin:-2000,ymax:2000,xlabel:'Время опоры, мс',ylabel:'Фаза, °'})}<div class="ta-pair">${cloud('Все данные до компенсации',d.received)}${cloud('Все данные после компенсации',d.corrected)}</div></details>`;
     }
@@ -124,5 +127,13 @@ export function mountAgreementScene(root, {range, select, plot, metric, fmt, esc
   });
   root.addEventListener('input',()=>{stop();if(kind!=='frequency')stage=0;draw();});
   document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();});
-  draw();return true;
+  draw();
+  if(kind==='frequency') {
+    let lastWaveWidth=0;
+    new ResizeObserver(()=>{
+      const width=root.querySelector('[data-frequency-oscillograms]').clientWidth;
+      if(Math.abs(width-lastWaveWidth)>1){lastWaveWidth=width;draw();}
+    }).observe(root);
+  }
+  return true;
 }
