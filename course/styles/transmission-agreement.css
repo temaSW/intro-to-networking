@@ -1,6 +1,45 @@
 /* Layout belongs to the component; surfaces and category colours come from the course. */
 .ta-demo { --ta-blue: var(--signal-ideal); --ta-orange: var(--signal-received); --ta-purple: var(--curve-qam64); --ta-green: var(--accent); }
 .ta-demo *, .ta-demo *::before, .ta-demo *::after { box-sizing: border-box; }
+.fs-reference { min-width: 0; }
+.fs-reference img { display: block; width: 100%; max-width: 100%; height: auto; }
+.fs-reference figcaption { margin-top: .65rem; color: var(--muted); font-size: .9rem; }
+.fs-reference :is(a, [tabindex]):focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+/* Standalone assignments use the normal page rhythm and a framed bit figure. */
+.message-bit-figure { margin-block: 1.5rem; }
+.message-bit-heading { padding: .75rem 1rem; border: 1px solid var(--line); border-radius: .35rem .35rem 0 0; background: var(--surface-alt); text-align: center; font-weight: 700; }
+.message-fields { display: grid; grid-template-columns: repeat(6,minmax(0,1fr)); border: 1px solid var(--line); border-top: 0; border-radius: 0 0 .35rem .35rem; overflow: hidden; }
+.message-field { --field-color: var(--accent); display: flex; flex-direction: column; align-items: center; gap: .65rem; padding: 1rem .65rem; border-top: 4px solid var(--field-color); background: color-mix(in srgb, var(--field-color) 8%, var(--surface)); text-align: center; min-width: 0; }
+.message-field + .message-field { border-left: 1px solid var(--line); }
+.message-field:nth-child(2) { --field-color: var(--signal-ideal); }
+.message-field:nth-child(3) { --field-color: var(--signal-received); }
+.message-field:nth-child(4) { --field-color: var(--curve-qam64); }
+.message-field:nth-child(5) { --field-color: var(--curve-qam16-high); }
+.message-field:nth-child(6) { --field-color: var(--signal-error); }
+.message-field-bits { color: var(--ink); background: transparent; font: 700 clamp(1.25rem,2vw,1.65rem) ui-monospace,Consolas,monospace; letter-spacing: .1em; white-space: nowrap; }
+.message-field-key { font-size: 1.4rem; }
+.message-field-name { font-weight: 600; }
+.message-field-rule { font-size: .95rem; }
+.message-field small { margin-top: auto; color: var(--muted); }
+.message-bit-figure figcaption { margin-top: .65rem; color: var(--muted); font-size: .9rem; text-align: center; }
+@media (max-width: 1000px) { .message-fields { grid-template-columns: repeat(3,minmax(0,1fr)); } }
+@media (max-width: 575px) { .message-fields { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+.message-bits { text-align: start !important; overflow-wrap: anywhere; }
+.message-bits code { white-space: normal; font-size: 1.05rem; }
+.message-layout { display: grid; grid-template-columns: repeat(6,minmax(0,1fr)); margin-block: 1rem; border: 1px solid var(--line); }
+.message-layout > span { padding: .5rem; background: var(--surface-alt); border-left: 1px solid var(--line); text-align: center; font-weight: 700; }
+.message-layout > span:first-child { border-left: 0; }
+.message-layout small { display: block; font-size: .8rem; font-weight: 400; }
+.message-task table { width: 100%; }
+.message-task th, .message-task td { overflow-wrap: anywhere; }
+.message-mode-table col:first-child { width: 4rem !important; }
+.message-mode-table col:last-child, .message-solution-table col:last-child { width: auto !important; }
+.message-solution-table col:first-child { width: 3rem !important; }
+.message-solution-table col:nth-child(2) { width: 4rem !important; }
+.message-diagram { max-width: 100%; overflow-x: auto; }
+.message-diagram table { min-width: 36rem; }
+.message-diagram:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+@media (max-width: 575px) { .message-layout { grid-template-columns: repeat(3,minmax(0,1fr)); } }
 .ta-controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--demo-gap); align-items: end; }
 .ta-controls label { display: grid; gap: .35rem; font-size: .9rem; min-width: 0; }
 .ta-controls label[hidden] { display: none; }
@@ -90,6 +129,12 @@
 .ta-time-strip > span + span { border-left: 1px solid var(--line); background: var(--accent-soft); }
 .ta-time-strip progress { display: block; width: 100%; height: .5rem; accent-color: var(--ta-purple); margin-top: .5rem; }
 .ta-vector-chain { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr); gap: .5rem; align-items: center; }
+.ta-frequency-view { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,2fr); gap: var(--demo-gap); align-items: center; }
+.ta-frequency-view > * { min-width: 0; }
+.ta-frequency-view .ta-plot-scroll svg { min-width: 0; }
+.ta-vector-single { width: 100%; max-width: 18rem; margin: 1rem auto; }
+.ta-vector-single figcaption { text-align: center; color: var(--ink); font-size: 1rem; font-weight: 700; }
+@media (max-width: 760px) { .ta-frequency-view { grid-template-columns: 1fr; } }
 .ta-vector-chain figure { margin: 0; min-width: 0; }
 .ta-vector-chain figcaption { color: var(--ink); font-size: 1rem; font-weight: 700; text-align: center; }
 .ta-vector { width: 100%; height: auto; display: block; background: var(--surface-alt); border-radius: .35rem; margin-top: .5rem; }
@@ -162,3 +207,48 @@
 /* MathJax may typeset closed explanations; constrain its own display box too. */
 main.content .math.display mjx-container { max-width: 100%; overflow-x: auto; overflow-y: hidden; }
 .ta-readout.ta-conflict { border: 2px dashed var(--ta-orange); }
+
+/* Shared sequence component: lifelines remain vertical on a narrow screen. */
+.at-controls { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; }
+.at-controls button { min-height: 3rem; padding: .6rem 1rem; border: 1px solid var(--line); border-radius: .35rem; font: inherit; color: var(--ink); background: var(--surface-alt); }
+.at-controls button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); }
+.at-controls button:disabled { opacity: .55; }
+.at-status { padding: .75rem; background: var(--surface-alt); border-left: 3px solid var(--accent); }
+.at-status p { margin-block: .5rem; }
+.at-diagram { margin-block: 1rem; min-width: 0; }
+.at-actors { display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); align-items: center; gap: .5rem; text-align: center; }
+.at-actors strong { padding: .6rem .25rem; background: var(--surface-alt); border: 1px solid var(--line); border-radius: .35rem; overflow-wrap: anywhere; }
+.at-actors span { color: var(--muted); font-size: .8rem; }
+.at-group { position: relative; padding: .5rem 0; background: linear-gradient(var(--line),var(--line)) 10% 0 / 2px 100% no-repeat, linear-gradient(var(--line),var(--line)) 90% 0 / 2px 100% no-repeat; }
+.lecture-overview main.content .at-group-label { width: fit-content; max-width: 80%; margin: .5rem auto; padding: .25rem .5rem; background: var(--surface); color: var(--ink); font-size: .85rem; text-align: center; }
+.at-current .at-group-label { background: var(--accent-soft); font-weight: 700; }
+.at-event { position: relative; margin: .75rem 10%; padding-bottom: 1.5rem; --event-color: var(--ta-purple); }
+.at-down { --event-color: var(--ta-blue); }
+.at-up { --event-color: var(--signal-error); }
+.at-event-label { position: relative; display: block; width: fit-content; max-width: 100%; margin-inline: auto; padding: .65rem .8rem; border: 2px solid var(--event-color); background: color-mix(in srgb, var(--event-color) 16%, var(--surface)); color: var(--ink); font-size: .95rem; font-weight: 600; overflow-wrap: anywhere; text-align: center; }
+.at-event-label small, .at-direction { display: block; color: var(--muted); font-size: .75rem; }
+.at-mixed .at-event-label { padding: 0; border: 0; background: transparent; }
+.at-message-fields { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); border: 2px solid var(--event-color); background: color-mix(in srgb,var(--event-color) 16%,var(--surface)); }
+.at-message-fields > span { padding: .65rem; border-left: 1px solid var(--event-color); font-size: .95rem; }
+.at-message-fields > span:first-child { border-left: 0; }
+.at-data .at-event-label { border-width: 3px; }
+.at-terminal .at-event-label { margin-left: 0; }
+.at-ap .at-event-label { margin-right: 0; }
+.at-terminal, .at-ap { padding-bottom: 0; }
+:is(.at-terminal, .at-ap) .at-event-label { max-width: 80%; border-left-width: 6px; border-radius: .35rem; text-align: start; }
+.at-arrow { position: absolute; bottom: .4rem; left: 0; width: 100%; border-top: 4px solid var(--event-color); }
+.at-arrow::after { content: ''; position: absolute; top: -.48rem; width: .8rem; height: .8rem; border-top: 4px solid var(--event-color); border-right: 4px solid var(--event-color); }
+.at-up .at-arrow::after { right: 0; transform: rotate(45deg); }
+.at-down .at-arrow::after { left: 0; transform: rotate(-135deg); }
+.at-legend { display: flex; flex-wrap: wrap; gap: .5rem 1rem; margin-top: 1rem; font-size: .8rem; color: var(--ink); }
+.at-legend span { border-left: 4px solid var(--ta-purple); padding-left: .5rem; }
+.at-legend .at-legend-dl { border-color: var(--ta-blue); }
+.at-legend .at-legend-ul { border-color: var(--signal-error); }
+@media (max-width: 575px) {
+  [data-agreement-timeline] .ta-stage-nav { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .at-controls button { flex: 1 1 auto; }
+  :is(.at-terminal, .at-ap) .at-event-label { max-width: 100%; }
+  .at-message-fields { grid-template-columns: 1fr; }
+  .at-message-fields > span { border-left: 0; border-top: 1px solid var(--event-color); }
+  .at-message-fields > span:first-child { border-top: 0; }
+}

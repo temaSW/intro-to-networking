@@ -78,6 +78,21 @@ export function frequency({hz=35,snr=Infinity,length=32,seed=13}={}) {
   return {dt,known,referenceReceived,reference:qpsk,transmitted,received,corrected,phase,estimate,residual:hz-estimate,
     estimatedPhase:phase.map(([t])=>[t,360*estimate*t/1000]),rawEvm:evm(received,transmitted,indices),evm:evm(corrected,transmitted,indices),rawErrors:errors(received),errors:errors(corrected)};
 }
+// Illustrative passband fragment of the selected symbol, consistent with its
+// complex sample at u=0. The display carrier is intentionally low (4 kHz).
+// Rectangular symbols; the symbol's sampled noise is held over the fragment.
+export function frequencyOscillograms(result,index) {
+  if(!Number.isInteger(index)||index<0||index>=result.transmitted.length)throw new RangeError('Unknown symbol');
+  const carrierHz=4000, samples=129;
+  const wave=(value,hz)=>Array.from({length:samples},(_,i)=>{
+    const u=result.dt*i/(samples-1),angle=2*Math.PI*hz*u;
+    return [u*1000,value[0]*Math.cos(angle)-value[1]*Math.sin(angle)];
+  });
+  return {carrierHz,
+    transmitted:wave(result.transmitted[index],carrierHz),
+    received:wave(result.received[index],carrierHz+result.estimate+result.residual),
+    corrected:wave(result.corrected[index],carrierHz+result.residual)};
+}
 function classify(choices,count) {
   const bins=Array.from({length:count},()=>[]);
   choices.forEach(([id,option])=>bins[option].push(id));

@@ -71,6 +71,26 @@ for(const snr of [0,5,20]) m.frequency({snr}).corrected.flat().forEach(v=>assert
 """)
 
 
+def test_frequency_waveforms_match_vector_samples_and_clean_compensation():
+    run_js("""
+for(const hz of [-80,0,80]) for(const index of [0,23,47]) {
+ const d=m.frequency({hz}),w=m.frequencyOscillograms(d,index);
+ assert.equal(w.transmitted[0][0],0);
+ assert.equal(w.transmitted.at(-1)[0],1);
+ assert.equal(w.transmitted[0][1],d.transmitted[index][0]);
+ assert.equal(w.received[0][1],d.received[index][0]);
+ assert.equal(w.corrected[0][1],d.corrected[index][0]);
+ w.corrected.forEach(([,v],i)=>assert(Math.abs(v-w.transmitted[i][1])<1e-10));
+ if(hz===0)assert.deepEqual(w.received,w.transmitted);
+ else assert(w.received.some(([,v],i)=>Math.abs(v-w.transmitted[i][1])>.1));
+}
+const noisy=m.frequency({hz:35,snr:10}),w=m.frequencyOscillograms(noisy,12);
+assert.equal(w.corrected[0][1],noisy.corrected[12][0]);
+w.received.flat().forEach(v=>assert(Number.isFinite(v)));
+assert.throws(()=>m.frequencyOscillograms(noisy,48),RangeError);
+""")
+
+
 def test_bootstrap_is_demodulated_and_controls_the_payload_decoder():
     run_js("""
 for(const mode of ['BPSK','QPSK','16-QAM']) {
