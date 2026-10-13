@@ -29,6 +29,8 @@ format:
 >
 > Что должно быть известно терминалу для начала работы?
 
+<div class="course-demo ta-demo" data-agreement-timeline data-timeline-stage="0"></div>
+
 ```{=html}
 <figure class="course-demo fs-reference">
   <div>
