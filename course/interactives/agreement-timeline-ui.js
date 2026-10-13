@@ -39,7 +39,7 @@ export function mountTimeline(root) {
       root.querySelector('[data-all]').setAttribute('aria-pressed', String(all));
     }
     root.querySelector('.at-status').innerHTML = `<strong>Этап ${stage+1}. ${escape(current.title)}</strong><p><b>Проблема:</b> ${escape(current.problem)}</p><p><b>Терминал:</b> ${escape(current.state)}</p>`;
-    const first = root.hasAttribute('data-timeline-previous') ? Math.max(0,stage-1) : stage;
+    const first = root.hasAttribute('data-timeline-previous') ? Math.max(0,stage-1) : 0;
     const visible = root.dataset.timelineFrame==='bootstrap' ? [{...bootstrapReception,index:stage}] : snapshot ? stages.slice(first,stage+1).map((s,index) => ({...s,index:first+index})) : view.visible.map((s,index) => ({...s,index}));
     root.querySelector('.at-scene').innerHTML = diagram(visible, stage);
   }
