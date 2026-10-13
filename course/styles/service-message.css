@@ -1,0 +1,15 @@
+/* Shared field diagram and time table for the lecture and independent work. */
+.service-fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--demo-gap); }
+.service-fields > div { display: grid; align-content: start; gap: .5rem; padding: .8rem; border: 1px solid var(--line); border-radius: .35rem; }
+.service-fields code { font-size: 1.25rem; color: var(--accent); }
+.service-fields span { color: var(--muted); }
+.service-timeline { overflow-x: auto; }
+.service-timeline table { width: 100%; min-width: 36rem; margin: 0; border-collapse: collapse; }
+.service-timeline th, .service-timeline td { padding: .6rem; text-align: center; border-bottom: 1px solid var(--line); }
+.service-timeline th[scope=row] { text-align: left; }
+.service-timeline .service-open { background: var(--accent-soft); font-weight: 700; }
+.service-timeline:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+.service-table { overflow-x: auto; }
+.service-table table { width: 100%; min-width: 32rem; }
+.service-table:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+@media (max-width: 575px) { .service-fields { grid-template-columns: 1fr; } }
