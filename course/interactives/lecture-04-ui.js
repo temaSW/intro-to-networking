@@ -40,7 +40,7 @@ const berSeries = [
   {id: 8, label: "64-QAM · без кода", color: "var(--curve-qam64)", uncoded: true},
 ];
 
-function berSvg(rows, selected) {
+export function berSvg(rows, selected, {threshold = null} = {}) {
   const left = 75, right = 735, top = 25, bottom = 370;
   const x = snr => left + (snr + 4) / 28 * (right - left);
   const y = ber => top + (-Math.log10(ber)) / 6 * (bottom - top);
@@ -52,6 +52,7 @@ function berSvg(rows, selected) {
     const value = 10 ** -decade;
     chart += `<line x1="${left}" y1="${y(value)}" x2="${right}" y2="${y(value)}" stroke="var(--line)"/><text x="${left-9}" y="${y(value)+5}" text-anchor="end" fill="var(--muted)">10<tspan dy="-5" font-size="11">${-decade}</tspan></text>`;
   }
+  if (threshold !== null) chart += `<line x1="${left}" y1="${y(threshold)}" x2="${right}" y2="${y(threshold)}" stroke="var(--focus)" stroke-width="2" stroke-dasharray="6 4"/><text x="${right}" y="${y(threshold)-8}" text-anchor="end" fill="var(--ink)">Требование BER ≤ 10⁻³</text>`;
   for (const series of berSeries.filter(item => selected.includes(item.id))) {
     const points = rows.filter(row => row.scheme === series.id && row.bit_errors > 0);
     chart += `<polyline points="${points.map(row => `${x(row.snr_db).toFixed(1)},${y(row.ber).toFixed(1)}`).join(" ")}" fill="none" stroke="${series.color}" stroke-width="3" ${series.uncoded ? 'stroke-dasharray="8 5"' : ""}/>`;

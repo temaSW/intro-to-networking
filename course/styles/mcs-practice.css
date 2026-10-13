@@ -1,0 +1,17 @@
+.mcs-practice { min-width: 0; }
+.mcs-practice .mcs-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); gap: 1rem; margin-bottom: 1rem; }
+.mcs-practice label { font-weight: 600; }
+.mcs-practice .mcs-fields label { display: grid; gap: .35rem; }
+.mcs-practice :is(input, select) { max-width: 100%; min-width: 0; padding: .35rem; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: .3rem; }
+.mcs-practice input[type=range] { width: 100%; accent-color: var(--accent); }
+.mcs-practice button { min-height: 48px; padding: .5rem .9rem; border: 1px solid var(--accent); border-radius: .35rem; background: var(--accent); color: var(--page-bg); font-weight: 700; }
+.mcs-practice :is(button, input, select, summary, [tabindex]):focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+.mcs-practice :is(.mcs-feedback, .mcs-result) { margin-top: 1rem; text-align: start; }
+.mcs-practice [aria-invalid=true] { border-color: var(--focus); }
+.mcs-practice .mcs-scroll { overflow-x: auto; max-width: 100%; }
+.mcs-practice table { width: 100%; margin-block: .7rem; }
+.mcs-practice :is(th, td) { padding: .5rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+.mcs-practice td:not(:first-child) { text-align: right; }
+.mcs-practice td input { width: 6rem; }
+.mcs-practice .ber-controls label { min-height: 44px; }
+.mcs-practice .mcs-status { font-weight: 400; }
