@@ -5,7 +5,13 @@ __pycache__/
 .venv/
 .tools/
 AGENTS.md
+AGENTS.override.md
 design/
+/docs/
+/interactives/**/*.md
+/.obsidian/
+/*.Rproj
+* (2).*
 
 /OPISiS course.7z
 
