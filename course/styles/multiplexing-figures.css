@@ -1,0 +1,46 @@
+/* Shared visual grammar: the same streams A/B/C in every diagram. */
+.mux-figure { --mux-a:#3569b7; --mux-b:#b35b16; --mux-c:#8e5cb1; --plot-min-width:60rem; }
+.quarto-dark .mux-figure { --mux-a:#83a9f2; --mux-b:#f5aa60; --mux-c:#ba93df; }
+.mux-figure-scroll { overflow-x:auto; max-width:100%; }
+.mux-figure svg { display:block; width:100%; height:auto; min-width:var(--plot-min-width); }
+.mux-figure text { fill:var(--ink); font:17px system-ui,-apple-system,"Segoe UI",sans-serif; }
+.mux-figure .mf-heading { font-size:19px; font-weight:650; }
+.mux-figure .mf-small { font-size:15px; fill:var(--muted); }
+.mux-figure .mf-bold { font-weight:700; }
+.mux-figure .mf-a { --flow:var(--mux-a); color:var(--mux-a); }
+.mux-figure .mf-b { --flow:var(--mux-b); color:var(--mux-b); }
+.mux-figure .mf-c { --flow:var(--mux-c); color:var(--mux-c); }
+.mux-figure .mf-empty { --flow:var(--line); color:var(--line); }
+.mux-figure .mf-neutral { --flow:var(--muted); color:var(--muted); }
+.mux-figure text:is(.mf-a,.mf-b,.mf-c) { fill:var(--flow); }
+.mux-figure .mf-wire,.mux-figure .mf-axis,.mux-figure .mf-symbol,.mux-figure .mf-guide,.mux-figure .mf-divider,.mux-figure .mf-time-guide,.mux-figure .mf-unresolved { fill:none; stroke:var(--muted); stroke-width:1.8; }
+.mux-figure .mf-wire { stroke-width:2; }
+.mux-figure .mf-route,.mux-figure .mf-switch-route,.mux-figure .mf-wave { fill:none; stroke:var(--flow); stroke-width:3; stroke-linecap:round; stroke-linejoin:round; }
+.mux-figure .mf-switch-route { stroke-width:5; }
+.mux-figure .mf-wave { stroke-width:2; }
+.mux-figure .mf-link { fill:none; stroke:var(--line); stroke-width:16; stroke-linejoin:round; }
+.mux-figure .mf-node,.mux-figure .mf-device,.mux-figure .mf-terminal,.mux-figure .mf-transmitter,.mux-figure .mf-cloud { fill:var(--surface); stroke:var(--ink); stroke-width:1.8; }
+.mux-figure .mf-device { fill:var(--surface-alt); }
+.mux-figure .mf-window,.mux-figure .mf-port { fill:var(--ink); }
+.mux-figure .mf-medium,.mux-figure .mf-fiber { fill:var(--surface-alt); stroke:var(--line); stroke-width:2; }
+.mux-figure .mf-enclosure { fill:var(--surface-alt); stroke:var(--line); stroke-width:1.5; }
+.mux-figure .mf-spectrum { fill:color-mix(in srgb,var(--flow) 16%,var(--surface)); stroke:var(--flow); stroke-width:2.5; }
+.mux-figure .mf-packet { fill:color-mix(in srgb,var(--flow) 14%,var(--surface)); stroke:var(--flow); stroke-width:2; }
+.mux-figure .mf-packet.mf-empty,.mux-figure .mf-vacant { fill:var(--surface); stroke:var(--line); stroke-dasharray:4 4; }
+.mux-figure .mf-packet-label { fill:var(--ink); font-weight:650; font-size:16px; }
+.mux-figure .mf-buffer { fill:none; stroke:var(--muted); stroke-width:2; }
+.mux-figure .mf-queue-fill { fill:var(--accent-soft); stroke:var(--accent); stroke-width:2; }
+.mux-figure .mf-reservation,.mux-figure .mf-reservation-data { fill:none; stroke:var(--accent); stroke-width:5; }
+.mux-figure .mf-reservation-data { stroke-width:8; }
+.mux-figure .mf-reserved-band { fill:var(--accent-soft); stroke:var(--accent); stroke-width:1.5; }
+.mux-figure .mf-guide { stroke:var(--line); }
+.mux-figure .mf-divider { stroke:var(--line); }
+.mux-figure .mf-time-guide { stroke:var(--line); stroke-dasharray:3 5; }
+.mux-figure .mf-unresolved { stroke-dasharray:7 5; }
+.mux-figure .mf-loss { fill:none; stroke:var(--focus); stroke-width:2.5; }
+.mux-figure text.mf-loss { fill:var(--focus); stroke:none; }
+.mux-figure marker path { fill:var(--muted); }
+.mux-figure figcaption { margin-top:.65rem; color:var(--muted); font-size:.9rem; line-height:1.45; }
+.mux-figure-scroll:focus-visible { outline:3px solid var(--focus); outline-offset:3px; }
+.mux-figure .mux-figure-hint { display:none; color:var(--muted); font-size:.8rem; text-align:start; }
+@media(max-width:1100px) { .mux-figure .mux-figure-hint { display:block; margin:.5rem 0; } }
