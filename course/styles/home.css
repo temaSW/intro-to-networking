@@ -1,15 +1,26 @@
 /* Loaded only by index.qmd; reuse the course palette in both themes. */
+.course-home { --home-page-gutter: clamp(1rem, 3vw, 2rem); }
+@media (min-width: 1200px) {
+  .course-home { --home-page-gutter: max(6vw, calc((100vw - 1800px) / 2)); }
+}
 .course-home #title-block-header { display: none; }
 .course-home #quarto-header :is(.navbar-brand-container, #navbarCollapse, .navbar-toggler) { display: none !important; }
-.course-home #quarto-header .navbar { box-shadow: none; }
-.course-home #quarto-header .navbar-container { justify-content: flex-end; gap: .5rem; max-width: 1120px; margin-inline: auto; padding: .4rem 1rem; }
+.course-home #quarto-header .navbar { box-shadow: none; padding-inline: 0; }
+.course-home #quarto-header .navbar-container { justify-content: flex-end; gap: .5rem; width: calc(100% - 2 * var(--home-page-gutter)); max-width: none; margin-inline: auto; padding: .4rem 0; }
 .course-home #quarto-header .quarto-navbar-tools { display: flex; align-items: center; gap: .4rem; margin: 0; order: 0; }
 .course-home #quarto-header #quarto-search { order: 1; margin: 0; }
 .course-home #quarto-header .quarto-color-scheme-toggle { order: -1; }
 .course-home #quarto-header .quarto-navigation-tool,
 .course-home #quarto-header .aa-DetachedSearchButton { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: .4rem; color: var(--ink); background: var(--surface-alt); }
 .course-home #quarto-header .quarto-navigation-tool:is(:hover, :focus-visible) { color: var(--accent); box-shadow: inset 0 0 0 1px currentColor; }
-.course-home #quarto-content { max-width: 1120px; margin-inline: auto; }
+.course-home #quarto-content {
+  max-width: none;
+  grid-template-columns: [screen-start] var(--home-page-gutter)
+    [screen-start-inset page-start page-start-inset body-start-outset body-start body-content-start]
+    minmax(0, 1fr)
+    [body-content-end body-end body-end-outset page-end-inset page-end screen-end-inset]
+    var(--home-page-gutter) [screen-end];
+}
 .course-home main.content { grid-column: page-start / page-end; padding-inline: 0; }
 .course-home .home-cover { padding-top: clamp(1.5rem, 4vw, 3.5rem); }
 .course-home main.content .home-cover p { max-width: none; }
