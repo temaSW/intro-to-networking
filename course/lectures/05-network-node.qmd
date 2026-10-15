@@ -4,7 +4,7 @@ subtitle: "Как организовать передачу потоков мн�
 body-classes: lecture-overview
 format:
   html:
-    css: ../styles/multiplexing.css
+    css: [../styles/multiplexing.css, ../styles/multiplexing-figures.css]
 ---
 
 В [предыдущей теме](transmission-agreement.qmd) мы организовали передачу по одному участку. Теперь у оператора несколько квартир подключены к домовому узлу, несколько домов — к районному, а за ним находятся общие линии и узлы. У абонентов разные собеседники и разная активность.
@@ -15,14 +15,7 @@ format:
 
 Для каждой квартиры можно представить отдельную линию до каждого нужного пункта. Что произойдёт с числом линий, портов и затратами при подключении ещё одного дома?
 
-```{=html}
-<div class="course-demo">
-<div class="mux-chain" role="img" aria-label="Абоненты через узел доступа и агрегацию входят в транспортную сеть, далее в ядро оператора и внешнюю сеть">
-<span>Квартиры<br>Абоненты</span><b aria-hidden="true">→</b><span>Домовой<br>узел доступа</span><b aria-hidden="true">→</b><span>Районный узел<br>агрегации</span><b aria-hidden="true">→</b><span>Транспортная<br>сеть</span><b aria-hidden="true">→</b><span>Ядро<br>оператора</span><b aria-hidden="true">→</b><span>Внешняя<br>сеть</span>
-</div>
-<p>Несколько квартир → один домовой узел; несколько домовых узлов → районный узел. Стрелки показывают одно направление передачи; обратное также нужно организовать.</p>
-</div>
-```
+{{< include ../_includes/topic05-architecture.html >}}
 
 <details><summary>Функции частей сети и понятие потока</summary>
 
@@ -44,13 +37,7 @@ format:
 
 > Как передать независимые потоки А, Б и В так, чтобы на другом конце их можно было различить? Достаточно ли просто сложить сигналы?
 
-```{=html}
-<div class="course-demo">
-<div class="mux-chain" role="img" aria-label="Три независимых потока входят в мультиплексор, проходят по общей линии и восстанавливаются демультиплексором">
-<span>А · Б · В<br>Три входа</span><b aria-hidden="true">→</b><span>Мультиплексор<br>Правило объединения</span><b aria-hidden="true">→</b><span>Общая линия<br>А + Б + В</span><b aria-hidden="true">→</b><span>Демультиплексор<br>Правило разделения</span><b aria-hidden="true">→</b><span>А · Б · В<br>Три выхода</span>
-</div>
-</div>
-```
+{{< include ../_includes/topic05-multiplexing.html >}}
 
 <details><summary>Мультиплексирование, демультиплексирование и ограниченный ресурс</summary>
 
@@ -68,13 +55,7 @@ format:
 
 > Как приёмник найдёт поток Б в каждом из трёх случаев? Что останется занятым, когда источник Б замолчит?
 
-```{=html}
-<div class="course-demo mux-panels">
-<div><strong>FDM: частотная полоса</strong><div class="mux-track"><span>А<br>f₁</span><span>Б<br>f₂</span><span>В<br>f₃</span></div><p>Частота →<br>Одновременная передача в разных подполосах.</p></div>
-<div><strong>TDM: временные позиции</strong><div class="mux-track"><span>А</span><span>Б</span><span>В</span><span>А</span><span>Б</span><span>В</span></div><p>Время →<br>Позиции повторяются в каждом цикле.</p></div>
-<div><strong>WDM: оптический спектр</strong><div class="mux-frequency"><span>А: длина волны λ₁</span><span>Б: длина волны λ₂</span><span>В: длина волны λ₃</span></div><p>Три оптических канала одновременно в одном волокне.</p></div>
-</div>
-```
+{{< include ../_includes/topic05-methods.html >}}
 
 <details><summary>Частотное разделение: ресурс, выделение и ограничения</summary>
 
@@ -106,13 +87,7 @@ WDM позволяет наращивать переносимую ёмкост�
 
 А передаёт постоянно, Б — короткими всплесками, В пока молчит. Фиксированная последовательность сохраняет для В пустые позиции.
 
-```{=html}
-<div class="course-demo">
-<p>Время →; одна ячейка — одна позиция передачи</p>
-<strong>Закрепление А / Б / В</strong><div class="mux-track"><span>А</span><span>Б</span><span class="mux-empty">В: пусто</span><span>А</span><span class="mux-empty">Б: пусто</span><span class="mux-empty">В: пусто</span></div>
-<strong>По наличию блоков</strong><div class="mux-track"><span>А₁</span><span>Б₁</span><span>А₂</span><span>А₃</span><span>Б₂</span><span>А₄</span></div>
-</div>
-```
+{{< include ../_includes/topic05-statistical.html >}}
 
 > Какие сведения теперь нужны на приёме? Хватит ли общей линии, если все источники одновременно станут активными?
 
@@ -130,16 +105,7 @@ WDM позволяет наращивать переносимую ёмкост�
 
 > Какую работу необходимо добавить к объединению и разделению потоков?
 
-```{=html}
-<div class="course-demo mux-node mux-scroll" tabindex="0" role="region" aria-label="Схема коммутационного узла, доступна прокрутка">
-<svg viewBox="0 0 720 240" role="img" aria-label="Узел связывает вход А с выходом 2, вход Б с выходом 3, вход В с выходом 1">
-<title>Выбор связей между входами и выходами</title>
-<rect x="220" y="20" width="280" height="190" rx="5"/><path d="M125 60 H250 L470 125 H585 M125 125 H250 L470 185 H585 M125 185 H250 L470 60 H585"/>
-<text x="20" y="65">Вход А</text><text x="20" y="130">Вход Б</text><text x="20" y="190">Вход В</text>
-<text x="600" y="65">Выход 1</text><text x="600" y="130">Выход 2</text><text x="600" y="190">Выход 3</text><text x="270" y="235">Коммутационный узел</text>
-</svg>
-</div>
-```
+{{< include ../_includes/topic05-switching.html >}}
 
 <details><summary>Коммутация и её отличие от мультиплексирования</summary>
 
@@ -157,13 +123,7 @@ WDM позволяет наращивать переносимую ёмкост�
 
 > Что должны проверить промежуточные узлы до начала разговора? Можно ли принять новое соединение, если на одном участке свободного ресурса уже нет?
 
-```{=html}
-<div class="course-demo">
-<div class="mux-chain" role="img" aria-label="Установление соединения, выбор пути и выделение ресурсов, передача с удержанием ресурса, освобождение">
-<span>Запрос<br>соединения</span><b aria-hidden="true">→</b><span>Выбор пути<br>и выделение ресурса</span><b aria-hidden="true">→</b><span>Передача<br>Ресурс удерживается</span><b aria-hidden="true">→</b><span>Завершение<br>Ресурс освобождён</span>
-</div>
-</div>
-```
+{{< include ../_includes/topic05-circuits.html >}}
 
 <details><summary>Коммутация каналов: соединение, пространство и время</summary>
 
@@ -181,13 +141,7 @@ WDM позволяет наращивать переносимую ёмкост�
 
 > Зачем постоянно резервировать ресурс, если значительную часть времени абонент ничего не передаёт?
 
-```{=html}
-<div class="course-demo mux-panels">
-<div><strong>Входы</strong><div class="mux-frequency"><span>А₁ · А₂ →</span><span>Б₁ →</span><span>В₁ · В₂ →</span></div></div>
-<div><strong>Обработка и очередь</strong><p>Границы блока → служебные сведения → нужный выход</p><div class="mux-track"><span>В₁</span><span>Б₁</span><span>А₂</span></div><p>Ожидают освобождения выхода</p></div>
-<div><strong>Выходная линия</strong><div class="mux-track"><span>А₁ →</span></div><p>Один блок уже передаётся; следующий получит ресурс после него.</p></div>
-</div>
-```
+{{< include ../_includes/topic05-packets.html >}}
 
 <details><summary>Пакетная коммутация и работа узла</summary>
 
@@ -207,12 +161,7 @@ WDM позволяет наращивать переносимую ёмкост�
 
 > В каком случае важнее гарантированная доля, а в каком — возможность занять временно свободный ресурс? Чем придётся заплатить?
 
-```{=html}
-<div class="course-demo">
-<strong>Каналы: ресурс закреплён за соединением</strong><div class="mux-track"><span>А</span><span>Б: молчит</span><span>А</span><span>Б: молчит</span></div>
-<strong>Пакеты: ресурс предоставляется блокам</strong><div class="mux-track"><span>А₁</span><span>А₂</span><span>Б₁</span><span>А₃</span></div>
-</div>
-```
+{{< include ../_includes/topic05-tradeoffs.html >}}
 
 <details><summary>Сравнение по общим критериям</summary>
 
@@ -260,13 +209,7 @@ WDM позволяет наращивать переносимую ёмкост�
 
 > Какой объём накопится? Сколько времени понадобится, чтобы передать его после окончания всплеска? Что изменится при буфере всего 40 кбит?
 
-```{=html}
-<div class="course-demo">
-<div class="mux-chain" role="img" aria-label="Поступление 14 Мбит в секунду на выход 10 Мбит в секунду создаёт избыток 4 Мбит в секунду и очередь 80 кбит за 20 миллисекунд">
-<span>Входы<br>14 Мбит/с</span><b aria-hidden="true">→</b><span>Очередь<br>+4 Мбит/с<br>80 кбит за 20 мс</span><b aria-hidden="true">→</b><span>Выход<br>10 Мбит/с</span>
-</div>
-</div>
-```
+{{< include ../_includes/topic05-queue.html >}}
 
 <details><summary>Обозначения, расчёт и пределы оценки</summary>
 
@@ -294,19 +237,7 @@ $$
 
 > Где объединяются потоки, где меняется выходное направление и какой именно ресурс может стать узким местом?
 
-```{=html}
-<div class="course-demo">
-<strong>Фиксированный доступ с Ethernet</strong>
-<div class="mux-chain" role="img" aria-label="Потоки квартир поступают в домовые коммутаторы, общий районный выход, оптический транспорт и ядро">
-<span>Квартиры<br>Множество потоков</span><b aria-hidden="true">→</b><span>Домовые узлы<br>Коммутация блоков</span><b aria-hidden="true">→</b><span>Районный выход<br>Общая очередь</span><b aria-hidden="true">→</b><span>Оптический транспорт<br>Общие линии</span><b aria-hidden="true">→</b><span>Ядро<br>Другие направления</span>
-</div>
-<strong>Оптический транспорт</strong>
-<div class="mux-chain" role="img" aria-label="Цифровые потоки объединяются по времени, передаются на нескольких длинах волн по одному волокну и разделяются на транспортном узле">
-<span>Цифровые потоки<br>Разных площадок</span><b aria-hidden="true">→</b><span>TDM<br>Цифровое объединение</span><b aria-hidden="true">→</b><span>WDM<br>Общее волокно</span><b aria-hidden="true">→</b><span>Транспортный узел<br>Разделение и коммутация</span><b aria-hidden="true">→</b><span>Другие площадки<br>Выделение потоков</span>
-</div>
-<p>Функциональные схемы реальных типов сетей; это не топология конкретного оператора. Вторая цепочка может переносить первую.</p>
-</div>
-```
+{{< include ../_includes/topic05-transport.html >}}
 
 <details><summary>Перенос принципов между системами</summary>
 
@@ -349,11 +280,7 @@ $$
 ::: {.callout-note icon=false appearance="simple"}
 ## 🚀 Что дальше?
 
-```{=html}
-<div class="course-demo mux-chain" role="img" aria-label="Блок данных поступает в узел, которому предстоит определить один из нескольких выходов">
-<span>Блок данных</span><b aria-hidden="true">→</b><span>Узел<br>Какие сведения нужны?</span><b aria-hidden="true">→</b><span>Выход 1?<br>Выход 2?<br>Выход 3?</span>
-</div>
-```
+{{< include ../_includes/topic05-next.html >}}
 
 Мы научились объединять потоки и передавать их через коммутационные узлы. Но каким образом сеть определяет, куда нужно направить конкретный блок данных?
 
