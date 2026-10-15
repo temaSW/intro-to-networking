@@ -1,0 +1,19 @@
+/* Static, reusable diagrams of logical blocks and their physical container. */
+.link-frame { color: var(--ink); }
+.link-frame__boundary { min-width: 0; padding: .8rem; border: 2px solid var(--line); border-radius: .35rem; }
+.link-frame__label { display: block; margin-bottom: .75rem; }
+.link-frame__fields { display: grid; grid-template-columns: 1.2fr 1.5fr 1fr; gap: .5rem; }
+.link-frame__field, .link-frame__mac { min-width: 0; display: grid; align-content: start; gap: .5rem; padding: .8rem; border: 1px solid var(--line); border-radius: .3rem; overflow-wrap: anywhere; }
+.link-frame__service { background: var(--surface-alt); }
+.link-frame__payload, .link-frame__mac { background: var(--accent-soft); }
+.link-frame__check { background: var(--surface); border-style: dashed; border-color: var(--focus); }
+.link-frame__physical { display: grid; grid-template-columns: 1fr 2.5fr; gap: .75rem; }
+.link-frame__contents { border-style: dashed; }
+.link-frame__aggregate { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; }
+.link-frame figcaption { margin-top: .75rem; color: var(--muted); font-size: .9rem; line-height: 1.45; }
+@media (max-width: 760px) {
+  .link-frame__physical { grid-template-columns: 1fr; }
+}
+@media (max-width: 575px) {
+  .link-frame__fields, .link-frame__aggregate { grid-template-columns: 1fr; }
+}
