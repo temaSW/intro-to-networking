@@ -1,0 +1,18 @@
+```{=html}
+<figure class="course-demo link-frame" aria-labelledby="link-physical-caption">
+  <div class="link-frame__boundary">
+    <strong class="link-frame__label">Одна физическая передача Wi-Fi — протокольный блок физического уровня (PPDU)</strong>
+    <div class="link-frame__physical">
+      <div class="link-frame__field link-frame__service"><strong>Физическое оформление</strong><span>Преамбула и служебное описание передачи</span></div>
+      <div class="link-frame__boundary link-frame__contents">
+        <strong class="link-frame__label">Часть, несущая канальные данные</strong>
+        <div class="link-frame__aggregate">
+          <div class="link-frame__mac"><strong>MAC-кадр 1</strong><span>Заголовок · тело, если есть · своя FCS</span></div>
+          <div class="link-frame__mac"><strong>MAC-кадр 2</strong><span>Заголовок · тело, если есть · своя FCS</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <figcaption id="link-physical-caption">Пример передачи с объединением двух MAC-кадров; разделители и заполнение опущены. Граница PPDU охватывает всю физическую передачу, границы MAC-кадров — отдельные блоки внутри. В других режимах может передаваться один MAC-кадр.</figcaption>
+</figure>
+```

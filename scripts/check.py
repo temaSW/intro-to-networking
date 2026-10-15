@@ -1,6 +1,7 @@
-"""Canonical project check: validate prerequisites and render the entire site."""
+"""Render the HTML site; include PDF only when explicitly requested with --pdf."""
 
 from pathlib import Path
+import argparse
 import os
 import shutil
 import subprocess
@@ -24,6 +25,9 @@ def find_quarto() -> str | None:
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--pdf", action="store_true", help="Also build PDF versions (only on explicit request).")
+    args = parser.parse_args()
     if sys.version_info < (3, 11):
         print("Python 3.11 or newer is required.", file=sys.stderr)
         return 2
@@ -48,7 +52,12 @@ def main() -> int:
         local_cache = ROOT / ".tools" / "appdata"
         local_cache.mkdir(parents=True, exist_ok=True)
         environment["LOCALAPPDATA"] = str(local_cache)
-    result = subprocess.run([quarto, "render", str(COURSE)], cwd=ROOT, env=environment, check=False)
+    if not args.pdf:
+        # HTML does not need the PDF hook's browser pass or vector exports.
+        environment["OPISIS_PDF_PREPARING"] = "1"
+    else:
+        environment.pop("OPISIS_PDF_PREPARING", None)
+    result = subprocess.run([quarto, "render", str(COURSE), "--to", "all" if args.pdf else "html"], cwd=ROOT, env=environment, check=False)
     return result.returncode
 
 

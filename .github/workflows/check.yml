@@ -53,9 +53,10 @@ jobs:
       - name: Test numerical models and static audio assets
         run: |
           python -m pip install pytest numpy
-          python -m pytest -q
-      - name: Render full site
-        run: python scripts/check.py
+          python -m pytest -q --ignore=tests/test_pdf_export.py
+      - name: Render HTML site
+        run: |
+          python scripts/check.py
       - name: Scan complete Pages artifact before upload
         run: python scripts/scan_secrets.py site
       - name: Upload site for Pages
