@@ -1,0 +1,16 @@
+```{=html}
+<div class="course-demo" data-multiplexing>
+<div class="mux-controls">
+<label>Число потоков: <output data-value="flows">8</output><input aria-label="Число потоков" data-parameter="flows" type="range" min="1" max="24" value="8"></label>
+<label>Активность каждого источника, %: <output data-value="activity">25</output><input aria-label="Активность источников, проценты" data-parameter="activity" type="range" min="0" max="100" value="25"></label>
+<label>Скорость выхода, Мбит/с: <output data-value="capacity">4</output><input aria-label="Скорость выхода, Мбит в секунду" data-parameter="capacity" type="range" min="1" max="24" value="4"></label>
+<label>Суммарный буфер ожидания, пакетов: <output data-value="buffer">48</output><input aria-label="Буфер ожидания, пакетов" data-parameter="buffer" type="range" min="0" max="240" step="1" value="48"></label>
+<label>Характер нагрузки<select data-parameter="pattern"><option value="staggered">Всплески с разными фазами</option><option value="synchronous">Одновременные всплески</option></select></label>
+</div>
+<p>Один опыт — 1 с. Активный источник передаёт 1 Мбит/с пакетами по 1000 бит; цикл активности — 100 мс. Оба варианта получают одни и те же пакеты.</p>
+<div data-results aria-live="polite"><p>При 8 потоках и активности 25 % средняя нагрузка — 2 Мбит/с. Для расчёта очереди и потерь требуется JavaScript; ниже в теме доступен пример расчёта без модели.</p></div>
+<div class="mux-legend"><span>Закреплённые доли</span><span>Общий ресурс</span></div>
+<div class="mux-scroll" data-plot tabindex="0" role="region" aria-label="График очереди, доступна горизонтальная прокрутка"></div>
+<details><summary>Числовые отсчёты графика</summary><div class="mux-scroll" data-sample-table tabindex="0" role="region" aria-label="Таблица очереди"></div></details>
+</div>
+```

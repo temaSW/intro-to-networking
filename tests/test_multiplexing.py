@@ -1,0 +1,86 @@
+"""Conservation, service limits and burst behaviour of the shared-resource model."""
+from pathlib import Path
+import subprocess
+
+MODEL = Path(__file__).resolve().parents[1] / 'course/interactives/multiplexing-model.js'
+
+
+def run_js(assertions):
+    source = f"""
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const m = await import('data:text/javascript,' + encodeURIComponent(fs.readFileSync({str(MODEL)!r}, 'utf8')));
+const base = {{flows:8, activity:25, capacity:4, buffer:48, pattern:'staggered'}};
+{assertions}
+"""
+    result = subprocess.run(['node', '--input-type=module', '-e', source], text=True, capture_output=True)
+    assert result.returncode == 0, result.stderr
+
+
+def test_conservation_capacity_and_finite_buffers():
+    run_js("""
+for (const flows of [1,8,24]) for (const activity of [0,25,100])
+for (const capacity of [1,4,24]) for (const buffer of [0,1,48,240]) {
+  const c = {...base, flows, activity, capacity, buffer};
+  for (const d of Object.values(m.compare(c))) {
+    assert.equal(d.offered, flows * activity * 10);
+    assert.equal(d.offered, d.sent + d.lost + d.pending);
+    assert(d.sent * m.PACKET_BITS <= capacity * 1e6 + 1e-5);
+    assert(d.utilization >= 0 && d.utilization <= 1 + 1e-9);
+    assert(d.samples.every(s => s.queue >= 0 && s.queue <= buffer));
+    assert(d.wait === null || d.wait >= 0);
+  }
+}
+""")
+
+
+def test_idle_and_uncontended_analytical_cases():
+    run_js("""
+const idle = m.compare({...base, activity:0});
+for (const d of Object.values(idle)) {
+  assert.equal(d.utilization,0); assert.equal(d.wait,null); assert.equal(d.lost,0);
+}
+const one = m.compare({...base,flows:1,activity:100,capacity:1,buffer:0});
+assert.deepEqual(one.dedicated,one.shared);
+assert.equal(one.shared.sent,1000);
+assert.equal(one.shared.utilization,1);
+assert.equal(one.shared.delay,1);
+assert.equal(one.shared.wait,0);
+""")
+
+
+def test_shared_resource_handles_staggered_bursts_better():
+    run_js("""
+const d=m.compare(base);
+assert.equal(d.shared.lost,0);
+assert(d.shared.delay < d.dedicated.delay);
+assert(d.dedicated.lost > 0);
+const synced=m.compare({...base,pattern:'synchronous'});
+assert(synced.shared.lost > d.shared.lost);
+assert(synced.shared.maxQueue > d.shared.maxQueue);
+""")
+
+
+def test_buffer_trades_losses_for_wait_and_does_not_create_capacity():
+    run_js("""
+const small=m.compare({...base,pattern:'synchronous',buffer:8}).shared;
+const large=m.compare({...base,pattern:'synchronous',buffer:240}).shared;
+assert(large.lost < small.lost);
+assert(large.wait > small.wait);
+const overloaded=m.compare({...base,activity:100,capacity:2,buffer:240}).shared;
+assert(overloaded.lost > 0);
+assert(overloaded.sent <= 2000);
+assert(overloaded.pending > 0);
+assert(overloaded.utilization > .999);
+""")
+
+
+def test_deterministic_independent_experiments_and_validation():
+    run_js("""
+const first=m.compare(base), snapshot=structuredClone(first);
+m.compare({...base,flows:24,pattern:'synchronous'});
+assert.deepEqual(first,snapshot);
+assert.deepEqual(m.compare(base),first);
+for(const change of [{flows:0},{capacity:0},{activity:101},{buffer:-1},{pattern:'random'}])
+  assert.throws(()=>m.compare({...base,...change}),RangeError);
+""")

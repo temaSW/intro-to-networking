@@ -1,0 +1,35 @@
+.lecture-overview .title { overflow-wrap:anywhere; hyphens:auto; }
+.mux-chain { display:flex; flex-wrap:wrap; align-items:center; gap:.65rem; margin:1rem 0; }
+.mux-chain > span { flex:1 1 7rem; padding:.8rem; border:1px solid var(--line); border-radius:.3rem; background:var(--surface-alt); text-align:center; }
+.mux-chain > b { color:var(--accent); }
+.mux-panels { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:var(--demo-gap,1rem); }
+.mux-panels > div, .mux-example { border:1px solid var(--line); border-radius:.3rem; padding:1rem; background:var(--surface); min-width:0; }
+.mux-track { display:flex; gap:.3rem; margin:1rem 0; }
+.mux-track span { flex:1; min-width:0; overflow-wrap:anywhere; text-align:center; padding:.5rem .1rem; background:var(--accent-soft); border:1px solid var(--accent); color:var(--ink); }
+.mux-track .mux-empty { background:var(--surface-alt); border-style:dashed; }
+.mux-frequency { display:grid; gap:.3rem; }
+.mux-frequency span { padding:.5rem; border:1px solid var(--accent); background:var(--accent-soft); }
+.mux-controls { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; }
+.mux-controls label { display:grid; gap:.4rem; color:var(--ink); }
+.mux-controls input, .mux-controls select { width:100%; min-width:0; accent-color:var(--accent); }
+.mux-controls select { background:var(--surface); color:var(--ink); padding:.4rem; border:1px solid var(--line); }
+.mux-scroll { overflow-x:auto; max-width:100%; }
+.mux-scroll table { width:100%; min-width:27rem; }
+.mux-scroll th, .mux-scroll td { padding:.5rem; border-bottom:1px solid var(--line); vertical-align:top; }
+.mux-scroll td { text-align:right; font-variant-numeric:tabular-nums; }
+.mux-scroll svg { display:block; width:100%; min-width:var(--plot-min-width); height:auto; }
+.mux-axis { stroke:var(--line); fill:none; }
+.mux-label { fill:var(--ink); font:14px system-ui,sans-serif; }
+.mux-reserved, .mux-shared { fill:none; stroke-width:3; }
+.mux-reserved { stroke:var(--focus); stroke-dasharray:7 4; }
+.mux-shared { stroke:var(--accent); }
+.mux-legend { display:flex; flex-wrap:wrap; gap:1rem; font-size:.9rem; }
+.mux-legend span::before { content:""; display:inline-block; width:2rem; margin-right:.4rem; vertical-align:middle; border-top:3px solid var(--accent); }
+.mux-legend span:first-child::before { border-color:var(--focus); border-top-style:dashed; }
+.mux-node svg { width:100%; min-width:var(--plot-min-width); height:auto; }
+.mux-node rect { fill:var(--surface-alt); stroke:var(--accent); stroke-width:2; }
+.mux-node path { fill:none; stroke:var(--accent); stroke-width:2; }
+.mux-node text { fill:var(--ink); font:16px system-ui,sans-serif; }
+[data-multiplexing] :focus-visible, .mux-scroll:focus-visible { outline:3px solid var(--focus); outline-offset:3px; }
+@media(max-width:760px) { .mux-panels { grid-template-columns:1fr; } }
+@media(max-width:575px) { .mux-controls { grid-template-columns:1fr; } .mux-chain { flex-direction:column; align-items:stretch; } .mux-chain > span { flex:auto; } .mux-chain > b { text-align:center; transform:rotate(90deg); } }
