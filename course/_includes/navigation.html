@@ -31,8 +31,20 @@ document.addEventListener('DOMContentLoaded', () => {
   const toc = document.querySelector('#quarto-margin-sidebar > #TOC');
   if (!toc) return;
 
+  const header = document.querySelector('#quarto-header');
+  if (header) {
+    const syncHeaderHeight = () => document.documentElement.style.setProperty(
+      '--course-header-height', `${header.getBoundingClientRect().height}px`);
+    new ResizeObserver(syncHeaderHeight).observe(header);
+    syncHeaderHeight();
+  }
+
   const disclosure = document.createElement('details');
   disclosure.className = 'toc-disclosure';
+  const desktop = window.matchMedia('(min-width: 1200px)');
+  const syncDisclosure = () => { disclosure.open = desktop.matches; };
+  syncDisclosure();
+  desktop.addEventListener('change', syncDisclosure);
   const summary = document.createElement('summary');
   summary.textContent = 'Содержание страницы';
   disclosure.append(summary, toc);
