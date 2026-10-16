@@ -25,10 +25,11 @@ export function mountTimeline(root) {
     return;
   }
   const snapshot = root.hasAttribute('data-timeline-stage');
+  const currentOnly = snapshot && root.hasAttribute('data-timeline-current');
   const overview = document.getElementById('agreement-timeline');
   let stage = snapshot ? Number(root.dataset.timelineStage) : 0, all = false;
   root.innerHTML = `${snapshot ? '' : `<nav class="ta-stage-nav" aria-label="Этапы согласования передачи">${stages.map((s,i) => `<button type="button" data-step="${i}" aria-pressed="false">${i+1}. ${escape(s.title)}</button>`).join('')}</nav><div class="at-controls"><button type="button" data-back>← Назад</button><button type="button" data-next>Далее →</button><button type="button" data-all aria-pressed="false">Весь процесс</button></div>`}
-    <div class="at-status" aria-live="polite"></div><div class="at-scene"></div>
+    ${currentOnly ? '' : '<div class="at-status" aria-live="polite"></div>'}<div class="at-scene"></div>
     ${snapshot ? (overview ? `<a href="#agreement-timeline" data-timeline-jump="${stage}">Этот этап на общей временной диаграмме ↑</a>` : '') : '<p class="ta-note">Учебный сценарий: этапы могут совмещаться, отсутствовать или повторяться. События добавляются сверху вниз; интервалы условные. Выделен выбранный этап. Служебная работа может идти параллельно данным.</p>'}`;
   function draw() {
     const view = timelineView(stage, all), current = view.selected;
@@ -38,9 +39,10 @@ export function mountTimeline(root) {
       root.querySelector('[data-next]').disabled = stage === stages.length-1;
       root.querySelector('[data-all]').setAttribute('aria-pressed', String(all));
     }
-    root.querySelector('.at-status').innerHTML = `<strong>Этап ${stage+1}. ${escape(current.title)}</strong><p><b>Проблема:</b> ${escape(current.problem)}</p><p><b>Терминал:</b> ${escape(current.state)}</p>`;
-    const first = root.hasAttribute('data-timeline-previous') ? Math.max(0,stage-1) : 0;
-    const visible = root.dataset.timelineFrame==='bootstrap' ? [{...bootstrapReception,index:stage}] : snapshot ? stages.slice(first,stage+1).map((s,index) => ({...s,index:first+index})) : view.visible.map((s,index) => ({...s,index}));
+    const status = root.querySelector('.at-status');
+    if (status) status.innerHTML = `<strong>Этап ${stage+1}. ${escape(current.title)}</strong><p><b>Проблема:</b> ${escape(current.problem)}</p><p><b>Терминал:</b> ${escape(current.state)}</p>`;
+    const first = currentOnly ? stage : root.hasAttribute('data-timeline-previous') ? Math.max(0,stage-1) : 0;
+    const visible = root.dataset.timelineFrame==='bootstrap' ? [{...bootstrapReception,index:stage}] : snapshot ? stages.slice(first,stage+1).map((s,index) => ({...s,index:first+index,hideTitle:currentOnly})) : view.visible.map((s,index) => ({...s,index}));
     root.querySelector('.at-scene').innerHTML = diagram(visible, stage);
   }
   root.addEventListener('click', event => {
