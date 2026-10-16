@@ -10,6 +10,7 @@ project:
     - styles/companding-line.css
     - styles/scrambler.css
     - styles/channel-playground.css
+    - styles/transmission-agreement.css
 
 website:
   title: "ОПИСиС"
