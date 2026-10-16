@@ -1,4 +1,4 @@
-import {stages, nrEvents, timelineView, bootstrapReception} from './agreement-timeline-model.js';
+import {stages, nrEvents, timelineView, bootstrapReception, terminalStates, terminalStateView} from './agreement-timeline-model.js?v=20261017-participant';
 
 const escape = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[c]));
 const kinds = {physical: 'Физическая опора / измерение', control: 'Служебная информация / управление', data: 'Пользовательские данные', mixed: 'Опора и служебные сведения в одной передаче'};
@@ -20,6 +20,15 @@ function diagram(groups, selected = -1, nr = false) {
 }
 
 export function mountTimeline(root) {
+  if (root.dataset.agreementTimeline === 'exchange') {
+    const {index, current} = terminalStateView(Number(root.dataset.exchangeState));
+    root.innerHTML = diagram([{...current, hideTitle: true, index}], index);
+    return;
+  }
+  if (root.dataset.agreementTimeline === 'story') {
+    mountTerminalStory(root);
+    return;
+  }
   if (root.dataset.agreementTimeline === 'nr') {
     root.innerHTML = diagram([{title: 'Четырёхшаговый доступ с конкуренцией; успешная ветвь', events: nrEvents}], -1, true);
     return;
@@ -58,8 +67,48 @@ export function mountTimeline(root) {
   draw();
 }
 
+function mountTerminalStory(root) {
+  let index = 0;
+  root.innerHTML = `<nav class="at-story-states" aria-label="Состояния терминала">${terminalStates.map((state, i) => `<button type="button" data-state="${i}" aria-pressed="false">${escape(state.title)}</button>`).join('')}</nav>
+    <div class="at-controls"><button type="button" data-state-back>← Назад</button><button type="button" data-state-next>Далее →</button><button type="button" data-state-reset>К началу</button></div>
+    <div class="at-status" aria-live="polite"></div>
+    <details><summary>Переход к выбранному состоянию</summary><p data-state-mechanism></p><div class="at-scene"></div></details>
+    <a data-state-section>К соответствующему вопросу ↓</a>`;
+  function draw() {
+    const {current} = terminalStateView(index);
+    root.querySelectorAll('[data-state]').forEach(button => button.setAttribute('aria-pressed', String(Number(button.dataset.state) === index)));
+    const chain = root.querySelector('.at-story-states');
+    const selected = chain.querySelector('[aria-pressed="true"]');
+    const chainBox = chain.getBoundingClientRect(), selectedBox = selected.getBoundingClientRect();
+    if (selectedBox.left < chainBox.left) chain.scrollLeft += selectedBox.left - chainBox.left;
+    if (selectedBox.right > chainBox.right) chain.scrollLeft += selectedBox.right - chainBox.right;
+    root.querySelector('[data-state-back]').disabled = index === 0;
+    root.querySelector('[data-state-next]').disabled = index === terminalStates.length - 1;
+    root.querySelector('.at-status').innerHTML = `<strong>${escape(current.title)}</strong><p>${escape(current.unknown)}</p><p><b>Доступно:</b> ${escape(current.possible)}</p>`;
+    root.querySelector('[data-state-mechanism]').textContent = current.mechanism;
+    root.querySelector('.at-scene').innerHTML = current.events.length ? diagram([{...current, hideTitle: true, index}], index) : '<p>Обмен с системой ещё не начался.</p>';
+    root.querySelector('[data-state-section]').href = `#${current.anchor}`;
+  }
+  root.addEventListener('click', event => {
+    const button = event.target.closest('button');
+    if (!button || !root.contains(button)) return;
+    if (button.hasAttribute('data-state')) index = Number(button.dataset.state);
+    if (button.hasAttribute('data-state-back')) index = Math.max(0, index - 1);
+    if (button.hasAttribute('data-state-next')) index = Math.min(terminalStates.length - 1, index + 1);
+    if (button.hasAttribute('data-state-reset')) index = 0;
+    draw();
+  });
+  root.addEventListener('agreement:state', event => {index = terminalStateView(event.detail).index; draw();});
+  draw();
+}
+
 document.querySelectorAll('[data-agreement-timeline]').forEach(mountTimeline);
 document.addEventListener('click', event => {
+  const stateLink = event.target.closest('[data-story-jump]');
+  if (stateLink) {
+    document.getElementById('agreement-story')?.dispatchEvent(new CustomEvent('agreement:state', {detail: Number(stateLink.dataset.storyJump)}));
+    return;
+  }
   const link = event.target.closest('[data-timeline-jump]');
   if (!link) return;
   const root = document.getElementById('agreement-timeline');

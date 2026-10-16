@@ -48,7 +48,7 @@ format:
 <a class="home-material" href="lectures/index.qmd"><i class="bi bi-book" aria-hidden="true"></i><span class="home-material-title">Лекции</span><span>Теоретические материалы, инженерные принципы и примеры реальных систем.</span><span class="home-material-action" aria-hidden="true">Открыть лекции →</span></a>
 <a class="home-material" href="practice/index.qmd"><i class="bi bi-pencil-square" aria-hidden="true"></i><span class="home-material-title">Практические занятия</span><span>Расчётные задачи, анализ систем и сравнение инженерных решений.</span><span class="home-material-action" aria-hidden="true">Перейти к практике →</span></a>
 <a class="home-material" href="labs/index.qmd"><i class="bi bi-beaker" aria-hidden="true"></i><span class="home-material-title">Лабораторные работы</span><span>Эксперименты, исследование характеристик и поведения систем.</span><span class="home-material-action">Материалы готовятся →</span></a>
-<a class="home-material" href="reference/models.qmd"><i class="bi bi-sliders" aria-hidden="true"></i><span class="home-material-title">Интерактивные модели</span><span>Симуляции, динамические схемы и вычислительные эксперименты.</span><span class="home-material-action" aria-hidden="true">Выбрать эксперимент →</span></a>
+<a class="home-material" href="reference/index.qmd"><i class="bi bi-journal-text" aria-hidden="true"></i><span class="home-material-title">Справочник</span><span>Децибелы, комплексные числа и звук через шумный канал.</span><span class="home-material-action" aria-hidden="true">Открыть справочник →</span></a>
 </div>
 ```
 
