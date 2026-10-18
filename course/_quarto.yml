@@ -11,6 +11,7 @@ project:
     - styles/scrambler.css
     - styles/channel-playground.css
     - styles/transmission-agreement.css
+    - styles/link-frame.css
 
 website:
   title: "ОПИСиС"
