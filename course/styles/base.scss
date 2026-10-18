@@ -409,15 +409,6 @@ main.content .error-rate-formulas .math.display { margin: .35rem 0; }
 .control-schematic .gate-label { text-anchor: middle; font: 27px ui-monospace, Consolas, monospace; }
 .control-schematic .adder-label text { text-anchor: middle; font: 29px system-ui, sans-serif; }
 .control-schematic .pin-label { font: 17px system-ui, sans-serif; }
-.repetition-circuit-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--demo-gap); }
-main.content .repetition-circuit-label { margin: 0 0 .5rem; text-align: start; font-weight: 700; }
-.repetition-circuit .control-schematic { max-width: none; margin: 0; }
-.repetition-circuit-scroll { overflow-x: auto; }
-.repetition-circuit figcaption { margin-top: .75rem; }
-@media (max-width: 760px) {
-  .repetition-circuit-grid { grid-template-columns: 1fr; }
-  .repetition-circuit-scroll .control-schematic { min-width: 28rem; }
-}
 .coded-frame { max-width: 34rem; }
 .coded-frame .frame-data { fill: var(--surface); }
 .coded-frame .frame-crc { fill: var(--accent-soft); }
