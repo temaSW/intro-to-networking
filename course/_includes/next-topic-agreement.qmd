@@ -27,6 +27,6 @@
       </div>
     </div>
   </div>
-  <figcaption id="access-exchange-caption">От включения терминала до первой передачи данных: что ещё нужно кроме исправного канала?</figcaption>
+  <figcaption id="access-exchange-caption">От включения терминала до первой передачи данных: что ещё необходимо, кроме исправного канала?</figcaption>
 </figure>
 ```

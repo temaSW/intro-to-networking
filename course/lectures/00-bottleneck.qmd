@@ -5,7 +5,7 @@ subtitle: "Самостоятельная модель к теме 00"
 
 [Вернуться к теме 00](00-introduction.qmd).
 
-Сначала предположите, какой общий сегмент ограничит передачу при росте числа пользователей, затем измените параметры и сравните результат.
+Сначала предположите, какой общий сегмент будет ограничивать передачу при увеличении числа пользователей. Затем измените параметры модели и сравните результат с прогнозом.
 
 <div class="lecture-interactive" data-bottleneck-interactive></div>
 <p class="interactive-source"><a href="https://github.com/temaSW/intro-to-networking/blob/main/course/interactives/bottleneck-ui.js">Исходник</a></p>
