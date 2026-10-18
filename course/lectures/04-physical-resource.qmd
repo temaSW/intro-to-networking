@@ -445,31 +445,6 @@ $k$ -- число информационных битов; $n$ -- число п�
 Источник таблицы MCS: [ETSI TS 138 214 V17.1.0 / 3GPP TS 38.214, таблица 5.1.3.1-4](https://www.etsi.org/deliver/etsi_ts/138200_138299/138214/17.01.00_60/ts_138214v170100p.pdf).
 :::
 
-## Если потоков несколько
-
-> Как можно объединить данные нескольких пользователей для передачи по общему каналу?
-
-`Потоки → объединение → общий канал → разделение → потоки`
-
-<details><summary>Объединение нескольких потоков</summary>
-
-**Мультиплексирование** -- совместное использование канала несколькими потоками.
-
-</details>
-
-<div class="multiplex-figures">
-  <figure class="multiplex-figure course-demo" tabindex="0">
-    <img src="../assets/lecture-04/tdm-vs-fdm.webp" alt="При TDM потоки по очереди занимают временные интервалы одного канала; при FDM потоки одновременно занимают разные частотные полосы">
-    <figcaption>Временное и частотное мультиплексирование. Изображение: <a href="https://resources.l-p.com/glossary/tdm-time-division-multiplexing-basics-uses-benefits-guide">LINK-PP</a>.</figcaption>
-  </figure>
-  <figure class="multiplex-figure fdm-ofdm-container course-demo">
-
-{{< include ../_includes/lecture-04-fdm-ofdm.qmd >}}
-
-<figcaption>FDM и OFDM при одинаковом масштабе частоты. Показаны основные лепестки спектров; сравнение полосы схематическое. В OFDM шаг поднесущих равен 1/T, где T — длительность полезной части символа.</figcaption>
-  </figure>
-</div>
-
 ## Кому достанется общий ресурс?
 
 > Как независимые пользователи могут передавать по одному общему каналу? Какую часть ресурса получит каждый?
