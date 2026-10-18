@@ -35,11 +35,10 @@ function mountRates(root) {
 }
 
 function mountBer(root, rows) {
-  root.innerHTML = `<div class="ber-controls" role="group" aria-label="Выберите режимы для сравнения">${modes.map((m, i) => `<label><input type="checkbox" value="${m.id}"><span class="ber-swatch" style="--curve-color:var(${colors[i]})"></span>M${m.id} · ${m.modulation} · ${m.rc === .5 ? "1/2" : "3/4"}</label>`).join("")}</div><div class="ber-plot" tabindex="0" aria-label="График BER, доступна локальная прокрутка"></div><p class="interactive-note">Линии соединяют измеренные точки для чтения графика; они не задают точную BER между точками. Точки с нулём зарегистрированных ошибок на логарифмической шкале не показаны. Их отсчёты доступны в таблице.</p><details><summary>Измеренные отсчёты выбранных режимов</summary><div class="mcs-scroll" tabindex="0" aria-label="Таблица измеренных BER"><table><thead><tr><th scope="col">Режим</th><th scope="col">SNR, дБ</th><th scope="col">Ошибок / бит</th><th scope="col">BER</th></tr></thead><tbody></tbody></table></div></details>`;
+  root.innerHTML = `<div class="ber-controls" role="group" aria-label="Выберите режимы для сравнения">${modes.map((m, i) => `<label><input type="checkbox" value="${m.id}"><span class="ber-swatch" style="--curve-color:var(${colors[i]})"></span>M${m.id} · ${m.modulation} · ${m.rc === .5 ? "1/2" : "3/4"}</label>`).join("")}</div><div class="ber-plot" tabindex="0" aria-label="График BER, доступна локальная прокрутка"></div><p class="interactive-note">Линии соединяют измеренные точки для чтения графика; они не задают точную BER между точками. Точки с нулём зарегистрированных ошибок на логарифмической шкале не показаны.</p>`;
   const draw = () => {
     const selected = [...root.querySelectorAll("input:checked")].map(el => Number(el.value));
     root.querySelector(".ber-plot").innerHTML = berSvg(rows, selected, {threshold: 1e-3});
-    root.querySelector("tbody").innerHTML = rows.filter(r => selected.includes(r.scheme)).map(r => `<tr><th scope="row">M${r.scheme}</th><td>${fmt(r.snr_db)}</td><td>${r.bit_errors} / ${r.information_bits}</td><td>${r.ber ? r.ber.toExponential(3) : "0 зарегистрировано"}</td></tr>`).join("");
   };
   root.addEventListener("change", draw);
   draw();
@@ -88,7 +87,7 @@ function mountShannon(root) {
     {key: `c${db}`, label: `Предел при ${db} дБ`, expected: capacity(2, db), unit: "Мбит/с", hint: "используйте log₂ и B = 2 МГц"},
   ]);
   root.innerHTML = `<div class="mcs-fields">${fields.map(f => field(f.key, `${f.label}${f.unit ? `, ${f.unit}` : ""}`)).join("")}</div>`;
-  checker(root, fields, "При 3 дБ предел исключает 5 Мбит/с. При 7 дБ не исключает, но R < C не гарантирует работу данного MCS: нужны подходящие код, приёмник и условия. Здесь SNR — отношение мощностей в полосе, а в BER-данных — Es/N₀ при заданной нормировке. C/B — теоретическая спектральная эффективность в бит/с/Гц.");
+  checker(root, fields, "При 3 дБ предел исключает 5 Мбит/с. При 7 дБ не исключает, но R < C не гарантирует работу данного MCS: нужны подходящие код, приёмник и условия. Здесь SNR -- отношение мощностей в полосе отдельной модели канала. C/B — теоретическая спектральная эффективность в бит/с/Гц.");
 }
 
 for (const root of document.querySelectorAll('[data-mcs="rates"]')) mountRates(root);
