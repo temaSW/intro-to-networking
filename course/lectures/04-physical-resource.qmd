@@ -80,9 +80,9 @@ $$R_b=n f_s,\qquad T_b=\frac{1}{n f_s}.$$
 </details>
 
 <div class="constellation-figures">
-  <figure><figcaption>QPSK · 2 бита на символ</figcaption><img src="../assets/lecture-04/qpsk.svg" alt="Созвездие QPSK: четыре точки"></figure>
-  <figure><figcaption>16-QAM · 4 бита на символ</figcaption><img src="../assets/lecture-04/16-qam.svg" alt="Созвездие 16-QAM: шестнадцать точек"></figure>
-  <figure><figcaption>64-QAM · 6 бит на символ</figcaption><img src="../assets/lecture-04/64-qam.svg" alt="Созвездие 64-QAM: шестьдесят четыре точки"></figure>
+  <figure><figcaption>QPSK</figcaption><img src="../assets/lecture-04/qpsk.svg" alt="Созвездие QPSK: четыре точки"></figure>
+  <figure><figcaption>16-QAM</figcaption><img src="../assets/lecture-04/16-qam.svg" alt="Созвездие 16-QAM: шестнадцать точек"></figure>
+  <figure><figcaption>64-QAM</figcaption><img src="../assets/lecture-04/64-qam.svg" alt="Созвездие 64-QAM: шестьдесят четыре точки"></figure>
 </div>
 
 ### Какие порядки модуляции применяют на практике?
@@ -181,7 +181,7 @@ $$R_b=n f_s,\qquad T_b=\frac{1}{n f_s}.$$
   <text x="410" y="439" text-anchor="middle">11|00</text><circle cx="410" cy="460" r="5"/>
   <text x="535" y="439" text-anchor="middle">10|00</text><circle cx="535" cy="460" r="5"/>
 </svg>
-<figcaption>Выделенные соседи <code>01|01</code> и <code>11|01</code> различаются одним битом.</figcaption>
+<figcaption>Выделены соседние точки с метками <code>01|01</code> и <code>11|01</code>.</figcaption>
 </figure>
 
 ::::
@@ -237,6 +237,8 @@ $$\eta\leq\frac{C}{B}=\log_2(1+\mathrm{SNR}),$$
 
 > Одна неверно распознанная точка созвездия, один неверный бит и один блок с ошибкой -- одинаковые события? Как считать долю ошибок?
 
+<details><summary>Разбор: показатели ошибок</summary>
+
 **SER** (*symbol error rate*) -- доля ошибочно распознанных символов: приёмник выбрал другую точку созвездия. **BER** (*bit error rate*) -- доля ошибочных битов; **BLER** (*block error rate*) -- доля блоков с ошибкой.
 
 ::: {.error-rate-formulas}
@@ -246,6 +248,8 @@ $$\mathrm{BER}=\frac{N_{\text{ошибочных битов}}}{N_{\text{пере
 
 $$\mathrm{BLER}=\frac{N_{\text{блоков с ошибкой}}}{N_{\text{переданных блоков}}}$$
 :::
+
+</details>
 
 ## Как обнаруживать ошибки? {#как-мы-можем-контролировать-ошибки}
 
