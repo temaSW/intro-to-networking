@@ -1,18 +1,19 @@
 ```{=html}
 <figure class="course-demo link-frame" aria-labelledby="link-physical-caption">
   <div class="link-frame__boundary">
-    <strong class="link-frame__label">Одна физическая передача Wi-Fi — протокольный блок физического уровня (PPDU)</strong>
+    <strong class="link-frame__label">Один кадр физического уровня<span class="link-frame__english" lang="en">Physical-layer frame (PHY frame)</span></strong>
     <div class="link-frame__physical">
-      <div class="link-frame__field link-frame__service"><strong>Физическое оформление</strong><span>Преамбула и служебное описание передачи</span></div>
+      <div class="link-frame__field link-frame__service"><strong>Преамбула и физический заголовок<span class="link-frame__english" lang="en">Preamble &amp; PHY header</span></strong><span>Опоры для приёма и параметры физической передачи</span></div>
       <div class="link-frame__boundary link-frame__contents">
-        <strong class="link-frame__label">Часть, несущая канальные данные</strong>
+        <strong class="link-frame__label">Полезная нагрузка физического кадра<span class="link-frame__english" lang="en">PHY payload</span></strong>
         <div class="link-frame__aggregate">
-          <div class="link-frame__mac"><strong>MAC-кадр 1</strong><span>Заголовок · тело, если есть · своя FCS</span></div>
-          <div class="link-frame__mac"><strong>MAC-кадр 2</strong><span>Заголовок · тело, если есть · своя FCS</span></div>
+          <div class="link-frame__mac"><strong>Канальный кадр 1<span class="link-frame__english" lang="en">Data-link frame 1</span></strong><span>Свой заголовок, нагрузка и контроль ошибок</span></div>
+          <div class="link-frame__mac"><strong>Канальный кадр 2<span class="link-frame__english" lang="en">Data-link frame 2</span></strong><span>Свой заголовок, нагрузка и контроль ошибок</span></div>
+          <span class="link-frame__more" aria-label="Другие канальные кадры">…</span>
         </div>
       </div>
     </div>
   </div>
-  <figcaption id="link-physical-caption">Пример передачи с объединением двух MAC-кадров; разделители и заполнение опущены. Граница PPDU охватывает всю физическую передачу, границы MAC-кадров — отдельные блоки внутри. В других режимах может передаваться один MAC-кадр.</figcaption>
+  <figcaption id="link-physical-caption">Пример объединения: один физический кадр несёт несколько кадров канального уровня. Внешняя рамка показывает границу физического кадра, внутренние -- границы отдельных канальных кадров. Их число и способ размещения зависят от технологии; разделители и заполнение опущены.</figcaption>
 </figure>
 ```
