@@ -643,6 +643,51 @@ main .zoomable-image { cursor: zoom-in; }
   .lecture-interactive { padding: .8rem; }
 }
 
+/* Signal paths keep stages connected in both horizontal and vertical layouts. */
+.signal-cascade { container-type: inline-size; margin-block: 1.25rem; }
+.signal-cascade-chain {
+  display: flex;
+  align-items: stretch;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  gap: 2rem;
+}
+.signal-cascade-chain > li { position: relative; flex: 1; min-width: 0; margin: 0; }
+.signal-cascade-stage {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: .35rem;
+  height: 100%;
+  min-height: 4.5rem;
+  padding: .8rem .45rem;
+  border: 1px solid var(--accent);
+  border-radius: .35rem;
+  background: var(--surface);
+  color: var(--ink);
+  text-align: center;
+  line-height: 1.4;
+}
+.signal-cascade-stage strong { color: var(--accent); white-space: nowrap; }
+.signal-cascade-stage > span { color: var(--muted); font-size: .9rem; }
+.signal-cascade-arrow {
+  position: absolute;
+  top: 50%;
+  right: -2rem;
+  width: 2rem;
+  color: var(--accent);
+  text-align: center;
+  font-size: 1.5rem;
+  line-height: 1;
+  transform: translateY(-50%);
+}
+@container (max-width: 58rem) {
+  .signal-cascade-chain { flex-direction: column; align-items: center; }
+  .signal-cascade-chain > li { width: 100%; max-width: 22rem; flex: auto; }
+  .signal-cascade-arrow { top: 100%; right: 50%; transform: translateX(50%) rotate(90deg); height: 2rem; line-height: 2rem; }
+}
+
 /* Reusable access-link diagram: the first hop stays explicit on narrow screens. */
 .access-topology { display: grid; grid-template-columns: minmax(0, 1fr) minmax(10rem, .27fr); gap: var(--demo-gap); align-items: center; }
 .access-hop { display: grid; grid-template-columns: minmax(7rem, 1fr) minmax(8rem, 1.4fr) minmax(9rem, 1fr); gap: 1rem; align-items: center; padding: 1rem; border: 1px solid var(--accent); border-radius: .4rem; background: var(--accent-soft); }

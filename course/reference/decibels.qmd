@@ -8,8 +8,16 @@ description: "Короткий инженерный справочник по у
 
 Сигнал редко проходит от передатчика к приёмнику без изменений:
 
-```text
-передатчик → кабель → усилитель → фильтр / линия → приёмник
+```{=html}
+<div class="signal-cascade">
+<ol class="signal-cascade-chain" aria-label="Последовательность элементов сигнального тракта">
+  <li><div class="signal-cascade-stage">Передатчик</div><span class="signal-cascade-arrow" aria-hidden="true">→</span></li>
+  <li><div class="signal-cascade-stage">Кабель</div><span class="signal-cascade-arrow" aria-hidden="true">→</span></li>
+  <li><div class="signal-cascade-stage">Усилитель</div><span class="signal-cascade-arrow" aria-hidden="true">→</span></li>
+  <li><div class="signal-cascade-stage">Фильтр / линия</div><span class="signal-cascade-arrow" aria-hidden="true">→</span></li>
+  <li><div class="signal-cascade-stage">Приёмник</div></li>
+</ol>
+</div>
 ```
 
 В линейных единицах каждый следующий элемент умножает мощность на свой коэффициент:
@@ -118,8 +126,17 @@ $$P_\mathrm{RX}=P_\mathrm{TX}10^{-7/10}10^{-2/10}10^{-0.8/10}.$$
 
 На входе $P_\mathrm{in}=-25\ \mathrm{dBm}$. Далее идут усилитель `+12 dB`, аттенюатор `−3 dB`, усилитель `+18 dB`, фильтр `−2 dB`, усилитель `+10 dB`.
 
-```text
-−25 dBm → +12 → −13 → −3 → −16 → +18 → +2 → −2 → 0 → +10 → +10 dBm
+```{=html}
+<div class="signal-cascade">
+<ol class="signal-cascade-chain" aria-label="Каскады усиления и уровень мощности после каждого элемента">
+  <li><div class="signal-cascade-stage">Вход<strong>−25 dBm</strong></div><span class="signal-cascade-arrow" aria-hidden="true">→</span></li>
+  <li><div class="signal-cascade-stage">Усилитель<strong>+12 dB</strong><span>Выход: −13 dBm</span></div><span class="signal-cascade-arrow" aria-hidden="true">→</span></li>
+  <li><div class="signal-cascade-stage">Аттенюатор<strong>−3 dB</strong><span>Выход: −16 dBm</span></div><span class="signal-cascade-arrow" aria-hidden="true">→</span></li>
+  <li><div class="signal-cascade-stage">Усилитель<strong>+18 dB</strong><span>Выход: +2 dBm</span></div><span class="signal-cascade-arrow" aria-hidden="true">→</span></li>
+  <li><div class="signal-cascade-stage">Фильтр<strong>−2 dB</strong><span>Выход: 0 dBm</span></div><span class="signal-cascade-arrow" aria-hidden="true">→</span></li>
+  <li><div class="signal-cascade-stage">Усилитель<strong>+10 dB</strong><span>Выход: +10 dBm</span></div></li>
+</ol>
+</div>
 ```
 
 Короткий расчёт даёт тот же результат:
