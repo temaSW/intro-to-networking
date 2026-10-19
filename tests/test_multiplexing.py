@@ -111,3 +111,20 @@ assert.equal(m.stateAt(data,.5).sent,1);
 assert.equal(m.stateAt(data,1).transmitting.length,1);
 for(const t of [-1,1001,NaN]) assert.throws(()=>m.stateAt(data,t),RangeError);
 """)
+
+
+def test_two_packet_story_has_analytical_waiting_interval():
+    run_js("""
+const config={flows:4,capacity:2,buffer:8};
+const trace=[{t:0,source:0,sequence:1},{t:1,source:0,sequence:2}];
+const dedicated=m.simulate(config,'dedicated',trace);
+const shared=m.simulate(config,'shared',trace);
+assert.deepEqual(dedicated.accepted.map(j=>[j.start,j.finish]),[[0,2],[2,4]]);
+assert.deepEqual(shared.accepted.map(j=>[j.start,j.finish]),[[0,.5],[1,1.5]]);
+assert.equal(m.stateAt(dedicated,1).waiting[0].sequence,2);
+assert.equal(m.stateAt(dedicated,1).transmitting[0].sequence,1);
+assert.equal(m.stateAt(shared,1).waiting.length,0);
+assert.equal(m.stateAt(shared,1).transmitting[0].sequence,2);
+assert.equal(m.stateAt(shared,1.5).sent,2);
+assert.equal(m.stateAt(dedicated,4).sent,2);
+""")
