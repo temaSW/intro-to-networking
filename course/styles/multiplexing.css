@@ -7,6 +7,9 @@
 .mux-scroll table { width:100%; min-width:27rem; }
 .mux-scroll th, .mux-scroll td { padding:.5rem; border-bottom:1px solid var(--line); vertical-align:top; }
 .mux-scroll td { text-align:right; font-variant-numeric:tabular-nums; }
+.mux-scroll th { text-align:left; }
+.mux-comparison th:first-child { width:20%; }
+.mux-comparison td { text-align:left; }
 .mux-scroll svg { display:block; width:100%; min-width:var(--plot-min-width); height:auto; }
 .mux-axis { stroke:var(--line); fill:none; }
 .mux-label { fill:var(--ink); font:14px system-ui,sans-serif; }
