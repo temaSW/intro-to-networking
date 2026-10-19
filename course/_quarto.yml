@@ -2,7 +2,6 @@ project:
   type: website
   output-dir: _site
   resources:
-    - self-study/bank.json
     - assets/scroll-demo/**
     - assets/lecture-04/keying-*.svg
     - interactives/*.js
@@ -51,8 +50,6 @@ website:
         href: lectures/index.qmd
       - text: "Практика"
         href: practice/index.qmd
-      - text: "Самостоятельные"
-        href: self-study/index.qmd
       - text: "Лабораторные"
         href: labs/index.qmd
       - text: "Справочник"
