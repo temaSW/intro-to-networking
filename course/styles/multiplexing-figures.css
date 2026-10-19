@@ -48,3 +48,8 @@
 .mt-pointer { fill:color-mix(in srgb,var(--focus) 20%,var(--surface)); stroke:var(--focus); stroke-width:1.5; }
 .mt-meta { fill:var(--surface-alt); stroke:var(--muted); stroke-width:1.5; }
 .mt-pointer-link { fill:none; stroke:var(--focus); stroke-width:2; }
+
+.mux-figure .mt-slot-number { font-size:13px; fill:var(--muted); }
+.mux-figure .mt-table-head { font-size:14px; font-weight:700; }
+.mux-figure .mt-table-cell { font-size:14px; }
+.mux-figure .mt-container { fill:color-mix(in srgb,var(--mux-a) 19%,var(--surface)); stroke:var(--mux-a); stroke-width:1.5; }
