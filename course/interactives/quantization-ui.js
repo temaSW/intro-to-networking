@@ -1,4 +1,5 @@
 import { quantizedWave, quantize } from './quantization-model.js';
+import { errorChart } from './quantization-plot.js';
 
 const number = x => x.toLocaleString('ru-RU', { maximumFractionDigits: 4 });
 document.querySelectorAll('[data-quantization-point]').forEach(root => {
@@ -22,20 +23,20 @@ document.querySelectorAll('[data-quantization-point]').forEach(root => {
   draw();
 });
 function chart(result, comparison) {
-  const left = 66, right = 810, x = t => left + t / 4 * (right - left);
+  const left = 90, right = 810, x = t => left + t / 4 * (right - left);
   const y = a => 146 - a * 73;
   const curve = Array.from({ length: 401 }, (_, k) => `${k ? 'L' : 'M'}${x(k / 100)} ${y(result.original(k / 100))}`).join(' ');
   const grid = [0, 1, 2, 3, 4].map(t => `<path class="q-grid" d="M${x(t)} 28V264"/><text x="${x(t)}" y="288" text-anchor="middle">${t}</text>`).join('');
-  const labels = [-1, 0, 1].map(a => `<text x="54" y="${y(a) + 5}" text-anchor="end">${a}</text>`).join('');
+  const labels = [-1, 0, 1].map(a => `<text x="78" y="${y(a) + 5}" text-anchor="end">${a}</text>`).join('');
   const brokenLine = (r, cls) => `<path class="${cls}" d="${r.samples.map((p, k) => `${k ? 'L' : 'M'}${x(p.timeMs)} ${y(p.reconstructed)}`).join(' ')}"/>`;
   const stems = result.samples.map(p => `<path class="q-error" d="M${x(p.timeMs)} ${y(p.value)}V${y(p.reconstructed)}"/>`).join('');
   const over = result.samples.filter(p => p.overloaded).map(p => `<rect class="q-overload" x="${x(p.timeMs) - 5}" y="${y(p.value) - 5}" width="10" height="10"/>`).join('');
-  return `<svg viewBox="0 0 850 315" role="img" aria-label="Исходный сигнал и ломаные через квантованные отсчёты за четыре миллисекунды; по вертикали амплитуда в относительных единицах"><rect class="q-paper" width="850" height="315"/>${grid}${labels}<text x="66" y="18">Амплитуда, отн. ед.</text><path class="q-limit" d="M${left} ${y(1)}H${right} M${left} ${y(-1)}H${right}"/><path class="q-axis" d="M${left} 28V264H${right}"/><path class="q-original" d="${curve}"/>${comparison ? '' : stems}${brokenLine(result, 'q-uniform-line')}${comparison ? brokenLine(comparison, 'q-log-line') : ''}${over}<text x="${right}" y="308" text-anchor="end">Время, мс</text></svg>`;
+  return `<svg viewBox="0 0 850 315" role="img" aria-label="Исходный сигнал и ломаные через квантованные отсчёты за четыре миллисекунды; по вертикали амплитуда в относительных единицах"><rect class="q-paper" width="850" height="315"/>${grid}${labels}<text x="90" y="18">Амплитуда, отн. ед.</text><path class="q-limit" d="M${left} ${y(1)}H${right} M${left} ${y(-1)}H${right}"/><path class="q-axis" d="M${left} 28V264H${right}"/><path class="q-original" d="${curve}"/>${comparison ? '' : stems}${brokenLine(result, 'q-uniform-line')}${comparison ? brokenLine(comparison, 'q-log-line') : ''}${over}<text x="${right}" y="308" text-anchor="end">Время, мс</text></svg>`;
 }
 
 document.querySelectorAll('[data-quantization]').forEach((root, instance) => {
   const compare = root.dataset.quantization === 'compare';
-  root.innerHTML = `<div class="q-controls"><label>Разрядность <output data-bits-out></output><input data-bits type="range" min="2" max="8" value="4" step="1"></label><label>Амплитуда <output data-amplitude-out></output><input data-amplitude type="range" min="0.1" max="1.4" value="${compare ? '.8' : '.7'}" step="0.05"></label></div><div class="q-chart" data-chart tabindex="0" role="region" aria-label="График квантования"></div><div class="q-legend"><span><i class="q-key-original"></i>Исходный сигнал</span><span><i class="q-key-uniform"></i>Равномерная шкала</span>${compare ? '<span><i class="q-key-log"></i>Нелинейная шкала</span>' : '<span><i class="q-key-error"></i>Ошибка отсчёта</span>'}<span><i class="q-key-limit"></i>Границы диапазона ±1</span><span><i class="q-key-overload"></i>Перегруженные отсчёты</span></div><p class="q-result" data-result aria-live="polite"></p><p class="q-chart-note">Ломаные соединяют квантованные отсчёты для сравнения; между отсчётами значения не вычисляются.</p><details><summary>Отсчёт, кодовое слово и ошибка</summary><label class="q-sample-label" for="q-sample-${instance}">Номер отсчёта <input id="q-sample-${instance}" data-sample type="number" min="0" max="32" value="3"></label><div data-word></div></details>`;
+  root.innerHTML = `<div class="q-controls"><label>Разрядность <output data-bits-out></output><input data-bits type="range" min="2" max="8" value="4" step="1"></label><label>Амплитуда <output data-amplitude-out></output><input data-amplitude type="range" min="0.1" max="1.4" value="${compare ? '.8' : '.7'}" step="0.05"></label></div><div class="q-chart" data-chart tabindex="0" role="region" aria-label="График квантования"></div><div class="q-chart q-error-chart" data-error-chart tabindex="0" role="region" aria-label="Ошибка квантования"></div><div class="q-legend"><span><i class="q-key-original"></i>Исходный сигнал</span><span><i class="q-key-uniform"></i>Равномерная шкала</span>${compare ? '<span><i class="q-key-log"></i>Нелинейная шкала</span>' : '<span><i class="q-key-error"></i>Ошибка отсчёта</span>'}<span><i class="q-key-limit"></i>Границы диапазона ±1</span><span><i class="q-key-overload"></i>Перегруженные отсчёты</span></div><p class="q-result" data-result aria-live="polite"></p><p class="q-chart-note">Ломаные соединяют квантованные отсчёты для сравнения; между отсчётами значения не вычисляются.</p><details><summary>Отсчёт, кодовое слово и ошибка</summary><label class="q-sample-label" for="q-sample-${instance}">Номер отсчёта <input id="q-sample-${instance}" data-sample type="number" min="0" max="32" value="3"></label><div data-word></div></details>`;
   const bits = root.querySelector('[data-bits]'), amplitude = root.querySelector('[data-amplitude]');
   const sample = root.querySelector('[data-sample]');
   function draw() {
@@ -44,6 +45,7 @@ document.querySelectorAll('[data-quantization]').forEach((root, instance) => {
     root.querySelector('[data-bits-out]').textContent = `${n} бит · ${2 ** n} уровней`;
     root.querySelector('[data-amplitude-out]').textContent = `${number(a)} отн. ед.`;
     root.querySelector('[data-chart]').innerHTML = chart(u, c);
+    root.querySelector('[data-error-chart]').innerHTML = errorChart(u, c);
     root.querySelector('[data-result]').textContent = `Максимальная абсолютная ошибка: равномерная шкала ${number(u.maxError)}${c ? `; нелинейная шкала ${number(c.maxError)}` : ''} отн. ед.${u.overloads ? ` Перегрузка: ${u.overloads} из 33 отсчётов за пределами диапазона.` : ''}`;
     const k = Math.max(0, Math.min(32, Math.round(Number(sample.value) || 0)));
     const p = u.samples[k], q = c?.samples[k];

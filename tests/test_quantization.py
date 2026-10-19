@@ -9,6 +9,7 @@ def test_quantization_bounds_overload_and_companding():
     script = r"""
 import assert from 'node:assert/strict';
 import {quantize, quantizedWave} from './course/interactives/quantization-model.js';
+import {errorExtent, errorChart} from './course/interactives/quantization-plot.js';
 import {sampledTone} from './course/interactives/sampling-model.js';
 for (let bits = 2; bits <= 8; bits++) {
   let last = -Infinity;
@@ -36,6 +37,26 @@ assert(quantizedWave(.1, 4, 'log').rmsError < quantizedWave(.1, 4).rmsError);
 assert(quantizedWave(.9, 4, 'log').rmsError > quantizedWave(.9, 4).rmsError);
 assert.equal(quantizedWave(.7, 4).overloads, 0);
 assert(quantizedWave(1.4, 4).overloads > 0);
+// The error plot must remain readable without clipping at every UI setting.
+for (let bits = 2; bits <= 8; bits++) {
+  for (let step = 2; step <= 28; step++) {
+    const u = quantizedWave(step * .05, bits);
+    const c = quantizedWave(step * .05, bits, 'log');
+    for (const comparison of [null, c]) {
+      const extent = errorExtent(u, comparison);
+      const peak = Math.max(u.maxError, comparison?.maxError ?? 0);
+      assert(extent >= peak * 1.15);
+      assert(peak / extent > .5, 'Errors must occupy a useful part of the axis');
+      for (const wave of [u, comparison].filter(Boolean)) {
+        assert(wave.samples.every(p => Math.abs(p.error) < extent));
+      }
+      const svg = errorChart(u, comparison);
+      assert(!/NaN|Infinity|undefined/.test(svg));
+      assert.equal((svg.match(/class="q-error-uniform"/g) ?? []).length, 33);
+      assert.equal((svg.match(/class="q-error-log"/g) ?? []).length, comparison ? 33 : 0);
+    }
+  }
+}
 const complexU = quantizedWave(.8, 4);
 const complexL = quantizedWave(.8, 4, 'log');
 assert(Math.abs(Math.max(...complexU.samples.map(p => Math.abs(p.value))) - .8) < 1e-12);
