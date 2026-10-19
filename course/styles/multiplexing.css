@@ -106,3 +106,10 @@
 .mux-story-states dd { margin:0; }
 .mux-story-is-waiting { border-left:3px solid var(--focus); background:var(--surface-alt); }
 @media(max-width:575px) { .mux-story-states { grid-template-columns:1fr; } .mux-story-time { margin-left:0; } }
+.clock-counts { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; margin:1rem 0; }
+.clock-counts dt { font-size:.9rem; font-weight:400; }
+.clock-counts dd { margin:0; font-weight:700; font-size:1.15rem; font-variant-numeric:tabular-nums; }
+.clock-point { fill:var(--accent); stroke:var(--surface); stroke-width:2; }
+[data-clock-drift] input[type=number] { color:var(--ink); background:var(--surface); border:1px solid var(--line); border-radius:.3rem; padding:.35rem; }
+[data-clock-drift] :focus-visible { outline:3px solid var(--focus); outline-offset:3px; }
+@media(max-width:575px) { .clock-counts { grid-template-columns:1fr; gap:.5rem; } }
