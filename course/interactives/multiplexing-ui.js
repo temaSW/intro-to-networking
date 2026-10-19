@@ -1,9 +1,49 @@
 import {compare, stateAt} from './multiplexing-model.js';
 
 const number = value => value === null ? 'нет завершённых пакетов' : value.toLocaleString('ru-RU', {maximumFractionDigits: 2});
+const plural = new Intl.PluralRules('ru');
+const packetCount = value => `${number(value)} ${{one:'пакет',few:'пакета',many:'пакетов',other:'пакета'}[plural.select(value)]}`;
 const sourceName = source => source < 4 ? ['А', 'Б', 'В', 'Г'][source] : String(source + 1);
 const token = (source, sequence = '') => `<span class="mux-token mux-source-${source % 4}">${sourceName(source)}${sequence !== '' && source >= 4 ? '·' : ''}${sequence}</span>`;
 const packets = jobs => jobs.length ? jobs.slice(0, 8).map(job => token(job.source, job.sequence)).join('') + (jobs.length > 8 ? `<span>+${jobs.length - 8}</span>` : '') : '<span class="mux-empty">пусто</span>';
+
+const activeSources = (config, time) => Array.from({length:config.flows}, (_, source) => source).filter(source => {
+  const phase = config.pattern === 'synchronous' ? 0 : Math.floor(source * 100 / config.flows);
+  return (time + phase) % 100 < config.activity;
+});
+
+function cause(config, state, time, dedicated) {
+  const active = activeSources(config, time);
+  const rate = dedicated ? config.capacity / config.flows : config.capacity;
+  let explanation;
+  if (dedicated) {
+    const source = state.waiting[0]?.source ?? active[0] ?? state.transmitting[0]?.source;
+    if (source === undefined) {
+      explanation = 'Сейчас источники не создают пакетов, ожидающих и передаваемых пакетов нет. Выделенные доли простаивают.';
+    } else if (!active.includes(source)) {
+      explanation = `Источник ${sourceName(source)} сейчас молчит, но его ранее поступившие пакеты ещё передаются со скоростью ${number(rate)} Мбит/с. Пауза в поступлении не означает, что накопленные данные уже переданы.`;
+    } else if (rate < 1) {
+      explanation = `У ${sourceName(source)} пакет появляется каждые <strong>1 мс</strong>, а его передача занимает <strong>около ${number(1 / rate)} мс</strong>. Пакеты приходят быстрее, чем уходят; лишние ждут в очереди или теряются, если места нет.`;
+    } else {
+      explanation = `У ${sourceName(source)} новый пакет появляется каждые <strong>1 мс</strong>, а передача занимает <strong>${number(1 / rate)} мс</strong>. Его выделенная доля успевает обслуживать поступающие пакеты.`;
+    }
+    const unused = config.capacity - state.transmitting.length * rate;
+    if (state.waiting.length && unused > 1e-9) {
+      explanation += ` <strong>Свободны ${number(unused)} Мбит/с других долей, но ожидающие пакеты не могут их использовать:</strong> каждая доля закреплена только за своим источником.`;
+    }
+  } else if (active.length > config.capacity) {
+    explanation = `За 1 мс активные источники создают <strong>${packetCount(active.length)}</strong>, а выход может передать <strong>${packetCount(config.capacity)}</strong>. Поступает больше, чем успевает уйти: избыток ожидает в очереди, а при полном буфере отбрасывается.`;
+  } else if (active.length === 1 && config.capacity === 1) {
+    explanation = `Каждую 1 мс поступает один пакет, и его передача занимает 1 мс. ${state.waiting.length ? 'Ранее накопленная очередь сохраняется: свободной скорости для её сокращения нет.' : 'Выход заканчивает предыдущий пакет к приходу следующего; очередь не накапливается.'}`;
+  } else if (active.length === config.capacity) {
+    explanation = `За 1 мс поступает <strong>${packetCount(active.length)}</strong>, и выход может передать столько же. Но одновременное поступление не означает одновременную передачу: выход передаёт пакеты по одному, поэтому часть пакетов кратковременно ожидает.`;
+  } else if (active.length) {
+    explanation = `За 1 мс поступает <strong>${packetCount(active.length)}</strong>, а выход может передать <strong>${packetCount(config.capacity)}</strong>. ${state.waiting.length ? 'Ресурса хватает и на новые пакеты, и на передачу части ранее накопленной очереди.' : `Один пакет занимает выход на <strong>${number(1 / rate)} мс</strong>; между поступлениями выход успевает освобождаться.`}`;
+  } else {
+    explanation = state.waiting.length || state.transmitting.length ? 'Новые пакеты сейчас не поступают. Выход передаёт оставшиеся данные; после их передачи он освободится.' : 'Новые пакеты сейчас не поступают, накопленной очереди нет. Выход свободен.';
+  }
+  return `<div class="mux-cause"><p class="mux-cause-title">Почему получается такое состояние?</p><p>${explanation}</p></div>`;
+}
 
 function activitySvg(config, time) {
   const height = 62 + config.flows * 28;
@@ -23,7 +63,7 @@ function activitySvg(config, time) {
 
 function lane(job, rate, time, idle) {
   const progress = job ? Math.max(0, Math.min(100, (time - job.start) / (job.finish - job.start) * 100)) : 0;
-  return `<div class="mux-lane${job ? ' mux-lane-busy' : ''}"><div class="mux-lane-fill" style="width:${progress}%"></div><span>${job ? `${token(job.source, job.sequence)} передаётся` : idle}</span><small>${number(rate)} Мбит/с</small></div>`;
+  return `<div class="mux-lane${job ? ' mux-lane-busy' : ''}"><div class="mux-lane-fill" style="width:${progress}%"></div><span>${job ? `${token(job.source, job.sequence)} передаётся` : idle}</span><small>${number(rate)} Мбит/с · ${number(1 / rate)} мс на пакет</small></div>`;
 }
 
 function scene(config, data, time, mode) {
@@ -34,9 +74,10 @@ function scene(config, data, time, mode) {
   const rows = dedicated ? Array.from({length:config.flows}, (_, source) => {
     const queue = state.waiting.filter(job => job.source === source);
     const limit = Math.floor(config.buffer / config.flows) + (source < config.buffer % config.flows ? 1 : 0);
-    return `<div class="mux-resource-row"><div class="mux-source-name">${token(source)}</div><div class="mux-queue${queue.length === limit && limit > 0 ? ' mux-queue-full' : ''}"><div class="mux-packets">${packets(queue)}</div><small>${queue.length} / ${limit} мест</small></div><span aria-hidden="true">→</span>${lane(state.transmitting.find(job => job.source === source), rate, time, 'Простой')}</div>`;
+    return `<div class="mux-resource-row"><div class="mux-source-name">${token(source)}</div><div class="mux-queue${queue.length === limit && limit > 0 ? ' mux-queue-full' : ''}"><div class="mux-packets">${packets(queue)}</div><small>${queue.length} / ${limit} мест</small></div><span aria-hidden="true">→</span>${lane(state.transmitting.find(job => job.source === source), rate, time, `Только для ${sourceName(source)}; простой`)}</div>`;
   }).join('') : `<div class="mux-shared-path"><div class="mux-source-list">${Array.from({length:config.flows}, (_, source) => token(source)).join('')}<span>→ одна очередь</span></div><div class="mux-queue${state.waiting.length === config.buffer && config.buffer > 0 ? ' mux-queue-full' : ''}"><div class="mux-packets">${packets(state.waiting)}</div><small>${state.waiting.length} / ${config.buffer} мест; первым передаётся пакет слева</small></div><div class="mux-path-arrow" aria-hidden="true">↓</div>${lane(state.transmitting[0], rate, time, 'Выход свободен')}</div>`;
   return `<section class="mux-scene"><h4>${dedicated ? 'Закреплённые доли' : 'Общий выход'}</h4><p class="mux-scene-rule">${dedicated ? `У каждого источника своя очередь и ${number(rate)} Мбит/с. Чужую долю занять нельзя.` : `Одна очередь для всех. Каждый пакет передаётся со скоростью ${number(rate)} Мбит/с.`}</p>
+    ${cause(config, state, time, dedicated)}
     <div class="mux-machine" tabindex="0" role="region" aria-label="${dedicated ? 'Очереди и выделенные доли' : 'Общая очередь и выход'}">${dedicated ? '<div class="mux-resource-head"><span>Вход</span><span>Очередь →</span><span>Передача</span></div>' : ''}${rows}</div>
     <p class="mux-instant">Сейчас используется <strong>${number(used)} из ${number(config.capacity)} Мбит/с</strong></p><div class="mux-use" role="img" aria-label="Используется ${number(used)} из ${number(config.capacity)} Мбит/с"><span style="width:${used / config.capacity * 100}%"></span></div>
     <dl class="mux-counts"><div><dt>Передано</dt><dd>${state.sent}</dd></div><div><dt>В очереди</dt><dd>${state.waiting.length}</dd></div><div><dt>Потеряно</dt><dd>${state.rejected.length}</dd></div></dl></section>`;
@@ -53,6 +94,8 @@ export function mountMultiplexing(root) {
     const time = Number(timeInput.value);
     timeRange.value = time;
     root.querySelector('[data-time-value]').textContent = number(time);
+    const active = activeSources(config, time);
+    root.querySelector('[data-input-rate]').innerHTML = `<strong>Сейчас создают пакеты: ${active.length ? active.map(sourceName).join(', ') : 'никто'}.</strong> Суммарная скорость поступления -- ${active.length} Мбит/с; полная скорость выхода -- ${number(config.capacity)} Мбит/с. При закреплённых долях одному источнику доступны только ${number(config.capacity / config.flows)} Мбит/с.`;
     root.querySelector('[data-activity]').innerHTML = activitySvg(config, time);
     root.querySelector('[data-scenes]').innerHTML = scene(config, data.dedicated, time, 'dedicated') + scene(config, data.shared, time, 'shared');
   };
