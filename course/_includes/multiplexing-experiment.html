@@ -1,17 +1,32 @@
 ```{=html}
-<div class="course-demo" data-multiplexing>
+<div class="course-demo mux-experiment" data-multiplexing>
+<div class="mux-main-controls">
+<label>Начало всплесков<select data-parameter="pattern" aria-label="Начало всплесков"><option value="staggered">Со сдвигом во времени</option><option value="synchronous">Одновременно у всех источников</option></select></label>
+<details><summary>Параметры источников и выхода</summary>
 <div class="mux-controls">
-<label>Число потоков: <output data-value="flows">8</output><input aria-label="Число потоков" data-parameter="flows" type="range" min="1" max="24" value="8"></label>
-<label>Доля времени передачи каждого источника, %: <output data-value="activity">25</output><input aria-label="Доля времени передачи каждого источника, проценты" data-parameter="activity" type="range" min="0" max="100" value="25"></label>
-<label>Скорость выхода, Мбит/с: <output data-value="capacity">4</output><input aria-label="Скорость выхода, Мбит в секунду" data-parameter="capacity" type="range" min="1" max="24" value="4"></label>
-<label>Суммарный буфер ожидания, пакетов: <output data-value="buffer">48</output><input aria-label="Буфер ожидания, пакетов" data-parameter="buffer" type="range" min="0" max="240" step="1" value="48"></label>
-<label>Начало всплесков<select data-parameter="pattern"><option value="staggered">Со сдвигом между источниками</option><option value="synchronous">Одновременно у всех источников</option></select></label>
+<label>Число источников<input aria-label="Число источников" data-number="flows" type="number" min="1" max="24" value="4"><input aria-label="Число источников, ползунок" data-parameter="flows" type="range" min="1" max="24" value="4"></label>
+<label>Время передачи за цикл 100 мс<input aria-label="Время передачи за цикл, мс" data-number="activity" type="number" min="0" max="100" value="25"><input aria-label="Время передачи за цикл, ползунок" data-parameter="activity" type="range" min="0" max="100" value="25"></label>
+<label>Скорость выхода, Мбит/с<input aria-label="Скорость выхода, Мбит/с" data-number="capacity" type="number" min="1" max="24" value="2"><input aria-label="Скорость выхода, ползунок" data-parameter="capacity" type="range" min="1" max="24" value="2"></label>
+<label>Всего мест ожидания<input aria-label="Суммарный буфер, пакетов" data-number="buffer" type="number" min="0" max="240" value="24"><input aria-label="Суммарный буфер, ползунок" data-parameter="buffer" type="range" min="0" max="240" value="24"></label>
+</div></details>
 </div>
-<p>Один опыт -- 1 с; цикл каждого источника -- 100 мс. Доля времени передачи 25 % означает 25 мс передачи и 75 мс паузы в каждом цикле. Во время передачи источник создаёт 1 Мбит/с пакетами по 1000 бит.</p>
-<div data-results aria-live="polite"><p>При 8 потоках и активности 25 % средняя нагрузка -- 2 Мбит/с. Для расчёта очереди и потерь требуется JavaScript; ниже в теме доступен пример расчёта без модели.</p></div>
-<p>График показывает число ожидающих пакетов: для закреплённых долей очереди всех источников суммируются. Передаваемые пакеты в очередь не входят. В таблице задержка включает ожидание и передачу только пакетов, переданных до конца опыта; её следует сопоставлять с потерями и остатком.</p>
+<p>Во время всплеска каждый источник создаёт один пакет по 1000 бит каждую миллисекунду (1 Мбит/с). Оба способа обслуживания получают одинаковые пакеты. Буква в прямоугольнике обозначает источник, число -- номер его пакета (А1, А2, …).</p>
+<div class="mux-time-controls">
+<button type="button" data-reset>К началу</button><button type="button" data-step="-0.25" aria-label="Назад на 0,25 миллисекунды">−0,25 мс</button><button type="button" data-play aria-pressed="false">Воспроизвести</button><button type="button" data-step="0.25" aria-label="Вперёд на 0,25 миллисекунды">+0,25 мс</button>
+<label>Момент, мс <input data-time-input aria-label="Момент наблюдения, мс" type="number" min="0" max="100" step="0.25" value="12.25"></label>
+<input data-time-range aria-label="Момент наблюдения, ползунок" type="range" min="0" max="100" step="0.25" value="12.25">
+</div>
+<div class="mux-scroll" data-activity tabindex="0" role="region" aria-label="Активность источников за первые 100 миллисекунд"></div>
+<p class="mux-reading-key">Полоса -- источник создаёт пакеты; пустой участок -- пауза. Вертикальная линия -- выбранный момент. Ниже показаны очереди и передача в этот же момент: <strong><span data-time-value>12,25</span> мс</strong>. На узком экране шкала и схемы прокручиваются по горизонтали.</p>
+<div class="mux-scenes" data-scenes></div>
+<p class="mux-reading-key">Прямоугольники в очередях -- ожидающие пакеты; пакет на передаче показан отдельно. Заполнение полосы передачи -- доля уже переданных битов этого пакета. Счётчики «Передано» и «Потеряно» накоплены с начала опыта.</p>
+<noscript><p>Для схемы обслуживания требуется JavaScript. Ниже в теме доступен расчёт очереди без интерактива.</p></noscript>
+<details><summary>Статистика и график за 1 секунду</summary>
+<div data-results></div>
+<p>Задержка включает ожидание и передачу только завершённых за 1 с пакетов. Остаток включает ожидающие и передаваемые пакеты. График показывает число ожидающих пакетов с отсчётами через 10 мс.</p>
 <div class="mux-legend"><span>Закреплённые доли</span><span>Общий выход</span></div>
-<div class="mux-scroll" data-plot tabindex="0" role="region" aria-label="График очереди, доступна горизонтальная прокрутка"></div>
+<div class="mux-scroll" data-plot tabindex="0" role="region" aria-label="График очереди за одну секунду"></div>
 <details><summary>Числовые отсчёты графика</summary><div class="mux-scroll" data-sample-table tabindex="0" role="region" aria-label="Таблица очереди"></div></details>
+</details>
 </div>
 ```
