@@ -44,12 +44,10 @@
 .mux-figure-scroll:focus-visible { outline:3px solid var(--focus); outline-offset:3px; }
 .mux-figure .mux-figure-hint { display:none; color:var(--muted); font-size:.8rem; text-align:start; }
 @media(max-width:1100px) { .mux-figure .mux-figure-hint { display:block; margin:.5rem 0; } }
-.mt-section { fill:var(--accent-soft); stroke:var(--accent); stroke-width:1.5; }
-.mt-pointer { fill:color-mix(in srgb,var(--focus) 20%,var(--surface)); stroke:var(--focus); stroke-width:1.5; }
 .mt-meta { fill:var(--surface-alt); stroke:var(--muted); stroke-width:1.5; }
-.mt-pointer-link { fill:none; stroke:var(--focus); stroke-width:2; }
 
-.mux-figure .mt-slot-number { font-size:13px; fill:var(--muted); }
-.mux-figure .mt-table-head { font-size:14px; font-weight:700; }
-.mux-figure .mt-table-cell { font-size:14px; }
-.mux-figure .mt-container { fill:color-mix(in srgb,var(--mux-a) 19%,var(--surface)); stroke:var(--mux-a); stroke-width:1.5; }
+
+.mux-source-scroll { overflow-x:auto; max-width:100%; }
+.mux-source-scroll img { display:block; width:100%; min-width:48rem; height:auto; background:white; }
+.mux-source-figure figcaption { margin-top:.7rem; color:var(--muted); font-size:.9rem; line-height:1.45; }
+.mux-source-scroll:focus-visible { outline:3px solid var(--focus); outline-offset:3px; }

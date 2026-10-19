@@ -128,3 +128,16 @@ assert.equal(m.stateAt(shared,1).transmitting[0].sequence,2);
 assert.equal(m.stateAt(shared,1.5).sent,2);
 assert.equal(m.stateAt(dedicated,4).sent,2);
 """)
+
+
+def test_short_queue_peak_between_plot_samples():
+    run_js("""
+const trace = [1,2,3].map(sequence => ({t:1,source:0,sequence}));
+const result = m.simulate({flows:1,capacity:1,buffer:8},'shared',trace);
+assert.equal(result.maxQueue,2);
+assert(result.samples.every(sample => sample.queue===0));
+assert.equal(m.stateAt(result,1).waiting.length,2);
+const paired = trace.concat(trace.map(packet=>({...packet,source:1})));
+const dedicated = m.simulate({flows:2,capacity:2,buffer:8},'dedicated',paired);
+assert.equal(dedicated.maxQueue,4);
+""")

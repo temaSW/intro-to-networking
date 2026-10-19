@@ -28,6 +28,7 @@ export function simulate(config, mode, trace = arrivals(config)) {
   const accepted = [];
   const rejected = [];
   let lost = 0;
+  let maxQueue = 0;
   for (const packet of trace) {
     const resource = resources[dedicated ? packet.source : 0];
     resource.jobs = resource.jobs.filter(job => job.finish > packet.t + 1e-9);
@@ -40,6 +41,9 @@ export function simulate(config, mode, trace = arrivals(config)) {
     resource.free = finish;
     resource.jobs.push(job);
     accepted.push(job);
+    // Queue peaks can fall between the ten-millisecond plot samples.
+    maxQueue = Math.max(maxQueue, resources.reduce((sum, r) =>
+      sum + r.jobs.filter(j => j.start > packet.t + 1e-9).length, 0));
   }
   const completed = accepted.filter(job => job.finish <= DURATION + 1e-9);
   const busyTime = accepted.reduce((sum, job) => sum + Math.max(0, Math.min(job.finish, DURATION) - job.start), 0);
@@ -53,7 +57,7 @@ export function simulate(config, mode, trace = arrivals(config)) {
     utilization: busyTime / (DURATION * count),
     wait: completed.length ? completed.reduce((sum, job) => sum + job.start - job.t, 0) / completed.length : null,
     delay: completed.length ? completed.reduce((sum, job) => sum + job.finish - job.t, 0) / completed.length : null,
-    maxQueue: samples.reduce((max, sample) => Math.max(max, sample.queue), 0),
+    maxQueue,
     samples,
     accepted, rejected,
   };
