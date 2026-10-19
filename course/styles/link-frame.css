@@ -1,5 +1,6 @@
 /* Static, reusable diagrams of logical blocks and their physical container. */
-.link-frame { color: var(--ink); }
+.link-frame { color: var(--ink); container-type: inline-size; }
+.link-frame__english { display: block; font-size: .85rem; font-weight: 400; color: var(--muted); margin-top: .25rem; }
 .link-frame__boundary { min-width: 0; padding: .8rem; border: 2px solid var(--line); border-radius: .35rem; }
 .link-frame__label { display: block; margin-bottom: .75rem; }
 .link-frame__fields { display: grid; grid-template-columns: 1.2fr 1.5fr 1fr; gap: .5rem; }
@@ -9,11 +10,12 @@
 .link-frame__check { background: var(--surface); border-style: dashed; border-color: var(--focus); }
 .link-frame__physical { display: grid; grid-template-columns: 1fr 2.5fr; gap: .75rem; }
 .link-frame__contents { border-style: dashed; }
-.link-frame__aggregate { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; }
+.link-frame__aggregate { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)) auto; gap: .5rem; }
+.link-frame__more { align-self: center; font-size: 1.5rem; }
 .link-frame figcaption { margin-top: .75rem; color: var(--muted); font-size: .9rem; line-height: 1.45; }
-@media (max-width: 760px) {
+@container (max-width: 44rem) {
   .link-frame__physical { grid-template-columns: 1fr; }
 }
-@media (max-width: 575px) {
+@container (max-width: 32rem) {
   .link-frame__fields, .link-frame__aggregate { grid-template-columns: 1fr; }
 }

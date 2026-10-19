@@ -31,6 +31,10 @@ def main() -> int:
         print("Python 3.11 or newer is required.", file=sys.stderr)
         return 2
 
+    assessment_check = ROOT / "scripts/check_assessments.py"
+    if subprocess.run([sys.executable, str(assessment_check)], cwd=ROOT, check=False).returncode:
+        return 1
+
     quarto = find_quarto()
     if quarto is None:
         print(f"Quarto {QUARTO_VERSION} is required: https://quarto.org/docs/get-started/", file=sys.stderr)
@@ -52,7 +56,9 @@ def main() -> int:
         local_cache.mkdir(parents=True, exist_ok=True)
         environment["LOCALAPPDATA"] = str(local_cache)
     result = subprocess.run([quarto, "render", str(COURSE), "--to", "html"], cwd=ROOT, env=environment, check=False)
-    return result.returncode
+    if result.returncode:
+        return result.returncode
+    return subprocess.run([sys.executable, str(assessment_check), "--site"], cwd=ROOT, check=False).returncode
 
 
 if __name__ == "__main__":

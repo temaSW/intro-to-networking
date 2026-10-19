@@ -2,6 +2,7 @@ project:
   type: website
   output-dir: _site
   resources:
+    - self-study/bank.json
     - assets/scroll-demo/**
     - assets/lecture-04/keying-*.svg
     - interactives/*.js
@@ -11,6 +12,10 @@ project:
     - styles/scrambler.css
     - styles/channel-playground.css
     - styles/transmission-agreement.css
+    - styles/link-frame.css
+    - styles/ip-journey.css
+    - styles/transport-delivery.css
+    - styles/path-performance.css
 
 website:
   title: "ОПИСиС"

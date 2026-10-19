@@ -10,8 +10,8 @@
 .mcs-practice [aria-invalid=true] { border-color: var(--focus); }
 .mcs-practice .mcs-scroll { overflow-x: auto; max-width: 100%; }
 .mcs-practice table { width: 100%; margin-block: .7rem; }
-.mcs-practice :is(th, td) { padding: .5rem; border-bottom: 1px solid var(--line); vertical-align: top; }
-.mcs-practice td:not(:first-child) { text-align: right; }
+.mcs-practice :is(th, td) { padding: .5rem; border-bottom: 1px solid var(--line); vertical-align: middle; text-align: center; }
+.mcs-practice tr > :first-child { text-align: start; }
 .mcs-practice td input { width: 6rem; }
 .mcs-practice .ber-controls label { min-height: 44px; }
 .mcs-practice .mcs-status { font-weight: 400; }

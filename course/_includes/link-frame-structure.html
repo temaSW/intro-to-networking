@@ -1,13 +1,13 @@
 ```{=html}
 <figure class="course-demo link-frame" aria-labelledby="link-frame-caption">
   <div class="link-frame__boundary">
-    <strong class="link-frame__label">Канальный кадр — один оформленный блок</strong>
+    <strong class="link-frame__label">Канальный кадр 1 крупнее<span class="link-frame__english" lang="en">Data-link frame 1 · field structure</span></strong>
     <div class="link-frame__fields">
-      <div class="link-frame__field link-frame__service"><strong>Заголовок</strong><span>Служебные поля: адресация, тип и другие сведения по формату</span></div>
-      <div class="link-frame__field link-frame__payload"><strong>Полезная нагрузка</strong><span>Переносимое содержимое, если предусмотрено</span></div>
-      <div class="link-frame__field link-frame__check"><strong>Контроль ошибок</strong><span>Например, контрольная последовательность кадра</span></div>
+      <div class="link-frame__field link-frame__service"><strong>Заголовок<span class="link-frame__english" lang="en">Header</span></strong><span>Служебные поля: адресация, тип и другие сведения по формату</span></div>
+      <div class="link-frame__field link-frame__payload"><strong>Полезная нагрузка<span class="link-frame__english" lang="en">Payload</span></strong><span>Переносимое содержимое, если предусмотрено</span></div>
+      <div class="link-frame__field link-frame__check"><strong>Контроль ошибок<span class="link-frame__english" lang="en">Error detection</span></strong><span>Например, контрольная последовательность кадра<span class="link-frame__english" lang="en">Frame Check Sequence (FCS)</span></span></div>
     </div>
   </div>
-  <figcaption id="link-frame-caption">Порядок чтения — слева направо, на узком экране — сверху вниз. Это функциональная схема: размеры условны, состав полей зависит от технологии и типа кадра.</figcaption>
+  <figcaption id="link-frame-caption">Структура одного из канальных кадров на схеме выше. Его заголовок и контроль ошибок относятся к этому кадру. Порядок чтения -- слева направо, на узком экране -- сверху вниз; размеры условны, состав полей зависит от технологии и типа кадра.</figcaption>
 </figure>
 ```

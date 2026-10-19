@@ -3,11 +3,11 @@ title: "Модели темы 02"
 subtitle: "Модуляция и кодирование"
 ---
 
-Три модели можно использовать отдельно от [темы 02](04-physical-resource.qmd). [Иллюстрации способов множественного доступа](04-physical-resource.qmd#кто-получит-общий-ресурс) находятся в теме.
+Три модели можно использовать отдельно от [темы 02](04-physical-resource.qmd). [Иллюстрации способов множественного доступа](04-physical-resource.qmd#кому-достанется-общий-ресурс) представлены на странице темы.
 
 ## Спектры амплитудной (ASK), частотной (FSK) и фазовой (PSK) манипуляции
 
-ASK — *amplitude-shift keying*; FSK — *frequency-shift keying*; PSK — *phase-shift keying*.
+ASK -- *amplitude-shift keying*; FSK -- *frequency-shift keying*; PSK -- *phase-shift keying*.
 
 <div class="lecture-interactive" data-lecture-interactive="spectrum"></div>
 <p class="interactive-source"><a href="https://github.com/temaSW/intro-to-networking/blob/main/course/interactives/lecture-04-spectrum-ui.js">Исходник</a></p>
