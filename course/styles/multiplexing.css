@@ -77,3 +77,32 @@
 .mux-experiment .mux-cause .mux-cause-title { font-weight:700; margin-bottom:.4rem; text-align:left; }
 @media(max-width:1100px) { .mux-scenes { grid-template-columns:1fr; } .mux-scene .mux-scene-rule { min-height:0; } }
 @media(max-width:575px) { .mux-main-controls { grid-template-columns:1fr; } .mux-scene { padding:.65rem; } }
+
+/* First encounter: two packets and a single common time scale. */
+.mux-story-controls { display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; }
+.mux-story-controls button { min-height:2.75rem; padding:.4rem .7rem; border:1px solid var(--line); border-radius:.3rem; background:var(--surface); color:var(--ink); }
+.mux-story-controls [data-story-next] { background:var(--accent); color:var(--page-bg); font-weight:700; }
+.mux-story-controls button:disabled { opacity:.5; }
+.mux-story-controls button:focus-visible, .mux-story-plot:focus-visible { outline:3px solid var(--focus); outline-offset:3px; }
+.mux-story-time { margin-left:auto; }
+.mux-story-event { padding:.65rem; margin:.75rem 0; border-left:3px solid var(--accent); background:var(--accent-soft); min-height:3.6em; }
+.mux-story-plot svg { min-width:54rem; }
+.mux-story svg text { fill:var(--ink); font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif; }
+.mux-story-label { font-size:16px; font-weight:700; }
+.mux-story-tick { font-size:15px; }
+.mux-story-packet-name { font-size:17px; font-weight:700; }
+.mux-story-transfer { fill:color-mix(in srgb,var(--mux-a) 18%,var(--surface)); stroke:var(--mux-a); stroke-width:2; }
+.mux-story-grid { fill:none; stroke:var(--line); stroke-width:1; stroke-dasharray:3 5; }
+.mux-story-hatch { fill:none; stroke:var(--focus); stroke-width:1.5; }
+.mux-story-wait { stroke:var(--focus); stroke-width:2; }
+.mux-story-arrival { fill:none; stroke:var(--mux-a); stroke-width:2; }
+.mux-story-future { opacity:.45; }
+.mux-story-cursor { fill:none; stroke:var(--ink); stroke-width:3; }
+.mux-story-states { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; margin:.75rem 0; }
+.mux-story-states section { border:1px solid var(--line); padding:.65rem; border-radius:.3rem; }
+.mux-story-states dl { margin:.5rem 0 0; }
+.mux-story-states dl > div { display:flex; gap:.75rem; align-items:center; padding:.35rem; }
+.mux-story-states dt { min-width:2rem; }
+.mux-story-states dd { margin:0; }
+.mux-story-is-waiting { border-left:3px solid var(--focus); background:var(--surface-alt); }
+@media(max-width:575px) { .mux-story-states { grid-template-columns:1fr; } .mux-story-time { margin-left:0; } }

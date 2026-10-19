@@ -1,4 +1,23 @@
 ```{=html}
+<div class="course-demo mux-experiment mux-story" data-mux-story>
+<div class="mux-story-controls">
+<button type="button" data-story-reset>К началу</button>
+<button type="button" data-story-back>Предыдущее событие</button>
+<button type="button" data-story-next>Следующее событие</button>
+<span class="mux-story-time" aria-live="polite">Момент: <strong data-story-time>0 мс</strong></span>
+</div>
+<p class="mux-story-event" data-story-event aria-live="polite"></p>
+<div class="mux-scroll mux-story-plot" data-story-plot tabindex="0" role="region" aria-label="Передача двух пакетов А на общей шкале времени"></div>
+<p class="mux-reading-key">Длина полосы -- время, а не размер пакета: А1 и А2 содержат по 1000 бит. Штриховка -- ожидание. Вертикальная черта -- выбранный момент. На узком экране схема прокручивается по горизонтали.</p>
+<div class="mux-story-states" data-story-states></div>
+<details><summary>Разбор: откуда взялось ожидание второго пакета?</summary>
+<p>В момент 1 мс пакет А2 уже поступил. Выделенная доля ещё занята пакетом А1 до 2 мс, поэтому А2 ждёт. Общий выход закончил А1 ещё в 0,5 мс и может сразу начать А2. Б, В и Г молчат, но их закреплённые доли недоступны А.</p>
+</details>
+<noscript><p>События опыта: А1 поступает в 0 мс, А2 -- в 1 мс. По выделенной доле А1 передаётся от 0 до 2 мс, А2 -- от 2 до 4 мс. Через общий выход А1 передаётся от 0 до 0,5 мс, А2 -- от 1 до 1,5 мс.</p></noscript>
+</div>
+<details class="mux-advanced"><summary>Продолжение: четыре источника, всплески и буфер</summary>
+<p>Теперь каждый из четырёх источников создаёт по одному пакету каждую миллисекунду в течение 25 мс, затем молчит 75 мс. Всплески начинаются одновременно или со сдвигом во времени. Оба способа обслуживания получают одинаковые пакеты и одинаковый суммарный буфер.</p>
+<p><strong>Как совпадение всплесков повлияет на очередь? Что изменит увеличение буфера?</strong></p>
 <div class="course-demo mux-experiment" data-multiplexing>
 <div class="mux-main-controls">
 <label>Начало всплесков<select data-parameter="pattern" aria-label="Начало всплесков"><option value="staggered">Со сдвигом во времени</option><option value="synchronous">Одновременно у всех источников</option></select></label>
@@ -30,4 +49,5 @@
 <details><summary>Числовые отсчёты графика</summary><div class="mux-scroll" data-sample-table tabindex="0" role="region" aria-label="Таблица очереди"></div></details>
 </details>
 </div>
+</details>
 ```
