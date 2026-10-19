@@ -71,5 +71,9 @@
 .mux-counts dt { font-size:.85rem; font-weight:400; }
 .mux-counts dd { margin:0; font-size:1.35rem; font-weight:700; font-variant-numeric:tabular-nums; }
 .mux-reading-key { color:var(--muted); font-size:.9rem; margin:.75rem 0; }
+.mux-input-rate { padding:.75rem; border-left:3px solid var(--accent); background:var(--accent-soft); }
+.mux-cause { padding:.65rem; margin:0 0 .75rem; background:var(--surface-alt); border-left:3px solid var(--accent); min-height:12rem; font-size:.9rem; }
+.mux-cause p { margin:0; }
+.mux-experiment .mux-cause .mux-cause-title { font-weight:700; margin-bottom:.4rem; text-align:left; }
 @media(max-width:1100px) { .mux-scenes { grid-template-columns:1fr; } .mux-scene .mux-scene-rule { min-height:0; } }
 @media(max-width:575px) { .mux-main-controls { grid-template-columns:1fr; } .mux-scene { padding:.65rem; } }
