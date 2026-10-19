@@ -16,7 +16,7 @@ export function mountJourney(root) {
   const frame = (f, limit) => `<div class="ip-frame"><strong>Канальный кадр: ${f.link}</strong><span>Локальный переход ${f.sender} → ${f.receiver}</span>${packet(limit)}</div>`;
   const network = () => `<div class="ip-scroll" tabindex="0" role="region" aria-label="Схема сети; текущий узел ${state.node}"><svg class="ip-network" viewBox="0 0 680 200" role="img" aria-label="A связан с R1, R1 с R2 и R3, R2 с B и R3, R3 с C">
     <path d="M65 100 H190 L365 50 H570 M190 100 L365 150 H570 M365 50 V150"/>
-    ${[['A',65,100],['R1',190,100],['R2',365,50],['R3',365,150],['B',570,50],['C',570,150]].map(([name,x,y])=>`<g class="${name===state.node?'ip-current':''}"><rect x="${x-30}" y="${y-19}" width="60" height="38" rx="4"/><text x="${x}" y="${y+5}" text-anchor="middle">${name}</text></g>`).join('')}
+    ${[['A',65,100],['R1',190,100],['R2',365,50],['R3',365,150],['B',570,50],['C',570,150]].map(([name,x,y])=>`<g class="${name.startsWith('R')?'ip-router ':''}${name===state.node?'ip-current':''}" transform="translate(${x} ${y})">${name.startsWith('R') ? '<circle r="25"/><path d="M-16 0 H16 M0 -16 V16 M-10 -6 L-16 0 L-10 6 M10 -6 L16 0 L10 6 M-6 -10 L0 -16 L6 -10 M-6 10 L0 16 L6 10"/>' : '<rect x="-30" y="-19" width="60" height="38" rx="4"/>'}<text x="0" y="${name.startsWith('R')?43:5}" text-anchor="middle">${name}</text></g>`).join('')}
     <text x="90" y="84">Wi-Fi</text><text x="450" y="30">сеть B</text><text x="450" y="186">сеть C</text></svg></div>`;
   const render = () => {
     revealed = false;
