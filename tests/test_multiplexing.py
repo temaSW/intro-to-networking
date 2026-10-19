@@ -84,3 +84,30 @@ assert.deepEqual(m.compare(base),first);
 for(const change of [{flows:0},{capacity:0},{activity:101},{buffer:-1},{pattern:'random'}])
   assert.throws(()=>m.compare({...base,...change}),RangeError);
 """)
+
+
+def test_snapshot_conservation_and_service_boundaries():
+    run_js("""
+for (const pattern of ['staggered','synchronous']) for (const buffer of [0,24]) {
+  const config = {...base, flows:4,capacity:2,buffer,pattern};
+  for (const result of Object.values(m.compare(config))) {
+    for (const t of [0,.25,.5,1,12,24.75,25,99.75,100,999.75,1000]) {
+      const s=m.stateAt(result,t);
+      assert.equal(s.offered,s.sent+s.waiting.length+s.transmitting.length+s.rejected.length);
+      assert(s.waiting.length<=buffer);
+      assert(s.transmitting.every(job=>job.start<=t+1e-9 && job.finish>t+1e-9));
+    }
+    const final=m.stateAt(result,1000);
+    assert.equal(final.sent,result.sent);
+    assert.equal(final.rejected.length,result.lost);
+    assert.equal(final.waiting.length+final.transmitting.length,result.pending);
+  }
+}
+const data=m.compare({...base,flows:1,activity:100,capacity:2,buffer:0}).shared;
+assert.equal(m.stateAt(data,0).transmitting.length,1);
+assert.equal(m.stateAt(data,.25).transmitting[0].finish,.5);
+assert.equal(m.stateAt(data,.5).transmitting.length,0);
+assert.equal(m.stateAt(data,.5).sent,1);
+assert.equal(m.stateAt(data,1).transmitting.length,1);
+for(const t of [-1,1001,NaN]) assert.throws(()=>m.stateAt(data,t),RangeError);
+""")
