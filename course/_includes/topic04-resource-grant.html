@@ -1,0 +1,38 @@
+```{=html}
+<figure class="course-demo resource-grant" aria-label="Запрос, назначение и передача двух блоков терминала T">
+  <div class="resource-grant-layout">
+    <div class="resource-grant-exchange">
+      <div class="resource-grant-heading">До кадра 12: служебный обмен</div>
+      <div class="resource-grant-actors"><strong>Терминал T</strong><strong>Узел</strong></div>
+      <div class="resource-grant-messages">
+        <div class="resource-grant-message">
+          <strong>1. Запрос</strong>
+          <span>«У меня 2 блока: Д1 и Д2»</span>
+          <span class="resource-grant-arrow" aria-hidden="true"></span>
+          <small>Терминал сообщает узлу</small>
+        </div>
+        <div class="resource-grant-message resource-grant-assignment">
+          <strong>2. Назначение для T</strong>
+          <span>«Кадр <b>12</b>, полоса <b>Б</b>,<br>интервалы <b>3 и 4</b>»</span>
+          <span class="resource-grant-arrow resource-grant-arrow-back" aria-hidden="true"></span>
+          <small>Узел сообщает терминалу</small>
+        </div>
+      </div>
+    </div>
+    <div class="resource-grant-transmission">
+      <div class="resource-grant-heading">3. Передача в кадре 12</div>
+      <div class="resource-grant-direction">Терминал T → узел: <strong>Д1 и Д2</strong></div>
+      <div class="resource-grant-time">Время: интервалы внутри кадра →</div>
+      <table class="resource-grant-grid" aria-label="Ресурс кадра 12: терминалу T назначена полоса Б, интервалы 3 и 4">
+        <thead><tr><th scope="col">Полоса</th><th scope="col">1</th><th scope="col">2</th><th scope="col">3</th><th scope="col">4</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">А</th><td>×</td><td>×</td><td>×</td><td>×</td></tr>
+          <tr><th scope="row">Б</th><td>×</td><td>×</td><td class="resource-grant-data"><strong>Д1</strong></td><td class="resource-grant-data"><strong>Д2</strong></td></tr>
+        </tbody>
+      </table>
+      <div class="resource-grant-legend"><span><b>Д1, Д2</b> -- данные терминала T</span><span><b>×</b> -- ресурс других участников</span></div>
+    </div>
+  </div>
+  <figcaption>А и Б -- две частотные полосы. Одна ячейка -- одна полоса на один интервал; в этом примере она вмещает один блок данных. Выделенные ячейки соответствуют назначению для T.</figcaption>
+</figure>
+```
