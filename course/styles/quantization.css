@@ -50,3 +50,7 @@ main.content .q-point-steps { list-style: none; padding: 0; display: grid; grid-
 .q-uniform-line { fill: none; stroke: var(--q-blue); stroke-width: 2.5; stroke-linejoin: round; }
 .q-log-line { fill: none; stroke: var(--q-purple); stroke-width: 2.5; stroke-dasharray: 7 4; stroke-linejoin: round; }
 .q-chart-note { font-size: .9rem; color: var(--muted); }
+.q-error-chart { margin-top: .75rem; }
+.q-zero { fill: none; stroke: var(--muted); stroke-width: 1.5; }
+.q-error-uniform { fill: var(--q-blue); }
+.q-error-log { fill: var(--q-purple); }
