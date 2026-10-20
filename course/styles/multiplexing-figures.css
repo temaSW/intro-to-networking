@@ -51,3 +51,7 @@
 .mux-source-scroll img { display:block; width:100%; min-width:48rem; height:auto; background:white; }
 .mux-source-figure figcaption { margin-top:.7rem; color:var(--muted); font-size:.9rem; line-height:1.45; }
 .mux-source-scroll:focus-visible { outline:3px solid var(--focus); outline-offset:3px; }
+
+/* Packet arrivals are instants; waiting and transmission are separate intervals. */
+.mux-figure .mf-arrival { fill:none; stroke:var(--flow); stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; }
+.mux-figure .mf-wait { fill:var(--surface); stroke:var(--flow); stroke-width:2; stroke-dasharray:5 4; }
