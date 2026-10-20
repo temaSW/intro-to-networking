@@ -199,19 +199,53 @@ def circuits():
 
 
 def packets():
-    b=text(35,32,'Поступающие пакеты','mf-heading')+text(520,32,'Очередь к одному выходу','mf-heading','middle')+text(872,32,'Передача','mf-heading','middle')
-    for i,(flow,label) in enumerate(zip('abc','АБВ')):
-        y=90+i*75
-        b+=packet(42,y-14,label+('₄' if flow=='a' else '₂'),flow)+path(f'M104 {y} H155 L237 165',f'mf-route mf-{flow}',True)
-    b+=path('M260 122 V95 H673 V122 M260 208 V235 H673 V208','mf-buffer')
-    for i,(flow,label) in enumerate([('c','В₁'),('a','А₃'),('b','Б₁'),('a','А₂')]): b+=packet(293+i*90,142,label,flow,75,46)
-    b+=path('M250 165 H280 M658 165 H740','mf-wire',True)
-    b+=rect(746,123,222,84,'mf-transmitter',8)+packet(782,142,'А₁','a',75,46)+path('M868 165 H1014','mf-wire',True)
-    b+=text(872,245,'Выход пока занят А₁','mf-small','middle')
-    b+=path('M316 270 H647','mf-axis',True)+text(480,299,'Порядок обслуживания →','mf-small','middle')
-    figure('packets','Несколько входов конкурируют за один выход',
-            'Новые пакеты А4, Б2 и В2 поступают с трёх входов. В буфере справа налево от головы очереди: А2, Б1, А3, В1. Пакет А1 уже передаётся по выходной линии. Следующим начнёт передачу А2, затем Б1; линия обслуживает пакеты последовательно.',b,330,
-            'Снимок одного выхода: А₁ уже передаётся, А₂ ждёт у головы очереди. Новые пакеты присоединяются к хвосту слева; порядок на рисунке читается от выхода назад.')
+    # Arrival markers denote complete packets ready at the node, not input link durations.
+    arrivals = [('А₁', 'a', 0), ('Б₁', 'b', .5), ('А₂', 'a', 1.5),
+                ('В₁', 'c', 1.75), ('А₃', 'a', 5), ('Б₂', 'b', 5.5)]
+    x = lambda t: 210 + 100 * t
+    rows = {'a': 100, 'b': 175, 'c': 250}
+    b = text(28, 32, 'Пакеты полностью поступили в узел', 'mf-heading')
+    b += text(1010, 32, 'Одна шкала времени для всех строк', 'mf-small', 'end')
+    for t in range(9):
+        b += path(f'M{x(t)} 64 V475', 'mf-time-guide')
+        b += text(x(t), 504, str(t), 'mf-small', 'middle')
+    for flow, label in zip('abc', 'АБВ'):
+        y = rows[flow]
+        b += text(28, y + 6, 'Абонент ' + label, 'mf-heading')
+        b += path(f'M210 {y} H1010', 'mf-guide')
+    for label, flow, arrival in arrivals:
+        y = rows[flow]
+        b += text(x(arrival), y - 20, label, f'mf-{flow} mf-bold', 'middle')
+        b += path(f'M{x(arrival)} {y-13} V{y+8}', f'mf-arrival mf-{flow}')
+        b += path(f'M{x(arrival)-5} {y+1} L{x(arrival)} {y+8} L{x(arrival)+5} {y+1}', f'mf-arrival mf-{flow}')
+    b += path('M28 287 H1010', 'mf-divider')
+    b += text(28, 329, 'Общий выход', 'mf-heading')
+    b += text(28, 353, '1 мс на пакет', 'mf-small')
+    b += path('M210 335 H1010', 'mf-guide')
+    # FIFO: one non-preemptive transmission at a time; enough buffer for this trace.
+    free_at = 0
+    for label, flow, arrival in arrivals:
+        start = max(arrival, free_at)
+        free_at = start + 1
+        b += packet(x(start), 312, label, flow, 100, 46)
+    b += text(x(4.5), 340, 'пауза', 'mf-small', 'middle')
+    b += text(x(7.5), 340, 'пауза', 'mf-small', 'middle')
+    b += text(28, 417, 'Пакет В₁', 'mf-heading')
+    b += text(28, 441, 'ожидание → передача', 'mf-small')
+    b += rect(x(1.75), 400, 125, 36, 'mf-wait mf-c', 0)
+    b += text(x(2.375), 423, 'ожидает', 'mf-small', 'middle')
+    b += packet(x(3), 400, 'В₁', 'c', 100, 36)
+    b += text(x(1.75), 461, '1,75', 'mf-small', 'middle')
+    b += text(x(3), 461, '3', 'mf-small', 'middle')
+    b += path('M210 478 H1020', 'mf-axis', True)
+    b += text(1010, 535, 'Время, мс', 'mf-small', 'end')
+    figure('packets', 'Поступление и передача пакетов на общей шкале времени',
+           'Стрелки показывают поступление готовых пакетов: А1 в 0 мс, Б1 в 0,5, А2 в 1,5, В1 в 1,75, А3 в 5, Б2 в 5,5 мс. '
+           'Общий выход передаёт по одному пакету за 1 мс в порядке поступления: А1, Б1, А2, В1, затем пауза с 4 до 5 мс, А3 и Б2. '
+           'Пакет В1 ожидает с 1,75 до 3 мс, затем передаётся с 3 до 4 мс.', b, 553,
+           'Стрелка -- момент полного поступления пакета в узел; цветная полоса -- время его передачи через общий выход. '
+           'Пакеты обслуживаются в порядке поступления. Пунктирная полоса показывает ожидание В₁: пока выход занят Б₁ и А₂, '
+           'пакет остаётся в буфере. Паузы на выходе появляются, когда готовых пакетов нет.')
 
 
 def tradeoffs():
