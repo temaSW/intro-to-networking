@@ -259,49 +259,110 @@ def packets():
 
 
 def tradeoffs():
-    b = text(28, 32, 'Временная коммутация каналов', 'mf-heading')
-    b += text(28, 61, 'Соответствия заданы при установлении соединений', 'mf-small')
-    b += text(28, 101, 'Вход узла', 'mf-bold') + text(211, 101, 'Выход узла', 'mf-bold')
-    mappings = [('a', 'А', 1, 2), ('b', 'Б', 2, 3), ('c', 'В', 3, 1)]
-    for row, (flow, label, incoming, outgoing) in enumerate(mappings):
-        y = 137 + row * 44
-        b += text(28, y, f'КИ{incoming}: {label}', f'mf-{flow} mf-bold')
-        b += path(f'M116 {y-6} H193', f'mf-route mf-{flow}', True)
-        b += text(211, y, f'КИ{outgoing}: {label}', f'mf-{flow} mf-bold')
-    b += text(370, 101, 'Выходной поток после перестановки', 'mf-bold')
+    words = {('a', 0): '00110110', ('a', 1): '00111001', ('b', 0): '01010010',
+             ('c', 0): '01100011', ('c', 1): '01100101',
+             ('a', 2): '00111100', ('c', 2): '01101000'}
+
+    def sample(x, y, flow, label, cycle):
+        body = rect(x, y, 78, 58, f'mf-packet mf-{flow}' + (' mf-idle-channel' if flow == 'b' and cycle >= 1 else ''))
+        if flow == 'b' and cycle >= 1:
+            return body + text(x+39, y+22, 'пауза Б', 'mf-small', 'middle') + text(x+39, y+46, 'нет данных', 'mf-small', 'middle')
+        return body + text(x+39, y+22, label + '₁₂₃'[cycle], 'mf-packet-label', 'middle') + text(x+39, y+46, words[(flow, cycle)], 'mf-bits', 'middle')
+
+    def data_packet(x, y, w, label, flow, h=38):
+        header = w * 24 / 92
+        return (rect(x, y, w, h, f'mf-packet mf-{flow}') + rect(x, y, header, h, 'mf-packet-header', 0)
+                + text(x+header/2, y+h/2+5, 'З', 'mf-packet-label', 'middle')
+                + text(x+header+(w-header)/2, y+h/2+5, label, 'mf-packet-label', 'middle'))
+
+    b = text(28, 32, 'Временная коммутация каналов: вход → выход', 'mf-heading')
+    b += text(28, 61, 'Пример с памятью: входной цикл записывается, в следующем цикле данные передаются в тех же КИ.', 'mf-small')
+    left, step = 260, 82
+    for cycle in range(3):
+        x = left + cycle*3*step
+        b += text(x+122, 90, ['Цикл n', 'Цикл n + 1', 'Цикл n + 2'][cycle], 'mf-bold', 'middle')
+        for slot in range(3):
+            b += text(x+slot*step+39, 116, f'КИ{slot+1}', 'mf-small', 'middle')
+        b += path(f'M{x} 122 V348', 'mf-time-guide')
+    b += text(28, 161, 'Входной поток', 'mf-heading')
+    b += text(28, 185, 'КИ1: А, КИ2: Б, КИ3: В', 'mf-small')
+    b += path('M260 166 H998', 'mf-guide')
+    b += text(28, 291, 'Выходной поток', 'mf-heading')
+    b += text(28, 315, 'КИ1: А, КИ2: Б, КИ3: В', 'mf-small')
+    b += path('M260 296 H998', 'mf-guide')
+    for cycle in range(3):
+        for slot, (flow, label) in enumerate([('a', 'А'), ('b', 'Б'), ('c', 'В')]):
+            b += sample(left+(cycle*3+slot)*step, 137, flow, label, cycle)
     for cycle in range(2):
-        left = 370 + cycle * 312
-        b += text(left + 154, 130, 'Цикл n' if cycle == 0 else 'Цикл n + 1', 'mf-small', 'middle')
-        for slot, (flow, label) in enumerate([('c', 'В'), ('a', 'А'), ('b', 'Б')]):
-            x = left + slot * 104
-            b += text(x + 50, 155, f'КИ{slot+1}', 'mf-small', 'middle')
-            if cycle == 1 and flow == 'b':
-                b += rect(x, 166, 100, 44, 'mf-packet mf-b mf-idle-channel')
-                b += text(x + 50, 184, 'нет данных', 'mf-small', 'middle')
-                b += text(x + 50, 202, 'Б', 'mf-b mf-bold', 'middle')
-            else:
-                b += packet(x, 166, label + ('₁' if cycle == 0 else '₂'), flow, 100, 44)
-        b += guide(left, left + 308, 217, 'Позиции повторяются' if cycle == 0 else 'КИ3 остаётся за Б')
-    b += path('M370 270 H1006', 'mf-axis', True)
-    b += text(1000, 297, 'Время', 'mf-small', 'end')
-    b += path('M28 318 H1010', 'mf-divider')
-    b += text(28, 352, 'Коммутация пакетов', 'mf-heading')
-    b += text(28, 381, 'В буфере уже стоят А₁, А₂, Б₁ и В₁ в таком порядке', 'mf-small')
-    b += text(28, 433, 'Общий выход', 'mf-heading')
-    b += text(28, 460, 'Следующий готовый пакет', 'mf-small')
-    for i, (flow, label) in enumerate([('a', 'А₁'), ('a', 'А₂'), ('b', 'Б₁'), ('c', 'В₁')]):
-        b += packet(370 + i * 156, 410, label, flow, 152, 48)
-    b += path('M370 481 H1006', 'mf-axis', True)
-    b += text(1000, 508, 'Время', 'mf-small', 'end')
-    b += text(370, 542, 'А передаёт два пакета подряд: закреплённой позиции Б между ними нет.', 'mf-small')
-    figure('tradeoffs', 'Повторяющиеся канальные интервалы и последовательность готовых пакетов',
-           'Вверху узел переносит данные входного КИ1 в выходной КИ2, КИ2 в КИ3, КИ3 в КИ1. '
-           'Поэтому в выходных циклах повторяется порядок каналов В, А, Б: В1, А1, Б1, затем В2, А2 и позиция Б без данных. '
-           'Внизу буфер содержит пакеты А1, А2, Б1, В1; выход передаёт их в этом порядке без закреплённых позиций абонентов.', b, 568,
-           'КИ -- канальный интервал. Вверху А₁ и А₂ -- последовательные отсчёты одного канала; '
-           'во втором цикле у Б нет данных, но КИ3 сохраняется за его соединением и не передаётся А. Между поступлением отсчёта и его выходным КИ '
-           'данные временно хранятся в памяти узла. Внизу А₁ и А₂ -- отдельные пакеты; показано обслуживание в порядке поступления. '
-           'У диаграмм отдельные условные шкалы времени: размеры отсчёта и пакета здесь не сопоставляются.')
+        for slot, (flow, label) in enumerate([('a', 'А'), ('b', 'Б'), ('c', 'В')]):
+            b += sample(left+((cycle+1)*3+slot)*step, 267, flow, label, cycle)
+    b += rect(260, 267, 242, 58, 'mf-enclosure')
+    b += text(381, 302, 'Предыдущие данные', 'mf-small', 'middle')
+    b += path('M299 195 V224 H545 V267', 'mf-route mf-a', True)
+    b += text(422, 215, 'А₁: вход КИ1 → выход КИ1', 'mf-small', 'middle')
+    b += path('M260 348 H1006', 'mf-axis', True)
+    for t in range(10):
+        b += text(260+t*82, 371, str(t), 'mf-small', 'middle')
+    b += text(1000, 397, 'Время, усл. ед.', 'mf-small', 'end')
+    b += text(28, 420, 'В интервале 7–8 -- пауза Б: его КИ2 нельзя отдать готовым данным В.', 'mf-small')
+    b += path('M28 440 H1010', 'mf-divider')
+
+    b += text(28, 475, 'Коммутация пакетов: три входа → общий выход', 'mf-heading')
+    b += text(28, 504, 'Потоки приходят по отдельным линиям; моменты готовности пакетов сохранены.', 'mf-small')
+    x = lambda t: 260 + 82*t
+    for t in range(10):
+        b += path(f'M{x(t)} 520 V818', 'mf-time-guide')
+        b += text(x(t), 844, str(t), 'mf-small', 'middle')
+    input_rows = {'a': 530, 'b': 588, 'c': 646}
+    for flow, label in [('a', 'А'), ('b', 'Б'), ('c', 'В')]:
+        y = input_rows[flow]
+        b += text(28, y+25, 'Вход ' + label, 'mf-heading')
+        b += path(f'M260 {y+20} H998', 'mf-guide')
+    b += text(28, 787, 'Общий выход', 'mf-heading')
+    b += path('M260 780 H998', 'mf-guide')
+    arrivals = []
+    for cycle in range(3):
+        for slot, (flow, label) in enumerate([('a', 'А'), ('b', 'Б'), ('c', 'В')]):
+            begin = cycle*3 + slot
+            if flow == 'b' and cycle >= 1:
+                continue
+            name = label + '₁₂₃'[cycle]
+            b += data_packet(x(begin), input_rows[flow], 78, name, flow)
+            arrivals.append((begin+1, name, flow))
+    b += rect(260, 760, 242, 38, 'mf-enclosure')
+    b += text(381, 784, 'Предыдущие данные', 'mf-small', 'middle')
+    # Both outputs are busy with preceding traffic until t=3.
+    # FIFO consumes the backlog continuously; the final В₃ arrives at the right boundary.
+    free_at = 3
+    for ready, name, flow in sorted(arrivals):
+        start = max(ready, free_at)
+        free_at = start + 1
+        if free_at > 9:
+            continue
+        b += data_packet(x(start), 760, 78, name, flow)
+    b += path('M752 684 V710 H834 V760', 'mf-route mf-c', True)
+    b += text(720, 701, 'В₂ уже готов и ждёт в буфере', 'mf-small', 'end')
+    b += path('M260 818 H1006', 'mf-axis', True)
+    b += text(1000, 870, 'Время, усл. ед.', 'mf-small', 'end')
+    b += text(28, 897, 'В интервале 7–8 передаётся В₂: пустой позиции Б на выходе нет, поскольку в буфере есть пакет.', 'mf-small')
+    b += path('M28 918 H1010', 'mf-divider')
+    b += text(28, 950, 'Что находится внутри пакета А₁?', 'mf-heading')
+    b += rect(28, 970, 250, 70, 'mf-packet-header', 3)
+    b += text(153, 996, 'З -- заголовок', 'mf-bold', 'middle')
+    b += text(153, 1022, 'Адрес и служебные сведения', 'mf-small', 'middle')
+    b += rect(278, 970, 732, 70, 'mf-packet mf-a', 0)
+    b += text(644, 994, 'Данные: последовательные блоки данных А', 'mf-small', 'middle')
+    for i, word in enumerate(['00110110', '00111001', '00111100', '00111010']):
+        b += text(368+i*180, 1025, word, 'mf-bits', 'middle')
+    figure('tradeoffs', 'Одинаковое поступление данных: канальные позиции и готовые пакеты',
+           'В обоих примерах данные становятся готовы в одном порядке: А1, Б1, В1, А2, В2, А3, В3. Пакеты поступают по отдельным входам А, Б, В. '
+           'До момента 3 оба выхода заняты предыдущими данными. Канальный выход затем передаёт А1, Б1, В1, А2, паузу Б, В2. '
+           'Пакетный выход передаёт А1, Б1, В1, А2, В2, А3 без паузы: пакет А3 уже поступил к моменту 7. '
+           'Пакет В3 полностью поступает в момент 9 и остаётся для следующей передачи.', b, 1062,
+           'КИ -- канальный интервал. Оба примера имеют одинаковый порядок и моменты готовности данных, а выход освобождается от предыдущего трафика в момент 3. '
+           'Сверху узел записывает цикл целиком и передаёт его данные в тех же КИ следующего цикла. Снизу пакеты поступают по трём отдельным входам; общий выход передаёт их в порядке полного поступления. '
+           'В интервале 7–8 канальный выход сохраняет пустую позицию Б, а пакетный передаёт готовый В₂. '
+           'При пустом буфере пакетный выход тоже простаивал бы. Масштаб времени в каждом примере условный; размеры канального блока, пакета и заголовка не приравниваются.')
 
 
 def queue():
