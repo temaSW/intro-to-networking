@@ -57,3 +57,5 @@
 .mux-figure .mf-wait { fill:var(--surface); stroke:var(--flow); stroke-width:2; stroke-dasharray:5 4; }
 
 .mux-figure .mf-idle-channel { fill:var(--surface); stroke-dasharray:5 4; }
+
+.mux-figure .mf-control { fill:none; stroke:var(--accent); stroke-width:2; stroke-dasharray:5 4; }
