@@ -55,3 +55,5 @@
 /* Packet arrivals are instants; waiting and transmission are separate intervals. */
 .mux-figure .mf-arrival { fill:none; stroke:var(--flow); stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; }
 .mux-figure .mf-wait { fill:var(--surface); stroke:var(--flow); stroke-width:2; stroke-dasharray:5 4; }
+
+.mux-figure .mf-idle-channel { fill:var(--surface); stroke-dasharray:5 4; }
