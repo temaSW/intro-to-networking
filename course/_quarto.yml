@@ -10,6 +10,7 @@ project:
     - styles/companding-line.css
     - styles/scrambler.css
     - styles/channel-playground.css
+    - styles/physical-channel.css
     - styles/transmission-agreement.css
     - styles/link-frame.css
     - styles/ip-journey.css
