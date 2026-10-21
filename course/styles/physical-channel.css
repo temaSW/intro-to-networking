@@ -1,0 +1,80 @@
+.pc-workspace section { margin-block: 1.5rem 2.5rem; }
+.pc-workspace label { display: grid; gap: .35rem; margin-block: .75rem; }
+.pc-workspace textarea, .pc-workspace input, .pc-workspace select {
+  width: 100%; min-width: 0; padding: .5rem; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: .3rem; font: inherit;
+}
+.pc-workspace textarea { resize: vertical; }
+.pc-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: 1rem; }
+.pc-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-block: .75rem; }
+.pc-workspace button { min-height: 48px; padding: .5rem .85rem; border: 1px solid var(--accent); border-radius: .3rem; background: var(--accent); color: var(--page-bg); font: inherit; font-weight: 700; }
+.pc-workspace :is(button, input, select, textarea, [tabindex]):focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+.pc-scroll { overflow-x: auto; margin-block: 1rem; }
+.pc-scroll svg { display: block; width: 100%; min-width: var(--plot-min-width, 36rem); }
+.pc-scroll table { width: 100%; min-width: 30rem; }
+.pc-workspace th, .pc-workspace td { padding: .45rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+.pc-workspace td:last-child { text-align: right; }
+ .pc-chain { padding-block: .75rem; border-block: 1px solid var(--line); }
+.pc-workspace svg text { fill: var(--ink); font-size: 14px; }
+.pc-axis { stroke: var(--muted); fill: none; }
+.pc-results { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap: .75rem; }
+.pc-results div { border-bottom: 1px solid var(--line); }
+.pc-results dd { margin: 0; font-variant-numeric: tabular-nums; }
+.ofdm-plots { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: var(--demo-gap, 1rem); align-items: start; }
+.pc-workspace figure { margin: 1rem 0; min-width: 0; }
+.pc-workspace figcaption { margin-bottom: .5rem; color: var(--ink); }
+.ofdm-spectrum svg { min-width: 42rem; }
+.ofdm-constellation { max-width: 23rem; }
+.ofdm-constellation svg { min-width: 20rem; }
+.ofdm-grid { stroke: var(--line); stroke-width: .7; fill: none; }
+.ofdm-band { fill: var(--accent-soft); }
+.ofdm-reference { stroke: var(--muted); stroke-width: 1.7; stroke-dasharray: 6 3; fill: none; }
+.ofdm-received { stroke: var(--accent); stroke-width: 2; fill: none; }
+.ofdm-point { fill: var(--accent); opacity: .35; }
+.ofdm-ideal { stroke: var(--focus); stroke-width: 2; fill: none; }
+.ofdm-caption { color: var(--muted); font-size: .9rem; }
+.ofdm-cable-plot svg { min-width: 48rem; }
+.ofdm-threshold { stroke: var(--muted); stroke-dasharray: 5 4; fill: none; }
+.ofdm-bit-boundary { stroke: var(--line); stroke-width: .7; }
+.ofdm-cable-line { stroke: var(--accent); stroke-width: 2.2; fill: none; }
+.ofdm-cable-sample { fill: var(--accent); }
+.ofdm-cable-error { stroke: var(--focus); stroke-width: 2.5; fill: var(--surface); }
+.ofdm-scheme svg { min-width: 54rem; }
+.ofdm-device { stroke: var(--accent); stroke-width: 1.5; fill: var(--surface-alt); }
+.ofdm-device-part { stroke: var(--line); stroke-width: 1.5; fill: var(--surface); }
+.ofdm-wire, .ofdm-radio { stroke: var(--accent); stroke-width: 2; fill: none; }
+.ofdm-cable-wire { stroke: var(--focus); stroke-width: 2.5; fill: none; }
+.ofdm-air { stroke: var(--accent); stroke-width: 1.5; stroke-dasharray: 5 4; fill: none; }
+.ofdm-arrow { fill: var(--accent); }
+.pc-workspace svg .ofdm-small-label { font-size: 12px; }
+.ofdm-summary { border-block: 1px solid var(--line); padding-block: .75rem; }
+@media (max-width: 1050px) { .ofdm-plots { grid-template-columns: 1fr; } .ofdm-constellation { max-width: 25rem; } }
+
+
+.ofdm-range-band { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.5; }
+.ofdm-range-edge { stroke: var(--accent); stroke-width: 2; fill: none; }
+.ofdm-level-marker { fill: var(--focus); }
+
+.ofdm-controls { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 1rem; margin-block: 1rem; }
+.ofdm-controls fieldset { min-width: 0; border: 1px solid var(--line); padding: .75rem; }
+.ofdm-controls legend { float: none; width: auto; padding-inline: .3rem; font-size: 1rem; font-weight: 600; }
+.ofdm-controls output { font-weight: 700; }
+.pc-workspace .ofdm-check { display: flex; align-items: center; gap: .5rem; }
+.pc-workspace .ofdm-check input { width: 1.1rem; height: 1.1rem; padding: 0; flex-shrink: 0; }
+.ofdm-controls p { font-size: .9rem; margin-block: .5rem; }
+@media (max-width: 900px) { .ofdm-controls { grid-template-columns: 1fr; } }
+
+.ofdm-reset-row { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--line); display: flex; justify-content: flex-end; }
+.pc-workspace .ofdm-reset-row button { background: transparent; color: var(--muted); border-color: var(--line); font-weight: 400; }
+.pc-workspace .ofdm-reset-row button:hover { color: var(--ink); background: var(--surface-alt); }
+
+.pc-link-sketch { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; align-items: center; padding-block: 1rem; border-block: 1px solid var(--line); }
+.pc-link-sketch span { min-width: 0; }
+.pc-trial-threshold { stroke: var(--muted); stroke-dasharray: 6 4; fill: none; }
+.pc-trial-loss { stroke: var(--focus); stroke-width: 2; fill: none; }
+.pc-trial-plot svg { min-width: 42rem; }
+.pc-workspace button.pc-secondary { background: transparent; color: var(--accent); border: 0; text-decoration: underline; font-weight: 400; }
+
+.pc-trial-cursor { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 2 3; fill: none; }
+
+.pc-design-controls { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 700px) { .pc-design-controls { grid-template-columns: 1fr; } }
