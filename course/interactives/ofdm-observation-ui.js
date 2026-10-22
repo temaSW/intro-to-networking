@@ -2,13 +2,16 @@ import {observeVariant, observationDefaults, AMPLIFIERS, CABLES} from './ofdm-ob
 
 function renderOFDM(root, controls, spectrumStage, variant) {
   const r=observeVariant(variant,controls), cable=r.cable;
+  const f=x=>Number(x.toFixed(2)).toLocaleString('ru-RU');
+  const halfSpan=r.parameters.sampleRate/2, bandwidth=2*r.parameters.active*r.parameters.sampleRate/r.parameters.size;
+  root.closest('main').querySelector('[data-ofdm-bandwidth]').textContent=f(bandwidth);
   const stageLabel=spectrumStage==='output'?'Выход УМ':'После обработки';
-  const sx=x=>55+(x+4)*76, sy=y=>265-(Math.max(-100,Math.min(20,y))+100)*230/120;
+  const sx=x=>55+(x+halfSpan)/(2*halfSpan)*608, sy=y=>265-(Math.max(-100,Math.min(20,y))+100)*230/120;
   const path=key=>r.spectrum.map(v=>`${sx(v.frequency).toFixed(2)},${sy(v[key]).toFixed(2)}`).join(' ');
   const spectrum=`<svg viewBox="0 0 690 325" role="img" aria-label="Спектр переданного OFDM и сигнала в точке: ${stageLabel}.">
-    <rect x="${sx(-1.5)}" y="35" width="${sx(1.5)-sx(-1.5)}" height="230" class="ofdm-band"/>
+    <rect x="${sx(-bandwidth/2)}" y="35" width="${sx(bandwidth/2)-sx(-bandwidth/2)}" height="230" class="ofdm-band"/>
     ${[-100,-80,-60,-40,-20,0,20].map(v=>`<path d="M55 ${sy(v)}H663" class="ofdm-grid"/><text x="8" y="${sy(v)+5}">${v}</text>`).join('')}
-    ${[-4,-2,0,2,4].map(v=>`<text x="${sx(v)-8}" y="287">${v}</text>`).join('')}
+    ${[-halfSpan,-halfSpan/2,0,halfSpan/2,halfSpan].map(v=>`<text x="${sx(v)-8}" y="287">${f(v)}</text>`).join('')}
     <text x="55" y="20">Мощность в частотном отсчёте, дБм</text>
     <text x="125" y="314">Частота относительно центра, МГц</text>
     <polyline points="${path('tx')}" class="ofdm-reference"/><polyline points="${path(spectrumStage)}" class="ofdm-received"/>
@@ -29,7 +32,7 @@ function renderOFDM(root, controls, spectrumStage, variant) {
     <path d="M965 35V190" class="ofdm-bit-boundary"/>
     <polyline points="${cable.trace.map(v=>`${wx(v.time).toFixed(2)},${wy(v.value).toFixed(2)}`).join(' ')}" class="ofdm-cable-line"/>
     ${cable.decisions.map(v=>`<circle cx="${wx(v.time)}" cy="${wy(v.value)}" r="${v.bit===v.source?2.7:5}" class="${v.bit===v.source?'ofdm-cable-sample':'ofdm-cable-error'}"/>`).join('')}
-    ${[0,1,2,3,4,5].map(t=>`<text x="${wx(t)-4}" y="213">${t}</text>`).join('')}
+    ${Array.from({length:6},(_,i)=>i*cable.duration/5).map(t=>`<text x="${wx(t)-4}" y="213">${f(t)}</text>`).join('')}
     <text x="830" y="237">Время, мкс</text></svg>`;
   const scheme=`<svg viewBox="0 0 1100 205" role="img" aria-label="Передатчик с антенной, беспроводной канал, приёмная антенна, приёмник с УМ и демодулятором, выходной кабель и получатель">
     <rect x="15" y="69" width="140" height="70" rx="5" class="ofdm-device"/>
@@ -58,7 +61,7 @@ function renderOFDM(root, controls, spectrumStage, variant) {
     <p class="ofdm-caption">Пунктир -- передано; сплошная линия -- ${stageLabel.toLowerCase()}. Полоса активных поднесущих выделена фоном.</p></figure>
     <figure><figcaption><strong>Созвездие 4-QAM</strong></figcaption><div class="pc-scroll ofdm-constellation" tabindex="0" aria-label="Созвездие с локальной прокруткой">${constellation}</div>
     <p class="ofdm-caption">Точки -- ${r.points.length} принятых символов со всех активных поднесущих; пустые окружности -- четыре опорных положения.</p></figure></div>
-    <figure><figcaption><strong>Битовая последовательность во времени -- после выходного кабеля</strong></figcaption>
+    <figure><figcaption><strong>Битовая последовательность во времени -- после выходного кабеля, ${f(cable.rate)} Мбит/с</strong></figcaption>
     <div class="pc-scroll ofdm-cable-plot" tabindex="0" aria-label="Временная форма сигнала на выходе кабеля">${waveform}</div>
     <p class="ofdm-caption">Одна последовательность: ${cable.count} бита цифрового выхода приёмника (позиции ${cable.offset+1}–${cable.offset+cable.count}). Цифры сверху -- уровни, выданные приёмником; линия -- напряжение после кабеля. Точки отмечают середины битовых интервалов; пустые кружки -- ${cable.errors} ошибочных решений после кабеля. Пунктирная горизонталь -- порог решения.</p>
     </figure>`;
