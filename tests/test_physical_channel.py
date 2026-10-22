@@ -19,131 +19,120 @@ const close = (a,b) => assert(Math.abs(a-b)<1e-9, `${{a}} != ${{b}}`);
     assert result.returncode == 0, result.stderr
 
 
-def test_trials_follow_link_budget_packet_curve_and_same_environment():
+def test_each_variant_has_about_a_hundred_solutions_in_the_complete_pool():
     run_js("""
-const p={bandwidth:10,modulation:'QPSK',antenna:'panel',coding:'3/4',power:12};
-const r=m.design(p);
-assert.deepEqual(r,m.design(p));assert.equal(r.samples.length,300);
-close(r.eirp,16);close(r.nominalRate,12);close(r.noise,-94+10*Math.log10(2));
-const e=m.environment();
-for(let i=0;i<r.samples.length;i++) {
-  const s=r.samples[i];assert.equal(s.time,i);close(s.loss,e[i].loss);
-  close(s.received,12+8-s.loss);close(s.snr,s.received-r.noise);
-  close(s.rate,s.supported?r.operatingRate:0);
-  assert.equal(s.bler,s.supported?.01:null);assert.equal(s.supported,s.snr>=r.requiredSnr);
+assert.deepEqual(Object.keys(m.VARIANTS).map(Number),[1,2,3,4,5,6,7,8]);
+const pools=[];
+for(const variant of Object.keys(m.VARIANTS).map(Number)) {
+ const accepted=new Set(),modes=new Set(),antennas=new Set(),c=m.variantSettings(variant);
+ for(const bandwidth of m.DESIGN_OPTIONS.bandwidth)for(const power of m.DESIGN_OPTIONS.power)
+ for(const modulation of Object.keys(m.MODES))for(const coding of Object.keys(m.CODINGS))
+ for(const antenna of Object.keys(m.ANTENNAS)) {
+  const p={bandwidth,power,modulation,coding,antenna},r=m.assessDesign(p,variant);
+  const gain=m.ANTENNAS[antenna].gain;
+  const rate=bandwidth*m.MODES[modulation].bits*m.CODINGS[coding].rate*.8*.99;
+  const snr=power+2*gain-c.maximumLoss+94-10*Math.log10(bandwidth/5);
+  const threshold=m.MODES[modulation].threshold+m.CODINGS[coding].thresholdShift;
+  assert.equal(r.feasible,bandwidth<=c.maxBandwidth && power+gain<=c.maxEirp && rate>=c.minRate && snr>=threshold);
+  if(r.feasible){accepted.add(JSON.stringify(p));modes.add(modulation);antennas.add(antenna);}
+ }
+ assert(accepted.size>=90 && accepted.size<=110,`Variant ${variant}: ${accepted.size}`);
+ assert(modes.size>=2 && antennas.size>=2);pools.push(accepted);
+ assert(!m.assessDesign(m.designDefaults(),variant).feasible);
 }
-const other=m.design({...p,power:6});
-assert.deepEqual(other.samples.map(s=>s.loss),r.samples.map(s=>s.loss));
-for(let i=0;i<r.samples.length;i++)close(r.samples[i].snr-other.samples[i].snr,6);
+assert(![...pools[0]].some(p=>pools.every(pool=>pool.has(p))));
+for(let i=0;i<pools.length;i++)for(let j=i+1;j<pools.length;j++)
+ assert([...pools[i]].some(p=>!pools[j].has(p))||[...pools[j]].some(p=>!pools[i].has(p)));
 """)
 
 
-def test_independent_resource_tradeoffs_have_multiple_feasible_solutions():
+def test_every_trace_matches_selected_passport_and_only_loss_changes_snr():
     run_js("""
-const narrow={bandwidth:5,modulation:'16-QAM',antenna:'panel',coding:'3/4',power:16};
-const lowPower={bandwidth:10,modulation:'QPSK',antenna:'panel',coding:'3/4',power:11};
-const easyMount={bandwidth:10,modulation:'QPSK',antenna:'omni',coding:'3/4',power:19};
-for(const p of [narrow,lowPower,easyMount])assert(m.design(p).feasible);
-assert(narrow.bandwidth<lowPower.bandwidth);assert(lowPower.power<narrow.power);
-assert.equal(m.ANTENNAS[easyMount.antenna].gain,0);
-const max=m.design({bandwidth:10,modulation:'64-QAM',antenna:'dish',coding:'3/4',power:18});
-assert(!max.legal && !max.feasible);assert.equal(max.eirp,26);assert.deepEqual(max.samples,[]);
-assert(!m.design(m.designDefaults()).feasible);
-""")
-
-
-def test_fading_is_the_only_time_varying_cause_and_snr_extrema_match_passport():
-    run_js("""
-const p={bandwidth:5,modulation:'16-QAM',antenna:'panel',coding:'3/4',power:14};
-const r=m.design(p);assert(!r.feasible && r.averageRate>10 && r.minimumRate<10);
-const trace=m.environment();
-close(Math.min(...trace.map(s=>s.loss)),m.CHANNEL.minimumLoss);
-close(Math.max(...trace.map(s=>s.loss)),m.CHANNEL.maximumLoss);
-close(r.snrRange.minimum,14+8-95-r.noise);close(r.snrRange.maximum,14+8-87-r.noise);
-close(Math.min(...r.samples.map(s=>s.snr)),r.snrRange.minimum);
-close(Math.max(...r.samples.map(s=>s.snr)),r.snrRange.maximum);
-close(r.snrRange.maximum-r.snrRange.minimum,8);
-for(let i=1;i<r.samples.length;i++) {
- close(r.samples[i].snr-r.samples[i-1].snr,-(r.samples[i].loss-r.samples[i-1].loss));
- assert(!('angle' in r.samples[i]) && !('pointingLoss' in r.samples[i]));
+for(const variant of Object.keys(m.VARIANTS).map(Number)) {
+ const p={bandwidth:5,power:12,antenna:'omni',modulation:'16-QAM',coding:'3/4'};
+ const c=m.variantSettings(variant),r=m.design(p,variant),e=m.environment(variant);
+ assert(r.legal);assert.equal(r.samples.length,300);assert.deepEqual(r,m.design(p,variant));
+ close(Math.min(...e.map(s=>s.loss)),c.minimumLoss);close(Math.max(...e.map(s=>s.loss)),c.maximumLoss);
+ close(r.snrRange.minimum,12-c.maximumLoss-r.noise);close(r.snrRange.maximum,12-c.minimumLoss-r.noise);
+ close(Math.min(...r.samples.map(s=>s.snr)),r.snrRange.minimum);
+ close(Math.max(...r.samples.map(s=>s.snr)),r.snrRange.maximum);
+ for(let i=0;i<r.samples.length;i++){
+  const s=r.samples[i];close(s.received,12-s.loss);close(s.snr,s.received-r.noise);
+  assert.equal(s.supported,s.snr>=r.requiredSnr);assert.equal(s.bler,s.supported?.01:null);
+  close(s.rate,s.supported?r.operatingRate:0);assert.equal(s.meets,s.rate>=c.minRate);
+  if(i)close(s.snr-r.samples[i-1].snr,-(s.loss-r.samples[i-1].loss));
+ }
 }
-assert(m.design({...p,power:16}).feasible);
 """)
 
 
-def test_boundary_combinations_metrics_and_invalid_inputs():
+def test_static_assessment_and_trial_have_the_same_decision_and_limits():
     run_js("""
-for(const bandwidth of [1,10,20])for(const modulation of Object.keys(m.MODES))
-for(const antenna of Object.keys(m.ANTENNAS))
-for(const coding of Object.keys(m.CODINGS))for(const power of [0,12,24])
-{
-  const r=m.design({bandwidth,modulation,antenna,coding,power});
-  if(!r.legal) {assert(!r.feasible);assert(r.eirp>20);continue;}
-  assert(r.samples.every(s=>Number.isFinite(s.rate)));
-  close(r.minimumRate,Math.min(...r.samples.map(s=>s.rate)));
-  close(r.averageRate,r.samples.reduce((sum,s)=>sum+s.rate,0)/300);
-  assert.equal(r.feasible,r.minimumRate>=10);
-  assert.equal(r.feasible,r.samples.every(s=>s.rate>=10));
-  close(r.rateReserve,r.operatingRate-10);
+const cases=[m.designDefaults(),{bandwidth:3,power:8,antenna:'dish',modulation:'64-QAM',coding:'3/4'},
+ {bandwidth:7,power:8,antenna:'dish',modulation:'16-QAM',coding:'3/4'},
+ {bandwidth:20,power:24,antenna:'dish',modulation:'QPSK',coding:'1/2'}];
+for(const variant of Object.keys(m.VARIANTS).map(Number))for(const p of cases){
+ const a=m.assessDesign(p,variant),r=m.design(p,variant);
+ for(const key of Object.keys(a))assert.deepEqual(r[key],a[key]);
+ if(!a.legal)assert.deepEqual(r.samples,[]);
+ else{close(r.minimumRate,Math.min(...r.samples.map(s=>s.rate)));
+  assert.equal(r.feasible,r.checks.bandwidth&&r.checks.eirp&&r.samples.every(s=>s.meets));}
 }
-for(const overrides of [{bandwidth:0},{modulation:'256-QAM'},{antenna:'missing'},{coding:'1/3'},{bandwidth:1.5},{power:12.5},{power:NaN}])
- assert.throws(()=>m.design({...m.designDefaults(),...overrides}),RangeError);
-
+const narrow=m.design({bandwidth:6,power:0,antenna:'omni',modulation:'QPSK',coding:'1/2'},1);
+assert(!narrow.checks.bandwidth && narrow.checks.eirp && !narrow.legal && !narrow.feasible);
+const over=m.design({bandwidth:5,power:20,antenna:'dish',modulation:'QPSK',coding:'1/2'},1);
+assert(over.checks.bandwidth && !over.checks.eirp && !over.legal && !over.feasible);
 """)
 
 
-def test_coding_rate_noise_bandwidth_and_equal_antenna_budgets():
+def test_coding_and_bandwidth_change_rate_and_noise_with_fixed_bler_overhead():
     run_js("""
 const p={bandwidth:7,modulation:'16-QAM',coding:'2/3',power:13,antenna:'panel'};
-const r=m.design(p);assert(r.legal);close(r.eirp,17);close(r.nominalRate,7*4*(2/3)*.8);
-close(r.noise,-94+10*Math.log10(7/5));close(r.threshold,20.5);
-for(const s of r.samples) {
- close(s.received,13+2*4-s.loss);
-
+const r=m.assessDesign(p,2);close(r.nominalRate,7*4*(2/3)*.8);close(r.operatingRate,r.nominalRate*.99);
+close(r.eirp,17);close(r.noise,-94+10*Math.log10(7/5));close(r.requiredSnr,20.5);
+close(r.snrRange.minimum,13+2*4-95-r.noise);
+for(const [coding,c] of Object.entries(m.CODINGS)){
+ const a=m.assessDesign({...p,coding},2);close(a.nominalRate,7*4*c.rate*.8);
+ close(a.requiredSnr,22+c.thresholdShift);assert.deepEqual(a.snrRange,r.snrRange);
 }
-const swapped=m.design({...p,antenna:'dish'});
-assert(!swapped.legal);close(swapped.eirp,21); // Only one antenna gain enters transmitter EIRP.
-for(const [coding,c] of Object.entries(m.CODINGS)) {
- const a=m.design({...p,coding});
- close(a.nominalRate,7*4*c.rate*.8);close(a.threshold,22+c.thresholdShift);
- assert.deepEqual(a.samples.map(s=>s.snr),r.samples.map(s=>s.snr));
-}
-const narrow=m.design({...p,bandwidth:1}),wide=m.design({...p,bandwidth:20});
-close(wide.noise-narrow.noise,10*Math.log10(20));
-close(wide.nominalRate/narrow.nominalRate,20);
-for(let i=0;i<r.samples.length;i++)close(narrow.samples[i].snr-wide.samples[i].snr,10*Math.log10(20));
+const narrow=m.assessDesign({...p,bandwidth:1},2),wide=m.assessDesign({...p,bandwidth:20},2);
+close(wide.noise-narrow.noise,10*Math.log10(20));close(wide.nominalRate/narrow.nominalRate,20);
+close(narrow.snrRange.minimum-wide.snrRange.minimum,10*Math.log10(20));
+assert(!wide.checks.bandwidth); // The parameter remains selectable, but violates this variant.
 """)
 
 
-def test_calculated_power_interval_predicts_a_conservative_candidate():
+def test_calculated_power_interval_produces_working_candidates():
     run_js("""
-const p={bandwidth:6,modulation:'16-QAM',coding:'2/3',antenna:'panel'};
-const nominal=6*4*(2/3)*.8, threshold=22-1.5;
-const noise=-94+10*Math.log10(6/5);
-const requiredSnr=threshold;
-assert(nominal*.99>=10);
-
-const minPower=Math.ceil(noise+requiredSnr+95-8),maxPower=20-4;
-assert(minPower>0 && minPower<=maxPower && maxPower-minPower<5);
-for(let power=minPower;power<=maxPower;power++) {
- const r=m.design({...p,power});assert(r.legal && r.feasible);
- assert(r.samples.every(s=>s.rate>=10));
+for(const variant of Object.keys(m.VARIANTS).map(Number)){
+ const c=m.variantSettings(variant);let found=false;
+ for(const bandwidth of m.DESIGN_OPTIONS.bandwidth)for(const modulation of Object.keys(m.MODES))
+ for(const coding of Object.keys(m.CODINGS))for(const antenna of Object.keys(m.ANTENNAS)){
+  const gain=m.ANTENNAS[antenna].gain,noise=-94+10*Math.log10(bandwidth/5);
+  const rate=bandwidth*m.MODES[modulation].bits*m.CODINGS[coding].rate*.8*.99;
+  const threshold=m.MODES[modulation].threshold+m.CODINGS[coding].thresholdShift;
+  if(bandwidth>c.maxBandwidth||rate<c.minRate)continue;
+  const low=Math.max(0,Math.ceil(noise+threshold+c.maximumLoss-2*gain));
+  const high=Math.min(24,c.maxEirp-gain);
+  if(low<=high){
+   assert(m.design({bandwidth,modulation,coding,antenna,power:low},variant).feasible);
+   if(low>0)assert(!m.assessDesign({bandwidth,modulation,coding,antenna,power:low-1},variant).checks.snr);
+   found=true;
+  }
+ }
+ assert(found);
 }
 """)
 
 
-def test_fixed_bler_requires_both_rate_and_snr_and_resources_restore_feasibility():
+def test_invalid_variants_and_settings_are_rejected():
     run_js("""
-const p={bandwidth:5,modulation:'16-QAM',coding:'3/4',antenna:'panel',power:14};
-const weak=m.design(p),strong=m.design({...p,power:16});
-assert(weak.checks.rate && !weak.checks.snr && !weak.feasible);assert(strong.feasible);
-assert(weak.reserveSnr<0 && strong.reserveSnr>0);assert.equal(weak.minimumRate,0);
-close(strong.operatingRate,strong.nominalRate*.99);close(strong.minimumRate,strong.operatingRate);
-close(weak.reserveSnr,weak.snrRange.minimum-weak.requiredSnr);close(weak.requiredSnr,22);
-close(strong.reserveSnr-weak.reserveSnr,2);close(strong.operatingRate,weak.operatingRate);
-const slow=m.design({...p,bandwidth:1,power:16});
-assert(!slow.checks.rate && slow.checks.snr && !slow.feasible);
-assert.equal(strong.targetBler,.01);
-for(const s of weak.samples)assert.equal(s.bler,s.supported?.01:null);
-assert(!('availability' in strong));assert(!('meanPacketLoss' in strong));
+for(const id of [0,9,1.5,'1',null,NaN]){
+ assert.throws(()=>m.variantSettings(id),RangeError);
+ assert.throws(()=>m.design(m.designDefaults(),id),RangeError);
+ assert.throws(()=>m.environment(id),RangeError);
+}
+for(const bad of [{bandwidth:0},{bandwidth:21},{bandwidth:1.5},{power:25},{power:NaN},
+ {antenna:'missing'},{modulation:'256-QAM'},{coding:'1/3'}])
+ assert.throws(()=>m.design({...m.designDefaults(),...bad},1),RangeError);
 """)
