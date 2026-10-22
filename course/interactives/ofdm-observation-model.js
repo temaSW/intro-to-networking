@@ -24,6 +24,42 @@ export function ofdmDefaults() {
     gainDb:36, clip:1.25, frequencyOffsetKhz:7.5, frequencyAdjustmentKhz:0, equalizer:false, sensitivityDbm:-50, maximumInputDbm:-35,
     paths:[{delay:0, re:1, im:0}, {delay:8, re:.86*Math.cos(.4), im:.86*Math.sin(.4)}]};
 }
+// Cases vary the physical record and installed equipment; diagnoses are not UI labels.
+const reflected=(delay,amplitude,phase)=>({delay,re:amplitude*Math.cos(phase),im:amplitude*Math.sin(phase)});
+const direct=()=>({delay:0,re:1,im:0});
+export const OFDM_VARIANTS = {
+  1:{channel:{seed:17019,lossDb:36,channelNoise:.0011,referenceNoise:.001,frequencyOffsetKhz:7.5,
+    paths:[direct(),reflected(8,.86,.4)]},initial:{amplifier:'A',gainDb:36,cableId:'A'}},
+  2:{channel:{seed:27131,lossDb:42,channelNoise:.0008,referenceNoise:.0015,frequencyOffsetKhz:0,
+    paths:[direct(),reflected(6,.75,.9),reflected(13,.25,-.8)]},initial:{amplifier:'A',gainDb:30,cableId:'B'}},
+  3:{channel:{seed:38147,lossDb:30,channelNoise:.0005,referenceNoise:.0007,frequencyOffsetKhz:-6,
+    paths:[direct()]},initial:{amplifier:'B',gainDb:36,cableId:'A'}},
+  4:{channel:{seed:49157,lossDb:44,channelNoise:.0008,referenceNoise:.002,frequencyOffsetKhz:0,
+    paths:[direct()]},initial:{amplifier:'A',gainDb:24,cableId:'C'}},
+  5:{channel:{seed:50177,lossDb:32,channelNoise:.0009,referenceNoise:.0006,frequencyOffsetKhz:0,
+    paths:[direct(),reflected(4,.72,1)]},initial:{amplifier:'C',gainDb:42,cableId:'A'}},
+  6:{channel:{seed:61193,lossDb:40,channelNoise:.0025,referenceNoise:.0004,frequencyOffsetKhz:11,
+    paths:[direct()]},initial:{amplifier:'A',gainDb:36,cableId:'D'}},
+  7:{channel:{seed:72211,lossDb:34,channelNoise:.0006,referenceNoise:.0007,frequencyOffsetKhz:0,
+    paths:[direct()]},initial:{amplifier:'B',gainDb:36,cableId:'A'}},
+  8:{channel:{seed:83219,lossDb:38,channelNoise:.0007,referenceNoise:.0013,frequencyOffsetKhz:-9.5,
+    paths:[direct(),reflected(3,.6,-.7),reflected(11,.5,1.2),reflected(19,.22,-1.4)]},initial:{amplifier:'A',gainDb:42,cableId:'C'}},
+};
+export function observationVariant(variant=1) {
+  if(!Number.isInteger(variant)||!Object.hasOwn(OFDM_VARIANTS,variant))throw new RangeError('Unsupported observation variant');
+  return structuredClone(OFDM_VARIANTS[variant]);
+}
+export function observationDefaults(variant=1) {
+  return {...observationVariant(variant).initial,frequencyAdjustmentKhz:0,equalizer:false};
+}
+export function observeVariant(variant=1,controls={}) {
+  const test=observationVariant(variant),c={...observationDefaults(variant),...controls};
+  if(!CABLES[c.cableId])throw new RangeError('Unsupported cable');
+  const r=observeOFDM({...test.channel,...equipmentSettings(c.amplifier,c.gainDb),
+    frequencyAdjustmentKhz:c.frequencyAdjustmentKhz,equalizer:c.equalizer});
+  const cable=cableWaveform(r.rxBits,{rate:2*r.carriers.length*r.parameters.sampleRate/(r.parameters.size+r.parameters.prefix),...CABLES[c.cableId]});
+  return {...r,variant,cable};
+}
 // Serial NRZ output through a bandwidth-limited cable after demodulation.
 // Rate in Mbit/s, bandwidth in MHz, time in us. No extra cable noise is added.
 export function cableWaveform(bits, {rate=4.8, bandwidth=.65, lossDb=0, offset=128, count=24}={}) {

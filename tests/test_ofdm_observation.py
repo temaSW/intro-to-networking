@@ -278,3 +278,59 @@ const ideal=m.observeOFDM({...settings,gainDb:18,equalizer:true,channelNoise:0,a
 for(const bin of ideal.spectrum.filter(v=>ideal.carriers.includes(v.frequency*128/8)))
   close(bin.processed,10*Math.log10(1/48)+18-36);
 """)
+
+
+def test_variants_are_distinct_reproducible_records_with_initial_faults():
+    run_js("""
+assert.equal(Object.keys(m.OFDM_VARIANTS).length,8);
+const signatures=new Set(), initialClipping=[];
+for(let v=1;v<=8;v++) {
+  const a=m.observeVariant(v), b=m.observeVariant(v);
+  assert.deepEqual(a,b); assert(a.errors>0);
+  assert.equal(a.bitCount,3840); assert.equal(a.points.length,1920);
+  close(a.cable.rate,4.8); signatures.add(JSON.stringify(a.points));
+  initialClipping.push(a.clipped);
+  const copy=m.observationVariant(v);copy.channel.paths[0].re=999;
+  assert.equal(m.observationVariant(v).channel.paths[0].re,1);
+}
+assert.equal(signatures.size,8);
+assert(initialClipping.includes(0)); assert(Math.max(...initialClipping)>6000);
+for(const id of [0,9,1.5,'1',NaN])assert.throws(()=>m.observeVariant(id),RangeError);
+assert.throws(()=>m.observeVariant(1,{cableId:'unknown'}),RangeError);
+""")
+
+
+def test_variants_need_different_processing_and_equipment_actions():
+    run_js("""
+// Curated operating points: equalization and frequency correction are tested
+// independently of overload, rather than inferred from scenario labels.
+const cases=[
+ [1,'C',30,true,7.5,10], [2,'B',24,true,0,50],
+ [3,'A',12,false,-6,0], [4,'B',24,false,0,0],
+ [5,'A',12,true,0,0], [6,'A',12,false,11,0],
+ [7,'A',12,false,0,0], [8,'C',30,true,-9.5,10]];
+for(const [v,amplifier,gainDb,equalizer,frequencyAdjustmentKhz,maxErrors] of cases) {
+  const controls={amplifier,gainDb,equalizer,frequencyAdjustmentKhz,cableId:'B'};
+  const initial=m.observeVariant(v), corrected=m.observeVariant(v,controls);
+  assert(corrected.errors<=maxErrors,`variant ${v}: ${corrected.errors}`);
+  assert(corrected.errors<initial.errors/5);
+  assert.equal(corrected.cable.errors,0);
+  if(equalizer)assert(m.observeVariant(v,{...controls,equalizer:false}).errors>200);
+  if(frequencyAdjustmentKhz!==0)
+    assert(m.observeVariant(v,{...controls,frequencyAdjustmentKhz:0}).errors>1800);
+  const otherCable=m.observeVariant(v,{...controls,cableId:'A'});
+  assert.deepEqual(otherCable.points,corrected.points);
+}
+// Neither processing switch can fix receiver noise or hard clipping.
+for(const v of [4,7]) {
+ const clicked=m.observeVariant(v,{equalizer:true});
+ assert(clicked.errors>0);
+}
+const noisy=m.observeVariant(4), background=m.observeVariant(6);
+assert(noisy.amplifierNoiseEnergy>noisy.channelNoiseEnergy*10);
+assert(background.channelNoiseEnergy>background.amplifierNoiseEnergy);
+const overloaded=m.observeVariant(7), reduced=m.observeVariant(7,{amplifier:'A',gainDb:12});
+assert(overloaded.clipped>5000); assert.equal(reduced.clipped,0);
+for(const v of [1,3,5,7])assert(m.observeVariant(v).cable.errors>0);
+for(const v of [2,4,6,8])assert.equal(m.observeVariant(v).cable.errors,0);
+""")
