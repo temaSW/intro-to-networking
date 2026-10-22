@@ -43,7 +43,7 @@ function renderTrial(trial) {
 function mount(shell) {
   const root=shell.closest('main'), diagnostic=root.querySelector('[data-diagnostic-workspace]'), workspace=root.querySelector('[data-design-workspace]');
   diagnostic.innerHTML='<section aria-labelledby="diagnostic-title"><h3 id="diagnostic-title">Задание 1. Исследование OFDM-сигнала</h3><div data-ofdm-observation></div></section>';
-  mountOFDM(diagnostic.querySelector('[data-ofdm-observation]'));
+  const observation=mountOFDM(diagnostic.querySelector('[data-ofdm-observation]'),+root.querySelector('[name="variant"]').value);
   let trialNumber=0,currentTrial=null;
   workspace.innerHTML=`<section aria-labelledby="design-title"><h3 id="design-title">Испытательный стенд линии между зданиями</h3>
     <p data-variant-conditions></p>
@@ -69,6 +69,7 @@ function mount(shell) {
   const variant=()=>+get('variant').value;
   function updateVariant() {
     const c=variantSettings(variant());
+    observation.setVariant(variant());
     for(const element of root.querySelectorAll('[data-variant-value]'))element.textContent=fmt(c[element.dataset.variantValue]);
     area('variant-conditions').textContent=`Требуется не менее ${c.minRate} Мбит/с во всём диапазоне потерь; полоса не более ${c.maxBandwidth} МГц; ЭИИМ не более ${c.maxEirp} дБм.`;
     area('link-rate').textContent=`Видеопоток ${c.minRate} Мбит/с`;

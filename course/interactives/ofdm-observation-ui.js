@@ -1,13 +1,10 @@
-import {observeOFDM, cableWaveform, AMPLIFIERS, CABLES, equipmentSettings} from './ofdm-observation-model.js';
+import {observeVariant, observationDefaults, AMPLIFIERS, CABLES} from './ofdm-observation-model.js';
 
-function renderOFDM(root, settings, cableSpec, spectrumStage) {
-  const r=observeOFDM(settings), p=r.parameters;
-  const cable=cableWaveform(r.rxBits,{rate:2*r.carriers.length*p.sampleRate/(p.size+p.prefix),bandwidth:cableSpec.bandwidth,lossDb:cableSpec.lossDb});
-  const f=x=>Number(x.toFixed(2)).toLocaleString('ru-RU');
+function renderOFDM(root, controls, spectrumStage, variant) {
+  const r=observeVariant(variant,controls), cable=r.cable;
   const stageLabel=spectrumStage==='output'?'Выход УМ':'После обработки';
   const sx=x=>55+(x+4)*76, sy=y=>265-(Math.max(-100,Math.min(20,y))+100)*230/120;
   const path=key=>r.spectrum.map(v=>`${sx(v.frequency).toFixed(2)},${sy(v[key]).toFixed(2)}`).join(' ');
-  const dr=r.receiverRange;
   const spectrum=`<svg viewBox="0 0 690 325" role="img" aria-label="Спектр переданного OFDM и сигнала в точке: ${stageLabel}.">
     <rect x="${sx(-1.5)}" y="35" width="${sx(1.5)-sx(-1.5)}" height="230" class="ofdm-band"/>
     ${[-100,-80,-60,-40,-20,0,20].map(v=>`<path d="M55 ${sy(v)}H663" class="ofdm-grid"/><text x="8" y="${sy(v)+5}">${v}</text>`).join('')}
@@ -68,8 +65,10 @@ function renderOFDM(root, settings, cableSpec, spectrumStage) {
 
 }
 
-export function mountOFDM(root) {
-  let amplifier='A', cableId='A', gainDb=36, frequencyAdjustmentKhz=0, equalizer=false, spectrumStage='processed';
+export function mountOFDM(root, initialVariant=1) {
+  let variant=initialVariant;
+  let {amplifier,cableId,gainDb,frequencyAdjustmentKhz,equalizer}=observationDefaults(variant);
+  let spectrumStage='processed';
   const f=x=>Number(x.toFixed(2)).toLocaleString('ru-RU');
   const options=items=>Object.entries(items).map(([id,item])=>`<option value="${id}">${item.name}</option>`).join('');
   root.innerHTML=`<div data-ofdm-scheme></div>
@@ -97,8 +96,8 @@ export function mountOFDM(root) {
   const view=root.querySelector('[data-ofdm-view]');
   function update() {
     const a=AMPLIFIERS[amplifier], c=CABLES[cableId];
-    const settings={...equipmentSettings(amplifier,gainDb),frequencyAdjustmentKhz,equalizer};
-    renderOFDM(view,settings,c,spectrumStage);
+    const controls={amplifier,gainDb,cableId,frequencyAdjustmentKhz,equalizer};
+    renderOFDM(view,controls,spectrumStage,variant);
     root.querySelector('[data-ofdm-scheme]').replaceChildren(view.querySelector('.ofdm-scheme'));
     root.querySelector('[data-gain-output]').textContent=gainDb;
     root.querySelector('[data-nf-output]').textContent=a.noiseFigureDb;
@@ -122,13 +121,21 @@ export function mountOFDM(root) {
   }
   root.addEventListener('input',event=>{if(event.target.matches('input[type="range"],input[type="number"]')) read();});
   root.addEventListener('change',event=>{if(event.target.matches('select,input[type="checkbox"]')) read();});
-  root.querySelector('[data-ofdm-reset]').addEventListener('click',()=>{
-    root.querySelector('[name="ofdm-amplifier"]').value='A';
-    const gain=root.querySelector('[name="ofdm-gain"]'); gain.min=12;gain.max=42;gain.value=36;
+  function reset() {
+    const defaults=observationDefaults(variant), a=AMPLIFIERS[defaults.amplifier];
+    root.querySelector('[name="ofdm-amplifier"]').value=defaults.amplifier;
+    const gain=root.querySelector('[name="ofdm-gain"]');
+    gain.min=a.minGain; gain.max=a.maxGain; gain.value=defaults.gainDb;
     root.querySelector('[name="ofdm-equalizer"]').checked=false;
     root.querySelector('[name="ofdm-frequency"]').value=0;
-    root.querySelector('[name="ofdm-cable"]').value='A';
+    root.querySelector('[name="ofdm-cable"]').value=defaults.cableId;
     root.querySelector('[name="ofdm-spectrum-stage"]').value='processed'; read();
-  });
-  update();
+  }
+  root.querySelector('[data-ofdm-reset]').addEventListener('click',reset);
+  reset();
+  return {setVariant(id) {
+    observationDefaults(id); // Validate before changing the selected record.
+    if(variant===id)return;
+    variant=id; reset();
+  }};
 }
