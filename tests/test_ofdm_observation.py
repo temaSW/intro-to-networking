@@ -288,7 +288,9 @@ for(let v=1;v<=8;v++) {
   const a=m.observeVariant(v), b=m.observeVariant(v);
   assert.deepEqual(a,b); assert(a.errors>0);
   assert.equal(a.bitCount,3840); assert.equal(a.points.length,1920);
-  close(a.cable.rate,4.8); signatures.add(JSON.stringify(a.points));
+  close(a.cable.rate,[4.8,2.4,9.6,1.2,7.2,14.4,3.6,12][v-1]);
+  close(a.cable.duration,24/a.cable.rate);
+  signatures.add(JSON.stringify(a.points));
   initialClipping.push(a.clipped);
   const copy=m.observationVariant(v);copy.channel.paths[0].re=999;
   assert.equal(m.observationVariant(v).channel.paths[0].re,1);
@@ -310,7 +312,7 @@ const cases=[
  [5,'A',12,true,0,0], [6,'A',12,false,11,0],
  [7,'A',12,false,0,0], [8,'C',30,true,-9.5,10]];
 for(const [v,amplifier,gainDb,equalizer,frequencyAdjustmentKhz,maxErrors] of cases) {
-  const controls={amplifier,gainDb,equalizer,frequencyAdjustmentKhz,cableId:'B'};
+  const controls={amplifier,gainDb,equalizer,frequencyAdjustmentKhz,cableId:v===6?'D':'B'};
   const initial=m.observeVariant(v), corrected=m.observeVariant(v,controls);
   assert(corrected.errors<=maxErrors,`variant ${v}: ${corrected.errors}`);
   assert(corrected.errors<initial.errors/5);
@@ -333,4 +335,32 @@ const overloaded=m.observeVariant(7), reduced=m.observeVariant(7,{amplifier:'A',
 assert(overloaded.clipped>5000); assert.equal(reduced.clipped,0);
 for(const v of [1,3,5,7])assert(m.observeVariant(v).cable.errors>0);
 for(const v of [2,4,6,8])assert.equal(m.observeVariant(v).cable.errors,0);
+""")
+
+
+def test_cable_bandwidth_is_compared_to_variant_bit_rate():
+    run_js("""
+// Use exactly the same bit pattern to separate rate effects from payload changes.
+const bits=Array.from({length:200},(_,i)=>i%7===0?1:0);
+const errors={};
+for(let v=1;v<=8;v++) {
+ const r=m.observeVariant(v);
+ errors[v]={};
+ for(const [id,cable] of Object.entries(m.CABLES)) {
+  const wave=m.cableWaveform(bits,{...cable,rate:r.cable.rate});
+  errors[v][id]=wave.errors;
+  close(wave.duration,24/r.cable.rate);
+  close(wave.decisions[0].time,.5/r.cable.rate);
+ }
+}
+assert.equal(errors[4].A,0); assert(errors[1].A>0);
+assert.equal(errors[2].B,0); assert(errors[6].B>0);
+assert.equal(errors[6].D,0);
+// Changing the sample rate changes the OFDM subcarrier spacing and serialized
+// rate together; no unrelated output-clock multiplier is introduced.
+for(let v=1;v<=8;v++) {
+ const r=m.observeVariant(v),p=r.parameters;
+ close(r.cable.rate,2*r.carriers.length*p.sampleRate/(p.size+p.prefix));
+ close(r.spectrum[1].frequency-r.spectrum[0].frequency,p.sampleRate/p.size);
+}
 """)
