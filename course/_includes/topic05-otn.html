@@ -1,14 +1,55 @@
 ```{=html}
 <figure class="course-demo mux-figure" aria-labelledby="topic05-otn-caption">
-<div class="mux-figure-scroll" tabindex="0" role="region" aria-label="Функции OTN при переносе клиентского сигнала. На узком экране схема прокручивается по горизонтали">
-<svg viewBox="0 0 1040 465" role="img" aria-labelledby="topic05-otn-title topic05-otn-desc">
-<title id="topic05-otn-title">Функции OTN при переносе клиентского сигнала</title>
-<desc id="topic05-otn-desc">Клиентский сигнал Ethernet проходит адаптацию, переносится блоком данных ODU с мониторингом пути и через линейный интерфейс OTU. В показанном варианте применяется исправление ошибок FEC. Затем цифровой поток передаётся оптическим сигналом по волокну.</desc>
-<defs><marker id="topic05-otn-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="context-stroke"/></marker></defs>
-<text x="28" y="32" class="mf-heading" text-anchor="start">Один клиентский сигнал через цифровой и оптический транспорт</text><rect x="22" y="110" width="142" height="132" rx="3" class="mf-device"/><text x="93.0" y="140" class="mf-bold" text-anchor="middle">Клиент Ethernet</text><text x="93.0" y="177" class="mf-small" text-anchor="middle">Кадры</text><path d="M164 176 H201" class="mf-wire" marker-end="url(#topic05-otn-arrow)"/><rect x="209" y="110" width="158" height="132" rx="3" class="mf-device"/><text x="288.0" y="140" class="mf-bold" text-anchor="middle">Адаптация</text><text x="288.0" y="177" class="mf-small" text-anchor="middle">Согласование</text><text x="288.0" y="203" class="mf-small" text-anchor="middle">представления</text><text x="288.0" y="229" class="mf-small" text-anchor="middle">и скорости</text><path d="M367 176 H401" class="mf-wire" marker-end="url(#topic05-otn-arrow)"/><rect x="409" y="110" width="168" height="132" rx="3" class="mf-device"/><text x="493.0" y="140" class="mf-bold" text-anchor="middle">Блок данных ODU</text><text x="493.0" y="177" class="mf-small" text-anchor="middle">Клиентская нагрузка</text><text x="493.0" y="203" class="mf-small" text-anchor="middle">и контроль тракта</text><path d="M577 176 H611" class="mf-wire" marker-end="url(#topic05-otn-arrow)"/><rect x="619" y="110" width="168" height="132" rx="3" class="mf-device"/><text x="703.0" y="140" class="mf-bold" text-anchor="middle">Передача OTU</text><text x="703.0" y="177" class="mf-small" text-anchor="middle">Синхронизация</text><text x="703.0" y="203" class="mf-small" text-anchor="middle">и контроль</text><text x="703.0" y="229" class="mf-small" text-anchor="middle">линейного участка</text><path d="M787 176 H821" class="mf-wire" marker-end="url(#topic05-otn-arrow)"/><rect x="829" y="110" width="187" height="132" rx="3" class="mf-device"/><text x="922.5" y="140" class="mf-bold" text-anchor="middle">Оптический сигнал</text><text x="922.5" y="177" class="mf-small" text-anchor="middle">Передача по волокну</text><rect x="610" y="282" width="192" height="65" rx="3" class="mt-meta"/><text x="706" y="309" class="mf-bold" text-anchor="middle">Избыточность FEC</text><text x="706" y="334" class="mf-small" text-anchor="middle">исправление ошибок</text><path d="M706 282 V247" class="mf-wire" marker-end="url(#topic05-otn-arrow)"/><text x="28" y="390" class="mf-small" text-anchor="start">Цифровые контейнеры и их контроль</text><text x="1020" y="390" class="mf-small" text-anchor="end">Оптическая физическая среда</text><text x="28" y="437" class="mf-small" text-anchor="start">Несколько оптических каналов могут совместно идти по волокну с WDM.</text>
+<div class="mux-figure-scroll" tabindex="0" role="region" aria-label="Перенос целого сигнала SDH через OTN с сохранением его нагрузки и служебных сведений">
+<svg viewBox="0 0 1100 535" role="img" aria-labelledby="topic05-otn-title topic05-otn-desc">
+<title id="topic05-otn-title">Целый сигнал SDH как клиент оптической транспортной сети OTN</title>
+<desc id="topic05-otn-desc">Слева сформированный сигнал SDH STM-N поступает в первый узел OTN. Второй узел восстанавливает исходный STM-N. Внизу внутри клиентской нагрузки показан целый сигнал SDH: контейнеры с E1 и служебные сведения SDH. Внешние сведения ODU контролируют перенос этого клиента, OTU обслуживает транспортный интерфейс; в показанном варианте применяется FEC.</desc>
+<defs><marker id="topic05-otn-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 Z"/></marker></defs>
+<text x="28" y="31" class="mf-heading">Клиентский сигнал на входе и на выходе</text>
+<rect x="28" y="78" width="155" height="106" class="mf-packet mf-a"/>
+<text x="105" y="118" class="mf-bold" text-anchor="middle">Сигнал SDH</text>
+<text x="105" y="149" class="mf-small" text-anchor="middle">STM-N целиком</text>
+<path d="M183 130 H219" class="mf-wire" marker-end="url(#topic05-otn-arrow)"/>
+<rect x="227" y="78" width="177" height="106" class="mf-device"/>
+<text x="315" y="107" class="mf-bold" text-anchor="middle">Узел OTN 1</text>
+<text x="315" y="139" class="mf-small" text-anchor="middle">Размещение клиента</text>
+<text x="315" y="164" class="mf-small" text-anchor="middle">в транспортный формат</text>
+<path d="M404 130 H682" class="mf-wire" marker-end="url(#topic05-otn-arrow)"/>
+<text x="543" y="107" class="mf-bold" text-anchor="middle">Оптический участок</text>
+<text x="543" y="164" class="mf-small" text-anchor="middle">Передача структуры OTU</text>
+<rect x="690" y="78" width="177" height="106" class="mf-device"/>
+<text x="778" y="107" class="mf-bold" text-anchor="middle">Узел OTN 2</text>
+<text x="778" y="139" class="mf-small" text-anchor="middle">Контроль и FEC</text>
+<text x="778" y="164" class="mf-small" text-anchor="middle">Восстановление клиента</text>
+<path d="M867 130 H903" class="mf-wire" marker-end="url(#topic05-otn-arrow)"/>
+<rect x="911" y="78" width="161" height="106" class="mf-packet mf-a"/>
+<text x="991" y="118" class="mf-bold" text-anchor="middle">Сигнал SDH</text>
+<text x="991" y="149" class="mf-small" text-anchor="middle">STM-N целиком</text>
+<text x="28" y="244" class="mf-heading">Назначение частей цифровой транспортной структуры</text>
+<rect x="28" y="270" width="1044" height="207" class="mf-enclosure"/>
+<text x="49" y="301" class="mf-bold">OTU: передача через транспортный интерфейс</text>
+<rect x="48" y="324" width="173" height="131" class="mf-device"/>
+<text x="134" y="361" class="mf-small" text-anchor="middle">Синхронизация</text>
+<text x="134" y="390" class="mf-small" text-anchor="middle">и контроль</text>
+<text x="134" y="419" class="mf-small" text-anchor="middle">интерфейса</text>
+<rect x="238" y="313" width="611" height="153" class="mf-medium"/>
+<text x="543" y="342" class="mf-bold" text-anchor="middle">ODU: перенос клиента и контроль тракта</text>
+<rect x="252" y="358" width="190" height="94" class="mf-device"/>
+<text x="347" y="390" class="mf-small" text-anchor="middle">Служебные сведения</text>
+<text x="347" y="420" class="mf-small" text-anchor="middle">контроля тракта</text>
+<rect x="442" y="358" width="393" height="94" class="mf-packet mf-a"/>
+<text x="638" y="391" class="mf-bold" text-anchor="middle">Целый сигнал SDH (STM-N)</text>
+<text x="638" y="416" class="mf-small" text-anchor="middle">Контейнеры с E1</text>
+<text x="638" y="440" class="mf-small" text-anchor="middle">+ служебные сведения SDH</text>
+<rect x="866" y="324" width="186" height="131" class="mf-device"/>
+<text x="959" y="360" class="mf-bold" text-anchor="middle">FEC</text>
+<text x="959" y="390" class="mf-small" text-anchor="middle">Избыточность</text>
+<text x="959" y="418" class="mf-small" text-anchor="middle">для исправления</text>
+<text x="959" y="441" class="mf-small" text-anchor="middle">ошибок</text>
+<text x="28" y="515" class="mf-small">Один цифровой транспортный поток может передаваться одним оптическим каналом WDM.</text>
 </svg>
 </div>
 <p class="mux-figure-hint" aria-hidden="true">Схема прокручивается по горизонтали →</p>
-<figcaption id="topic05-otn-caption">Функциональная схема примера интерфейса с FEC: блоки не изображают полный формат кадра или отдельные устройства. OTN задаёт цифровую транспортную организацию, WDM -- совместную передачу оптических каналов.</figcaption>
+<figcaption id="topic05-otn-caption">Клиентом служит целый сигнал SDH вместе с его служебной структурой. Другим клиентом OTN может быть Ethernet. Внизу показаны функции и вложение структур; размеры и расположение полей условны. Физический сигнал в линии формируется оптическим интерфейсом.</figcaption>
 </figure>
 ```
