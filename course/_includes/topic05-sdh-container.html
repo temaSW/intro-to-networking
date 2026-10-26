@@ -1,0 +1,48 @@
+```{=html}
+<figure class="course-demo mux-figure" aria-labelledby="topic05-container-caption">
+<div class="mux-figure-scroll" tabindex="0" role="region" aria-label="Порция непрерывного E1 размещается в C-12, затем к C-12 добавляется заголовок POH и получается VC-12">
+<svg viewBox="0 0 1040 560" role="img" aria-labelledby="topic05-container-title topic05-container-desc">
+<title id="topic05-container-title">От непрерывного E1 к контейнеру C-12 и виртуальному контейнеру VC-12</title>
+<desc id="topic05-container-desc">Вверху показан непрерывный поток E1 с выделенной очередной порцией битов. В середине эта порция размещена в C-12 вместе с позициями адаптации. Внизу тот же C-12 дополнен отдельным заголовком POH. Получившаяся структура -- VC-12. Собственные служебные канальные интервалы E1 переносятся внутри клиентских данных; POH относится к SDH.</desc>
+<defs><marker id="topic05-container-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 Z"/></marker></defs>
+<text x="28" y="29" class="mf-heading">E1: непрерывный поток речевых и служебных данных</text>
+<text x="124" y="94" text-anchor="end">…</text>
+<rect x="150" y="57" width="150" height="55" class="mf-device"/>
+<text x="225" y="91" class="mf-small" text-anchor="middle">Предыдущие биты</text>
+<rect x="300" y="57" width="525" height="55" class="mf-packet mf-a"/>
+<text x="562" y="91" class="mf-bold" text-anchor="middle">Очередная порция битов E1</text>
+<rect x="825" y="57" width="175" height="55" class="mf-device"/>
+<text x="912" y="91" class="mf-small" text-anchor="middle">Следующие биты</text>
+<text x="1015" y="94">…</text>
+<path d="M562 119 V200" class="mf-wire" marker-end="url(#topic05-container-arrow)"/>
+<text x="586" y="165" class="mf-small">Размещение в формате SDH</text>
+<text x="28" y="247" class="mf-bold">C-12</text>
+<text x="28" y="276" class="mf-small">Контейнер</text>
+<rect x="300" y="211" width="525" height="94" class="mf-packet mf-a"/>
+<text x="562" y="251" class="mf-bold" text-anchor="middle">Очередная порция битов E1</text>
+<text x="562" y="281" class="mf-small" text-anchor="middle">Речевые каналы отдельно не выделяются</text>
+<rect x="825" y="211" width="175" height="94" class="mf-device"/>
+<text x="912" y="245" class="mf-bold" text-anchor="middle">Адаптация</text>
+<text x="912" y="271" class="mf-small" text-anchor="middle">Согласующие</text>
+<text x="912" y="292" class="mf-small" text-anchor="middle">позиции</text>
+<path d="M650 314 V391" class="mf-wire" marker-end="url(#topic05-container-arrow)"/>
+<text x="674" y="356" class="mf-small">Добавляется трактовый заголовок POH</text>
+<rect x="140" y="401" width="870" height="130" class="mf-enclosure"/>
+<text x="28" y="456" class="mf-bold">VC-12</text>
+<text x="28" y="485" class="mf-small">C-12 + POH</text>
+<rect x="150" y="419" width="150" height="94" class="mf-device"/>
+<text x="225" y="451" class="mf-bold" text-anchor="middle">POH</text>
+<text x="225" y="479" class="mf-small" text-anchor="middle">Контроль</text>
+<text x="225" y="500" class="mf-small" text-anchor="middle">тракта SDH</text>
+<rect x="300" y="419" width="525" height="94" class="mf-packet mf-a"/>
+<text x="562" y="451" class="mf-bold" text-anchor="middle">Та же порция битов E1</text>
+<text x="562" y="481" class="mf-small" text-anchor="middle">E1 сохраняет свои служебные данные</text>
+<rect x="825" y="419" width="175" height="94" class="mf-device"/>
+<text x="912" y="452" class="mf-bold" text-anchor="middle">Адаптация</text>
+<text x="912" y="480" class="mf-small" text-anchor="middle">Те же позиции</text>
+</svg>
+</div>
+<p class="mux-figure-hint" aria-hidden="true">Схема прокручивается по горизонтали →</p>
+<figcaption id="topic05-container-caption">Последовательные этапы формирования одного VC-12. Группировка битов, размеры и расположение полей условны. Следующие порции E1 переносятся аналогично; служебные КИ0 и КИ16 E1 сохраняются внутри клиентского потока.</figcaption>
+</figure>
+```
