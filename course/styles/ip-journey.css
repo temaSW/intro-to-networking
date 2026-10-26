@@ -17,7 +17,7 @@
 .ip-selected { background:var(--accent-soft); outline:2px solid var(--accent); outline-offset:-2px; }
 .ip-choices { display:flex; flex-wrap:wrap; gap:.7rem; margin:1rem 0; }
 .ip-topology { font-family:monospace; white-space:normal; }
-.ip-header { display:grid; grid-template-columns:repeat(32,minmax(0,1fr)); border-left:1px solid var(--line); border-top:1px solid var(--line); min-width:28rem; font-size:.85rem; text-align:center; }
+.ip-scroll .ip-header { display:grid; grid-template-columns:repeat(32,minmax(0,1fr)); grid-auto-rows:minmax(3rem,auto); border-left:1px solid var(--line); border-top:1px solid var(--line); min-width:32rem; font-size:.85rem; text-align:center; }
 .ip-header span { grid-column:span var(--bits); padding:.45rem .1rem; border-right:1px solid var(--line); border-bottom:1px solid var(--line); background:var(--surface-alt); overflow-wrap:anywhere; }
 .ip-header .ip-address { padding:1rem .1rem; background:var(--accent-soft); }
 [data-ip-journey] :focus-visible,.ip-scroll:focus-visible { outline:2px solid var(--focus); outline-offset:3px; }
@@ -47,3 +47,23 @@
 @media(max-width:575px) { .ip-address-pair { grid-template-columns:1fr; } }
 .ip-headers > section { min-width:0; }
 .ip-screenshot img { display:block; width:auto; max-width:100%; height:auto; margin-inline:auto; }
+
+.ip-packet-diagram { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,2fr); margin-bottom:.8rem; }
+.ip-packet-label { grid-column:1 / -1; text-align:center; font-weight:700; margin-bottom:.8rem; }
+.ip-packet-header,.ip-packet-data { display:grid; align-content:center; gap:.5rem; padding:var(--demo-padding,1rem); text-align:center; min-width:0; }
+.ip-packet-header { background:var(--accent-soft); border:2px solid var(--accent); }
+.ip-packet-data { background:var(--surface-alt); border:2px solid var(--line); border-left:0; }
+@media(max-width:575px) {
+  .ip-packet-diagram { grid-template-columns:minmax(0,1fr); }
+  .ip-packet-data { border-left:2px solid var(--line); border-top:0; }
+}
+
+.ip-scroll .ip-header .ip-address-v6 { grid-row:span 4; min-height:8rem; display:grid; align-content:center; }
+.ip-header .ip-header-optional { border-style:dashed; color:var(--muted); }
+.ip-header .ip-header-payload { padding:1.4rem .5rem; background:var(--surface); font-weight:700; }
+.ip-header abbr { text-decoration:none; cursor:help; }
+
+.ip-headers { grid-template-columns:repeat(auto-fit,minmax(min(100%,32rem),1fr)); }
+
+.ip-network .ip-radio-link { stroke-dasharray:5 4; }
+.ip-network .ip-local-path { stroke:var(--accent); stroke-width:4; fill:none; }

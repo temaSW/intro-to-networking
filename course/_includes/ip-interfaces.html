@@ -2,10 +2,13 @@
 <div class="ip-scroll" tabindex="0" role="region" aria-label="Три сети: подключения">
 <svg class="ip-network ip-foundation-network ip-map-overview" viewBox="0 0 1100 370" role="img" aria-labelledby="ip-interfaces-title ip-interfaces-desc">
 <title id="ip-interfaces-title">Три связанные сети: интерфейсы</title>
-<desc id="ip-interfaces-desc">A и D подключены к сети 1 вместе с левым интерфейсом R1. Правый интерфейс R1 и левый интерфейс R2 подключены к сети 2. Правый интерфейс R2 и B подключены к сети 3.</desc>
+<desc id="ip-interfaces-desc">A, D и левый интерфейс R1 подключены по Wi-Fi к отдельной точке доступа, работающей как мост в сети 1. Правый интерфейс R1 и левый интерфейс R2 подключены к сети 2. Правый интерфейс R2 и B подключены к сети 3.</desc>
 <g class="ip-segments"><rect x="15" y="18" width="360" height="335" rx="10"/><rect x="405" y="18" width="290" height="335" rx="10"/><rect x="725" y="18" width="360" height="335" rx="10"/></g>
 <text x="195" y="48" text-anchor="middle">Сеть 1 · Wi-Fi</text><text x="550" y="48" text-anchor="middle">Сеть 2 · Ethernet</text><text x="905" y="48" text-anchor="middle">Сеть 3 · Ethernet</text><text x="550" y="73" text-anchor="middle">медь</text><text x="905" y="73" text-anchor="middle">волокно</text>
-<path d="M118 165 H360 M190 237 V165 M420 165 H680 M740 165 H972"/>
+<path class="ip-radio-link" d="M118 165 H207 M190 237 L217 184 M263 165 H360"/>
+<path d="M420 165 H680 M740 165 H972"/>
+<g transform="translate(235 165)"><rect x="-28" y="-19" width="56" height="38" rx="4"/><path d="M-14 -4 H14 M-14 5 H14 M-9 -9 L-14 -4 L-9 1 M9 0 L14 5 L9 10"/></g>
+<text x="235" y="90" text-anchor="middle">Точка</text><text x="235" y="114" text-anchor="middle">доступа</text><text x="235" y="137" text-anchor="middle">мост</text>
 <g transform="translate(90 165)"><rect x="-28" y="-23" width="56" height="40" rx="3"/><path d="M-17 27 H17 M0 17 V27"/></g>
 <g transform="translate(190 260)"><rect x="-28" y="-23" width="56" height="40" rx="3"/><path d="M-17 27 H17 M0 17 V27"/></g>
 <text x="90" y="101" text-anchor="middle">A</text><text x="190" y="314" text-anchor="middle">D</text>
