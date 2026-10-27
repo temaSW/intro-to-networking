@@ -24,7 +24,7 @@ const dataURL = text => 'data:text/javascript,' + encodeURIComponent(text);
     const row = records.filter(e => e.initialTTL === ttl);
     assert.deepEqual(row.map(e => e.probe), [1, 2, 3]);
     assert(row.every(e => e.to === 0 && e.reply));
-    assert(row.every(e => e.record.responder === (ttl === 4 ? 'B' : `R${ttl}`)));
+    assert(row.every(e => e.record.responder === ['A', 'R1', 'R3', 'R2', 'B'][ttl]));
     assert(row.every(e => e.record.response === (ttl === 4 ? 'Echo Reply' : 'Time Exceeded')));
   }
   // Every response is created at the endpoint of a finished request, not returned as that request.
@@ -62,7 +62,7 @@ const dataURL = text => 'data:text/javascript,' + encodeURIComponent(text);
   const d=delivery.parts,t=tracing.parts;
   assert.equal(frames.size,0);assert.equal(d.controls.hidden,false);assert.equal(t.controls.hidden,false);
   d.step.emit('click');assert.equal(d.badge.textContent,'TTL = 1');
-  d.step.emit('click');assert.match(d.status.textContent,/R2: TTL 1 → 0/);assert.equal(d.play.disabled,true);
+  d.step.emit('click');assert.match(d.status.textContent,/R3: TTL 1 → 0/);assert.equal(d.play.disabled,true);
   assert.equal(t.badge.textContent,'TTL = 1'); // independent instances
   d.range.value='4';d.range.emit('input');assert.equal(frames.size,0);
   for(let i=0;i<4;i++)d.step.emit('click');

@@ -1,6 +1,6 @@
 <div class="course-demo ip-ttl-demo" data-ttl-loop>
 <div class="ip-ttl-controls" hidden data-ttl-controls><label><input type="checkbox" data-ttl-limited> Ограничить TTL</label><label>Начальный TTL <input type="range" min="1" max="255" value="3" data-ttl-range disabled><input type="number" min="1" max="255" value="3" aria-label="Точное значение начального TTL" data-ttl-number disabled></label><div class="ip-ttl-actions"><button type="button" data-ttl-play>Запуск</button><button type="button" data-ttl-step>Один шаг</button><button type="button" data-ttl-reset>В начало</button><button type="button" data-ttl-expand hidden>На весь экран</button></div></div>
-<p>TTL показан в пакете, готовом к отправке. Начало опыта -- после обработки на R1. Значение уменьшается при обработке пакета на следующем маршрутизаторе; при нуле пакет отбрасывается. Поэтому начальный TTL 2 даёт два перехода: R1 → R2 → R1.</p>
+<p>TTL показан в пакете, готовом к отправке. Начало опыта -- после обработки на R1. Значение уменьшается при обработке пакета на следующем маршрутизаторе; при нуле пакет отбрасывается.</p>
 <p>«Без ограничения» -- условный опыт с отключённым ограничителем, а не допустимое значение поля TTL в IP.</p>
 <div class="ip-scroll" tabindex="0" role="region" aria-label="Цикл пересылки между R1 и R2">
 <svg class="ip-network ip-ttl-network no-lightbox" viewBox="0 0 720 350" role="img" aria-labelledby="ip-ttl-title ip-ttl-desc">
