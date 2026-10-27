@@ -1,0 +1,17 @@
+<div class="course-demo ip-ttl-demo" data-ttl-loop>
+<div class="ip-ttl-controls" hidden data-ttl-controls><label><input type="checkbox" data-ttl-limited> Ограничить TTL</label><label>Начальный TTL <input type="range" min="1" max="255" value="3" data-ttl-range disabled><input type="number" min="1" max="255" value="3" aria-label="Точное значение начального TTL" data-ttl-number disabled></label><div class="ip-ttl-actions"><button type="button" data-ttl-play>Запуск</button><button type="button" data-ttl-step>Один шаг</button><button type="button" data-ttl-reset>В начало</button><button type="button" data-ttl-expand hidden>На весь экран</button></div></div>
+<p>TTL показан в пакете, готовом к отправке. Начало опыта -- после обработки на R1. Значение уменьшается при обработке пакета на следующем маршрутизаторе; при нуле пакет отбрасывается. Поэтому начальный TTL 2 даёт два перехода: R1 → R2 → R1.</p>
+<p>«Без ограничения» -- условный опыт с отключённым ограничителем, а не допустимое значение поля TTL в IP.</p>
+<div class="ip-scroll" tabindex="0" role="region" aria-label="Цикл пересылки между R1 и R2">
+<svg class="ip-network ip-ttl-network no-lightbox" viewBox="0 0 720 350" role="img" aria-labelledby="ip-ttl-title ip-ttl-desc">
+<title id="ip-ttl-title">Пакет в цикле R1 → R2 → R1</title><desc id="ip-ttl-desc">Ошибочные таблицы направляют пакет к B от R1 через R2 и обратно. Без ограничителя цикл продолжается; с ограниченным TTL пакет отбрасывается при исчерпании лимита.</desc>
+<defs><marker id="ip-ttl-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0 L10 5 L0 10 Z" style="fill:var(--accent);stroke:none"/></marker></defs>
+<path data-ttl-path="R1" class="ip-ttl-direction" d="M150 125 C150 45 570 45 570 125" marker-end="url(#ip-ttl-arrow)"/>
+<path data-ttl-path="R2" class="ip-ttl-direction" d="M570 125 C570 305 150 305 150 125" marker-end="url(#ip-ttl-arrow)"/>
+<text x="360" y="38" text-anchor="middle">R1: к B через R2</text><text x="360" y="330" text-anchor="middle">R2: к B через R1</text>
+<g class="ip-router ip-current" data-ttl-router="R1" transform="translate(150 180)"><circle r="32"/><path d="M-18 0 H18 M0 -18 V18 M-12 -6 L-18 0 L-12 6 M12 -6 L18 0 L12 6 M-6 -12 L0 -18 L6 -12 M-6 12 L0 18 L6 12"/></g><text x="80" y="188" text-anchor="middle" data-ttl-node-label="">R1</text>
+<g class="ip-router" data-ttl-router="R2" transform="translate(570 180)"><circle r="32"/><path d="M-18 0 H18 M0 -18 V18 M-12 -6 L-18 0 L-12 6 M12 -6 L18 0 L12 6 M-6 -12 L0 -18 L6 -12 M-6 12 L0 18 L6 12"/></g><text x="640" y="188" text-anchor="middle" data-ttl-node-label="">R2</text>
+<g data-ttl-packet="" transform="translate(150 125)"><rect x="-68" y="-24" width="136" height="48" rx="5"/><text y="-4" text-anchor="middle">Пакет к B</text><text y="16" text-anchor="middle" data-ttl-badge="">Без ограничения</text></g>
+</svg></div>
+<p class="ip-ttl-status" data-ttl-status role="status" aria-live="polite">Пакет на R1 готов к отправке. Для анимации нужен JavaScript.</p>
+</div>

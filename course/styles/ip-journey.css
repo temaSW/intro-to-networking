@@ -67,3 +67,41 @@
 
 .ip-network .ip-radio-link { stroke-dasharray:5 4; }
 .ip-network .ip-local-path { stroke:var(--accent); stroke-width:4; fill:none; }
+
+.ip-scroll .ip-ttl-network { min-width:36rem; }
+.ip-network .ip-ttl-direction { stroke:var(--accent); stroke-width:3; }
+.ip-ttl-steps { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:var(--demo-gap,1rem); list-style:none; padding:0; margin:1rem 0; }
+.ip-ttl-steps li { display:grid; align-content:start; gap:.6rem; padding:var(--demo-padding,1rem); border:1px solid var(--line); border-radius:.3rem; background:var(--surface-alt); }
+.ip-ttl-steps .ip-ttl-value { font-size:1.5rem; font-weight:700; color:var(--accent); }
+.ip-ttl-steps .ip-ttl-expired { border:2px solid var(--focus); }
+.ip-ttl-expired .ip-ttl-value { color:var(--focus); }
+@media(max-width:760px) { .ip-ttl-steps { grid-template-columns:minmax(0,1fr); } }
+
+.ip-ttl-controls { display:grid; gap:.8rem; margin-bottom:1rem; }
+.ip-ttl-controls[hidden] { display:none; }
+.ip-ttl-controls label { display:flex; align-items:center; flex-wrap:wrap; gap:.6rem; }
+.ip-ttl-controls input[type="range"] { flex:1; min-width:8rem; accent-color:var(--accent); }
+.ip-ttl-controls input[type="number"] { width:5rem; background:var(--surface); color:var(--ink); border:1px solid var(--line); padding:.4rem; }
+.ip-ttl-actions { display:flex; gap:.6rem; flex-wrap:wrap; }
+.ip-ttl-actions button { background:var(--surface); color:var(--accent); border:1px solid var(--accent); border-radius:.3rem; padding:.5rem .8rem; min-height:44px; }
+.ip-ttl-actions [data-ttl-play] { background:var(--accent); color:var(--page-bg); font-weight:700; }
+.ip-ttl-actions button:disabled { opacity:.55; }
+.ip-ttl-demo [data-ttl-packet] rect { fill:var(--accent-soft); stroke:var(--accent); stroke-width:2; }
+.ip-ttl-demo [data-ttl-packet] text { font-size:15px; }
+.ip-ttl-demo .ip-ttl-dropped rect { fill:var(--surface); stroke:var(--focus); stroke-dasharray:5 3; }
+.ip-ttl-demo .ip-ttl-dropped text { fill:var(--focus); }
+.ip-ttl-status { min-height:3.5em; }
+
+.ip-ttl-demo:fullscreen { background:var(--page-bg); color:var(--ink); overflow:auto; padding:1.5rem; }
+.ip-ttl-demo:fullscreen .ip-ttl-network { max-height:65vh; }
+
+.ip-scroll .ip-path-network { display:block; width:100%; min-width:40rem; height:auto; }
+.ip-path-demo [data-path-packet] rect { fill:var(--accent-soft); stroke:var(--accent); stroke-width:2; }
+.ip-path-demo [data-path-packet] text { font-size:16px; }
+.ip-path-demo .ip-path-reply rect { fill:var(--surface-alt); stroke-dasharray:5 3; }
+.ip-path-demo .ip-ttl-dropped rect { stroke:var(--focus); stroke-dasharray:5 3; }
+.ip-path-demo .ip-ttl-dropped text { fill:var(--focus); }
+.ip-ttl-actions [data-path-play] { background:var(--accent); color:var(--page-bg); font-weight:700; }
+.ip-trace-results { width:100%; min-width:35rem; font-variant-numeric:tabular-nums; }
+.ip-trace-results caption { caption-side:top; color:var(--ink); }
+.ip-path-demo:fullscreen .ip-path-network { max-height:45vh; }
