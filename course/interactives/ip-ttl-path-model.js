@@ -1,4 +1,4 @@
-export const NODES = ['A', 'R1', 'R2', 'R3', 'B'];
+export const NODES = ['A', 'R1', 'R3', 'R2', 'B'];
 
 export function packetJourney(initialTTL) {
   if (!Number.isInteger(initialTTL) || initialTTL < 1 || initialTTL > 255) throw new RangeError('TTL: целое от 1 до 255');
