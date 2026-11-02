@@ -1,0 +1,6 @@
+body-classes: lab-page
+toc: true
+toc-depth: 2
+format:
+  html:
+    css: ../styles/labs.css
