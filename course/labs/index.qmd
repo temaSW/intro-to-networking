@@ -1,5 +1,54 @@
 ---
 title: "Лабораторные"
+toc: false
 ---
 
-Здесь появятся лабораторные работы курса.
+Методички можно читать на сайте или скачать в PDF.
+
+::: {.lab-catalog}
+
+::: {.lab-card}
+## Цифровые виды модуляции
+
+ASK, PSK, FSK и QAM: сигналы, модулятор, демодулятор и влияние шума.
+
+::: {.lab-card-actions}
+[Читать на сайте](modulation.qmd){.lab-read}
+[Скачать PDF](pdf/modulation.pdf){.lab-download .lab-download-secondary download="modulation.pdf"}
+:::
+:::
+
+::: {.lab-card}
+## Дискретизация непрерывных сигналов
+
+Теорема Котельникова, спектры сигналов и восстановление с помощью фильтров низких частот.
+
+::: {.lab-card-actions}
+[Читать на сайте](discretization-kotelnikov.qmd){.lab-read}
+[Скачать PDF](pdf/discretization-kotelnikov.pdf){.lab-download .lab-download-secondary download="discretization-kotelnikov.pdf"}
+:::
+:::
+
+::: {.lab-card}
+## Изучение ИКМ-кодека
+
+Кодирование и декодирование, квантование и характеристики преобразования кодека.
+
+::: {.lab-card-actions}
+[Читать на сайте](pcm-codec.qmd){.lab-read}
+[Скачать PDF](pdf/pcm-codec.pdf){.lab-download .lab-download-secondary download="pcm-codec.pdf"}
+:::
+:::
+
+::: {.lab-card}
+## Система связи с ИКМ
+
+Формирование ИКМ-сигнала, временное разделение каналов и восстановление аналогового сигнала.
+
+::: {.lab-card-actions}
+[Читать на сайте](pcm-communication-system.qmd){.lab-read}
+[Скачать PDF](pdf/pcm-communication-system.pdf){.lab-download .lab-download-secondary download="pcm-communication-system.pdf"}
+:::
+:::
+
+:::

@@ -6,6 +6,8 @@ project:
     - "!lectures/07-transport-layer.qmd"
     - "!lectures/08-network-performance.qmd"
   resources:
+    - assets/labs/**
+    - labs/pdf/*.pdf
     - assets/scroll-demo/**
     - assets/lecture-04/keying-*.svg
     - interactives/*.js
