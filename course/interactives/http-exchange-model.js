@@ -10,6 +10,15 @@
     return Object.freeze({ method: 'GET', url: url.href });
   }
   async function receive(request, signal) {
+    if (scope.CourseHttpLocal) {
+      const response = await fetch(scope.CourseHttpLocal, {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({url: request.url}), signal
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Не удалось выполнить локальный запрос.');
+      return data;
+    }
     const response = await fetch(request.url, { method: request.method, cache: 'no-store', credentials: 'omit', signal });
     const bytes = new Uint8Array(await response.arrayBuffer());
     const type = response.headers.get('content-type') || 'Не указан';

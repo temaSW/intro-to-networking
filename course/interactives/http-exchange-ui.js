@@ -27,7 +27,7 @@
     }
     address.addEventListener('input', reset);
     find('reset').addEventListener('click', reset);
-    find('import').addEventListener('change', async event => {
+    find('import')?.addEventListener('change', async event => {
       const file = event.target.files[0];
       reset();
       event.target.value = '';
@@ -65,11 +65,15 @@
       find('request').hidden = false;
       find('request-text').textContent = `Действие: ${request.method}\nАдрес: ${request.url}`;
       find('open').href = request.url;
-      find('status').textContent = 'Браузер отправляет запрос и ожидает ответ…';
+      find('status').textContent = window.CourseHttpLocal ? 'curl отправляет запрос и ожидает ответ…' : 'Браузер отправляет запрос и ожидает ответ…';
       try {
         const received = await api.receive(request, controller.signal);
         if (generation !== current) return;
         result = received;
+        if (received.source === 'local-curl') {
+          find('provenance').textContent = `Настоящий ответ curl на этом компьютере. Запрос занял ${received.elapsedSeconds} с. Адрес после перенаправлений: ${received.finalUrl}`;
+          find('provenance').hidden = false;
+        }
         read.disabled = false;
         find('status').textContent = 'Ответ получен. Следующий шаг -- прочитать его.';
       } catch (error) {
@@ -77,7 +81,9 @@
         result = undefined;
         send.disabled = false;
         address.disabled = false;
-        find('status').textContent = 'Браузер не смог прочитать ответ. Возможны запрет чтения со стороны сайта (CORS), ограничения безопасности браузера или ошибка сети. Код HTTP неизвестен. Адрес можно открыть в отдельной вкладке по ссылке ниже.';
+        find('status').textContent = window.CourseHttpLocal
+          ? `Запрос не выполнен. ${error.message} Код HTTP неизвестен.`
+          : 'Браузер не смог прочитать ответ. Возможны запрет чтения со стороны сайта (CORS), ограничения безопасности браузера или ошибка сети. Код HTTP неизвестен. Адрес можно открыть в отдельной вкладке по ссылке ниже.';
       } finally {
         if (generation === current) root.setAttribute('aria-busy', 'false');
       }
