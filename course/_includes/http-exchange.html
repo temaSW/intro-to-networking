@@ -1,0 +1,40 @@
+```{=html}
+<div class="course-demo http-exchange" data-http-exchange aria-label="Настоящий запрос по введённому адресу">
+  <div class="http-controls">
+    <label>Адрес ресурса (http:// или https://)
+      <input data-http="address" type="url" inputmode="url" spellcheck="false" value="https://temasw.github.io/intro-to-networking/" placeholder="https://сайт/страница">
+    </label>
+    <div class="http-actions">
+      <button type="button" data-http="send">1. Отправить запрос</button>
+      <button type="button" data-http="read" disabled>2. Прочитать ответ</button>
+      <button type="button" data-http="render" disabled>3. Показать фрагмент страницы</button>
+      <button type="button" data-http="reset">Начать заново</button>
+    </div>
+  </div>
+  <p class="http-status" data-http="status" role="status" aria-live="polite"></p>
+  <section data-http="request" hidden>
+    <h3>Браузер отправляет</h3>
+    <pre data-http="request-text"></pre>
+    <p>Здесь показаны действие и адрес запроса. Остальные поля браузер формирует сам.</p>
+    <p><a data-http="open" target="_blank" rel="noopener noreferrer">Открыть адрес в отдельной вкладке</a></p>
+  </section>
+  <section data-http="response" hidden>
+    <h3>Сервер ответил</h3>
+    <dl class="http-fields">
+      <dt>Код результата</dt><dd data-http="code"></dd>
+      <dt>Тип содержимого (Content-Type)</dt><dd data-http="type"></dd>
+      <dt>Размер полученного тела, байт</dt><dd data-http="bytes"></dd>
+    </dl>
+    <details><summary>Тело ответа в текстовом виде</summary>
+      <p data-http="source-note"></p>
+      <pre class="http-source" tabindex="0"><code data-http="source"></code></pre>
+    </details>
+  </section>
+  <section data-http="preview" hidden>
+    <h3>Браузер обрабатывает содержимое</h3>
+    <p>Из полученного HTML выделены заголовок и первые абзацы. Это фрагмент документа без оформления исходного сайта.</p>
+    <div class="http-page" data-http="page"></div>
+  </section>
+  <noscript>Для отправки запроса кнопкой требуется JavaScript.</noscript>
+</div>
+```

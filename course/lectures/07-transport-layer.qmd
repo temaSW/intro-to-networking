@@ -314,12 +314,12 @@ A передаёт на B два файла по TCP. В первом соеди
 ::: {.callout-note icon=false appearance="simple"}
 ## 🚀 Что дальше?
 
-<div class="transport-scroll" tabindex="0" role="region" aria-label="Разные скорости участков сквозного пути">
-<svg class="transport-figure" style="min-width:42rem" viewBox="0 0 680 140" role="img" aria-label="Доступ 100 Мбит/с, агрегация 20 Мбит/с, ядро 1000 Мбит/с: что ограничивает результат всего пути?"><path d="M40 70 H640"/><rect x="20" y="35" width="190" height="70" rx="4"/><rect x="245" y="35" width="190" height="70" rx="4"/><rect x="470" y="35" width="190" height="70" rx="4"/><text x="115" y="63" text-anchor="middle">Доступ</text><text x="115" y="90" text-anchor="middle">100 Мбит/с</text><text x="340" y="63" text-anchor="middle">Агрегация</text><text x="340" y="90" text-anchor="middle">20 Мбит/с</text><text x="565" y="63" text-anchor="middle">Ядро</text><text x="565" y="90" text-anchor="middle">1000 Мбит/с</text></svg>
+<div class="transport-scroll" tabindex="0" role="region" aria-label="От потока байтов к запросу приложения">
+<svg class="transport-figure" style="min-width:42rem" viewBox="0 0 680 140" role="img" aria-label="Браузер передаёт поток байтов серверу: по каким правилам прочитать запрос?"><defs><marker id="transport-app-next-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 Z"/></marker></defs><rect x="20" y="35" width="180" height="70" rx="4"/><rect x="480" y="35" width="180" height="70" rx="4"/><path d="M200 70 H475" marker-end="url(#transport-app-next-arrow)"/><text x="110" y="76" text-anchor="middle">Браузер</text><text x="340" y="50" text-anchor="middle">Поток байтов</text><text x="570" y="63" text-anchor="middle">Сервер</text><text x="570" y="90" text-anchor="middle">Как прочитать?</text></svg>
 </div>
 
-Транспорт восстанавливает поток между приложениями. Но от чего зависит время получения результата? Почему ускорение одного участка может почти ничего не изменить для всего пути?
+Транспорт позволяет передавать данные между приложениями. Но как получатель узнаёт, что от него требуется, где заканчивается запрос и что означает ответ?
 
-Следующая тема: «Производительность сети: скорость, задержки и потери». Материал готовится.
+[Следующая тема: Прикладной уровень: от обмена байтами к сетевой службе →](08-application-layer.qmd)
 
 :::

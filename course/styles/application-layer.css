@@ -1,0 +1,39 @@
+.application-lecture main table { overflow-wrap:anywhere; }
+.application-lecture main table code { white-space:normal; overflow-wrap:anywhere; }
+.application-scroll { max-width:100%; overflow-x:auto; }
+.application-scroll:focus-visible { outline:2px solid var(--focus); outline-offset:3px; }
+.application-figure { display:block; width:100%; min-width:36rem; height:auto; color:var(--ink); }
+.application-figure text { fill:currentColor; font:16px system-ui,sans-serif; }
+.application-figure rect { fill:var(--surface-alt); stroke:var(--line); }
+.application-figure path { fill:none; stroke:var(--accent); stroke-width:2; }
+.application-figure marker path { fill:var(--accent); stroke:none; }
+.application-path { display:flex; align-items:center; gap:.65rem; margin-block:1.2rem; }
+.application-path>div { flex:1; min-width:0; padding:1rem; border:1px solid var(--line); border-radius:.4rem; background:var(--surface-alt); }
+.application-path strong,.application-path span:not(.application-link) { display:block; overflow-wrap:anywhere; }
+.application-path span:not(.application-link) { margin-top:.4rem; color:var(--muted); }
+.application-link { color:var(--accent); font-size:1.5rem; }
+.http-exchange [hidden] { display:none !important; }
+.http-controls { display:grid; gap:1rem; }
+.http-controls label { display:grid; gap:.4rem; }
+.http-controls input,.http-actions button { min-height:48px; padding:.5rem .75rem; border:1px solid var(--line); border-radius:.35rem; background:var(--surface); color:var(--ink); font:inherit; }
+.http-controls input { width:100%; min-width:0; }
+.http-actions { display:flex; flex-wrap:wrap; gap:.6rem; }
+.http-actions button:first-child { background:var(--accent); color:var(--page-bg); font-weight:700; }
+.http-actions button:disabled { opacity:.55; }
+.http-exchange :focus-visible { outline:2px solid var(--focus); outline-offset:3px; }
+.http-exchange section { margin-top:1rem; padding-top:1rem; border-top:1px solid var(--line); }
+.http-exchange h3 { font-size:1.2rem; }
+.http-exchange pre { white-space:pre-wrap; overflow-wrap:anywhere; color:var(--ink); }
+.http-status { min-height:3rem; margin-top:1rem; }
+.http-fields { display:grid; grid-template-columns:minmax(9rem,1fr) 2fr; gap:.4rem 1rem; }
+.http-fields dd { margin:0; overflow-wrap:anywhere; }
+.http-source { max-height:18rem; overflow:auto; }
+.http-page { background:var(--surface); padding:1rem; border:1px solid var(--line); border-radius:.4rem; }
+.http-page h4 { margin-top:0; }
+@media(max-width:700px) {
+  .http-fields { grid-template-columns:1fr; }
+  .http-fields dd { margin-bottom:.6rem; }
+  .http-actions { flex-direction:column; }
+  .application-path { flex-direction:column; align-items:stretch; }
+  .application-link { align-self:center; transform:rotate(90deg); }
+}
