@@ -10,6 +10,12 @@
       <button type="button" data-http="render" disabled>3. Показать фрагмент страницы</button>
       <button type="button" data-http="reset">Начать заново</button>
     </div>
+    <details class="http-actions-import"><summary>Получить ответ через GitHub Actions</summary>
+      <p>Если сайт не разрешает браузеру читать ответ, запрос можно выполнить на машине GitHub. Для запуска нужен вход в GitHub и право запускать задания этого репозитория.</p>
+      <p><a href="https://github.com/temaSW/intro-to-networking/actions/workflows/http-probe.yml" target="_blank" rel="noopener noreferrer">Открыть эксперимент в GitHub</a>: Run workflow → поле url → Run workflow. После завершения задания в разделе Artifacts доступен архив http-response. Из него нужен файл response.json.</p>
+      <label>Открыть полученный response.json<input data-http="import" type="file" accept=".json,application/json"></label>
+      <p>Адрес и результат задания доступны в GitHub. В этом режиме запрос выполняет машина GitHub, а страница читает сохранённый ответ.</p>
+    </details>
   </div>
   <p class="http-status" data-http="status" role="status" aria-live="polite"></p>
   <section data-http="request" hidden>
@@ -20,6 +26,7 @@
   </section>
   <section data-http="response" hidden>
     <h3>Сервер ответил</h3>
+    <p data-http="provenance" hidden></p>
     <dl class="http-fields">
       <dt>Код результата</dt><dd data-http="code"></dd>
       <dt>Тип содержимого (Content-Type)</dt><dd data-http="type"></dd>

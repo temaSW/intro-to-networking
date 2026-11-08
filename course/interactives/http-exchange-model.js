@@ -25,5 +25,19 @@
       textual
     };
   }
-  scope.CourseHttpExchange = Object.freeze({ requestFor, receive });
+  function importCapture(data) {
+    if (!data || data.schema !== 'opisis-http-probe-v1' || data.source !== 'github-actions' ||
+        !Number.isInteger(data.status) || data.status < 100 || data.status > 599 ||
+        typeof data.type !== 'string' || typeof data.text !== 'string' || data.text.length > 300000 ||
+        !Number.isInteger(data.byteLength) || data.byteLength < 0 || data.byteLength > 256000 ||
+        typeof data.textual !== 'boolean' || typeof data.truncated !== 'boolean' ||
+        typeof data.requestedAt !== 'string' || !Number.isFinite(Date.parse(data.requestedAt)) ||
+        typeof data.elapsedSeconds !== 'number' || !Number.isFinite(data.elapsedSeconds) || data.elapsedSeconds < 0) {
+      throw new Error('Файл не соответствует формату эксперимента HTTP.');
+    }
+    const request = requestFor(data.request?.url || '');
+    if (data.request?.method !== 'GET') throw new Error('Ожидался результат запроса GET.');
+    return { request, result: data };
+  }
+  scope.CourseHttpExchange = Object.freeze({ requestFor, receive, importCapture });
 })(window);

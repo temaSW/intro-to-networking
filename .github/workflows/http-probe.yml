@@ -1,0 +1,33 @@
+name: HTTP classroom experiment
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: 'Public HTTP/HTTPS address (the request and result are public)'
+        required: true
+        default: 'https://www.google.com/'
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  request:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Make one HTTP request
+        env:
+          TARGET_URL: ${{ inputs.url }}
+        run: python3 scripts/http_probe.py --url "$TARGET_URL" --output "$RUNNER_TEMP/http-probe-result/response.json"
+      - name: Save response for the lecture page
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: http-response
+          path: ${{ runner.temp }}/http-probe-result/response.json
+          retention-days: 1
+          if-no-files-found: error

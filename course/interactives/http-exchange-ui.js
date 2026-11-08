@@ -22,10 +22,36 @@
       for (const name of ['request', 'response', 'preview']) find(name).hidden = true;
       find('source').textContent = '';
       find('page').replaceChildren();
+      find('provenance').hidden = true;
       find('status').textContent = 'Укажите адрес. Запрос ещё не отправлен.';
     }
     address.addEventListener('input', reset);
     find('reset').addEventListener('click', reset);
+    find('import').addEventListener('change', async event => {
+      const file = event.target.files[0];
+      reset();
+      event.target.value = '';
+      if (!file) return;
+      const current = generation;
+      try {
+        if (file.size > 2000000) throw new Error('Файл слишком большой для результата этого эксперимента.');
+        const data = api.importCapture(JSON.parse(await file.text()));
+        if (generation !== current) return;
+        result = data.result;
+        address.value = data.request.url;
+        address.disabled = true;
+        send.disabled = true;
+        read.disabled = false;
+        find('request').hidden = false;
+        find('request-text').textContent = `Действие: GET\nАдрес: ${data.request.url}\nИсполнитель запроса: машина GitHub Actions`;
+        find('open').href = data.request.url;
+        find('provenance').textContent = `Сохранённый ответ GitHub Actions. Время запроса: ${new Date(result.requestedAt).toLocaleString('ru-RU')}. Выполнение HTTP-запроса: ${result.elapsedSeconds} с; ожидание запуска задания сюда не входит.`;
+        find('provenance').hidden = false;
+        find('status').textContent = 'Сохранённый ответ загружен. Следующий шаг -- прочитать его.';
+      } catch (error) {
+        if (generation === current) find('status').textContent = `Не удалось открыть результат. ${error instanceof SyntaxError ? 'Некорректный JSON.' : error.message}`;
+      }
+    });
     send.addEventListener('click', async () => {
       reset();
       const current = generation;
@@ -63,7 +89,7 @@
       find('type').textContent = result.type;
       find('bytes').textContent = result.byteLength.toLocaleString('ru-RU');
       find('source').textContent = result.textual ? result.text.slice(0, 3000) : 'Бинарное содержимое не отображается как текст.';
-      find('source-note').textContent = !result.textual ? 'Содержимое получено, его тип указан выше.' : result.text.length > 3000 ? 'Первые 3000 символов тела ответа.' : 'Тело ответа целиком.';
+      find('source-note').textContent = (!result.textual ? 'Содержимое получено, его тип указан выше.' : result.text.length > 3000 ? 'Первые 3000 символов тела ответа.' : 'Тело ответа целиком.') + (result.truncated ? ' Сохранение было ограничено первыми 256 000 байтами; размер выше относится к сохранённой части.' : '');
       render.disabled = !/\btext\/html\b/i.test(result.type);
       read.disabled = true;
       find('status').textContent = result.status === 404
