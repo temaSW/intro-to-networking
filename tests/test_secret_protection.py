@@ -153,8 +153,8 @@ def test_scanner_execution_error_fails_closed(repository, tmp_path, monkeypatch,
 
 def test_publication_has_no_failure_bypass():
     workflows = list((ROOT / ".github" / "workflows").glob("*.y*ml"))
-    assert len(workflows) == 1
-    workflow = workflows[0].read_text(encoding="utf-8")
+    assert {path.name for path in workflows} == {"check.yml", "http-probe.yml"}
+    workflow = (ROOT / ".github" / "workflows" / "check.yml").read_text(encoding="utf-8")
     source = workflow.split("  source-scan:\n")[1].split("  render:\n")[0]
     render = workflow.split("  render:\n")[1].split("  deploy:\n")[0]
     deploy = workflow.split("  deploy:\n")[1]
@@ -169,3 +169,16 @@ def test_publication_has_no_failure_bypass():
     assert "github.event_name != 'pull_request' && github.ref == 'refs/heads/main'" in deploy
     assert "pages: write" not in source + render
     assert "id-token: write" not in source + render
+
+
+def test_http_experiment_cannot_publish_site():
+    workflow = (ROOT / ".github" / "workflows" / "http-probe.yml").read_text(encoding="utf-8")
+    assert "workflow_dispatch:" in workflow
+    assert "contents: read" in workflow
+    assert "persist-credentials: false" in workflow
+    assert "timeout-minutes: 2" in workflow
+    assert "${{ inputs.url }}" in workflow.split("env:\n")[1].split("run:")[0]
+    assert '"$TARGET_URL"' in workflow
+    assert "${{ inputs.url }}" not in workflow.split("run:")[1]
+    for forbidden in ("pages:", "id-token:", "contents: write", "secrets.", "pull_request_target", "upload-pages-artifact", "deploy-pages", "git push", "continue-on-error"):
+        assert forbidden not in workflow
