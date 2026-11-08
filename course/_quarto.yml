@@ -3,7 +3,6 @@ project:
   output-dir: _site
   render:
     - "**/*.qmd"
-    - "!lectures/07-transport-layer.qmd"
     - "!lectures/08-network-performance.qmd"
   resources:
     - assets/labs/**

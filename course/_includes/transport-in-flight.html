@@ -1,0 +1,14 @@
+<div class="transport-scroll" tabindex="0" role="region" aria-label="Отправка нескольких сегментов до получения первого подтверждения">
+<svg class="transport-figure" viewBox="0 0 800 435" role="img" aria-labelledby="transport-flight-title transport-flight-desc">
+<defs><marker id="transport-flight-arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="12" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto"><path d="M1 1 L11 6 L1 11 Z" style="fill:var(--accent);stroke:none"/></marker></defs>
+<title id="transport-flight-title">Три сегмента в полёте</title>
+<desc id="transport-flight-desc">Время идёт вниз. A отправляет байты 1–1000, 1001–2000 и 2001–3000, прежде чем к нему приходит первое подтверждение. B отправляет ACK 1001, ACK 2001 и ACK 3001. Каждое подтверждает все предшествующие байты.</desc>
+<text x="100" y="25" text-anchor="middle">Отправитель A</text><text x="650" y="25" text-anchor="middle">Получатель B</text>
+<path d="M100 40 V415 M650 40 V415"/>
+<path d="M100 60 L650 170" marker-end="url(#transport-flight-arrow)"/><path d="M100 100 L650 210" marker-end="url(#transport-flight-arrow)"/><path d="M100 140 L650 250" marker-end="url(#transport-flight-arrow)"/>
+<text style="paint-order:stroke;stroke:var(--page-bg);stroke-width:5px;stroke-linejoin:round" x="310" y="80" text-anchor="middle">Байты 1–1000</text><text style="paint-order:stroke;stroke:var(--page-bg);stroke-width:5px;stroke-linejoin:round" x="310" y="120" text-anchor="middle">Байты 1001–2000</text><text style="paint-order:stroke;stroke:var(--page-bg);stroke-width:5px;stroke-linejoin:round" x="310" y="160" text-anchor="middle">Байты 2001–3000</text>
+<path d="M650 185 L100 315" marker-end="url(#transport-flight-arrow)"/><path d="M650 225 L100 355" marker-end="url(#transport-flight-arrow)"/><path d="M650 265 L100 395" marker-end="url(#transport-flight-arrow)"/>
+<text style="paint-order:stroke;stroke:var(--page-bg);stroke-width:5px;stroke-linejoin:round" x="435" y="257" text-anchor="middle">ACK 1001</text><text style="paint-order:stroke;stroke:var(--page-bg);stroke-width:5px;stroke-linejoin:round" x="435" y="297" text-anchor="middle">ACK 2001</text><text style="paint-order:stroke;stroke:var(--page-bg);stroke-width:5px;stroke-linejoin:round" x="435" y="337" text-anchor="middle">ACK 3001</text>
+<text x="25" y="235" transform="rotate(-90 25 235)" text-anchor="middle">Время</text><path d="M25 270 V320" marker-end="url(#transport-flight-arrow)"/>
+</svg>
+</div>

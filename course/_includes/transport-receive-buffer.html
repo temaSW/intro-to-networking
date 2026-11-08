@@ -1,0 +1,10 @@
+<div class="transport-scroll" tabindex="0" role="region" aria-label="Окно приёма: ACK 1001 и 4000 байт">
+<svg class="transport-figure" viewBox="0 0 760 190" role="img" aria-labelledby="transport-buffer-title transport-buffer-desc">
+<title id="transport-buffer-title">Окно приёма в пространстве номеров байтов</title>
+<desc id="transport-buffer-desc">Слева байты до 1000 включительно уже подтверждены. Справа объявленное окно на 4000 байт начиная с 1001. Правую границу нужно определить. Среди подтверждённых байтов могут оставаться ещё не прочитанные приложением.</desc>
+<rect x="20" y="45" width="250" height="60"/><rect x="270" y="45" width="460" height="60" style="fill:var(--surface);stroke-dasharray:6 4"/>
+<text x="145" y="80" text-anchor="middle">Подтверждены</text><text x="500" y="80" text-anchor="middle">Объявленное окно · 4000 байт</text>
+<text x="260" y="135" text-anchor="end">…1000</text><text x="280" y="135">1001…</text><text x="720" y="135" text-anchor="end">…?</text>
+<text x="20" y="177">Подтверждённые байты могут ещё ожидать чтения приложением.</text>
+</svg>
+</div>

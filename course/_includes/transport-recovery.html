@@ -1,0 +1,18 @@
+<div class="transport-scroll" tabindex="0" role="region" aria-label="Передача трёх частей данных с потерей второй">
+<svg class="transport-figure" viewBox="0 0 800 460" role="img" aria-labelledby="transport-recovery-title transport-recovery-desc">
+<defs><marker id="transport-recovery-arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="12" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto"><path d="M1 1 L11 6 L1 11 Z" style="fill:var(--accent);stroke:none"/></marker></defs>
+<title id="transport-recovery-title">Потеря и повтор в одном направлении TCP</title>
+<desc id="transport-recovery-desc">Время идёт вниз. A отправляет ABCD, затем EFGH, которое теряется, затем IJKL. B возвращает подтверждения, значения которых предстоит определить. После ожидания A повторяет EFGH, B отвечает новым подтверждением.</desc>
+<text x="100" y="25" text-anchor="middle">Отправитель A</text><text x="650" y="25" text-anchor="middle">Получатель B</text>
+<path d="M100 40 V440 M650 40 V440"/>
+<path d="M100 65 L650 100" marker-end="url(#transport-recovery-arrow)"/><text x="365" y="67" text-anchor="middle">ABCD · SEQ 1</text>
+<path d="M650 115 L100 150" marker-end="url(#transport-recovery-arrow)"/><text x="365" y="120" text-anchor="middle">ACK ?</text>
+<path d="M100 170 L395 190"/><path d="M385 179" marker-end="url(#transport-recovery-arrow)"/><path d="M405 179" marker-end="url(#transport-recovery-arrow)"/><text x="245" y="168" text-anchor="middle">EFGH · SEQ 5</text><text x="430" y="195">Потеря</text>
+<path d="M100 220 L650 255" marker-end="url(#transport-recovery-arrow)"/><text x="365" y="222" text-anchor="middle">IJKL · SEQ 9</text>
+<path d="M650 270 L100 305" marker-end="url(#transport-recovery-arrow)"/><text x="365" y="275" text-anchor="middle">ACK ?</text>
+<text x="110" y="337">Повтор после ожидания</text>
+<path d="M100 355 L650 390" marker-end="url(#transport-recovery-arrow)"/><text x="365" y="357" text-anchor="middle">Повтор EFGH · SEQ 5</text>
+<path d="M650 405 L100 440" marker-end="url(#transport-recovery-arrow)"/><text x="365" y="412" text-anchor="middle">ACK ?</text>
+<text x="25" y="260" transform="rotate(-90 25 260)" text-anchor="middle">Время</text><path d="M25 295 V345" marker-end="url(#transport-recovery-arrow)"/>
+</svg>
+</div>

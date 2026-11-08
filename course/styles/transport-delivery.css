@@ -19,6 +19,7 @@
 .transport-figure { width:100%; height:auto; color:var(--ink); }
 .transport-figure text { fill:currentColor; font:16px system-ui,sans-serif; }
 .transport-figure path,.transport-figure line { fill:none; stroke:var(--accent); stroke-width:2; }
+.transport-figure marker path { fill:var(--accent); stroke:none; }
 .transport-figure rect { fill:var(--surface-alt); stroke:var(--line); }
 .transport-scroll { overflow-x:auto; max-width:100%; }
 .transport-scroll svg { min-width:42rem; }
