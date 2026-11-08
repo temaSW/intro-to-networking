@@ -31,7 +31,12 @@
       send.disabled = true;
       root.setAttribute('aria-busy', 'true');
       find('request').hidden = false;
-      find('request-text').textContent = `Действие: ${request.method}\nАдрес: ${request.url}`;
+      const url = new URL(request.url);
+      const target = url.pathname + url.search;
+      find('method').textContent = request.method;
+      find('host').textContent = url.host;
+      find('target').textContent = target;
+      find('request-text').textContent = `${request.method} ${target} HTTP/1.1\nHost: ${url.host}\n\n`;
       find('open').href = request.url;
       find('status').textContent = 'Браузер отправляет запрос и ожидает ответ…';
       try {
@@ -53,6 +58,12 @@
       if (!result) return;
       find('response').hidden = false;
       find('code').textContent = String(result.status);
+      find('code-meaning').textContent = result.status === 200
+        ? 'Запрос выполнен успешно: сервер вернул содержимое страницы.'
+        : result.status === 404 ? 'Запрошенный ресурс не найден либо сервер не раскрывает его существование.'
+        : result.status >= 500 ? 'Сервер сообщил об ошибке при обработке запроса.'
+        : result.status >= 400 ? 'Сервер не выполнил запрос; причина уточняется кодом ответа.'
+        : 'Сервер сообщил результат обращения этим кодом.';
       find('type').textContent = result.type;
       find('bytes').textContent = result.byteLength.toLocaleString('ru-RU');
       find('source').textContent = result.textual ? result.text.slice(0, 3000) : 'Бинарное содержимое не отображается как текст.';

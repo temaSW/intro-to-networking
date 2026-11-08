@@ -26,6 +26,7 @@
 .http-status { min-height:3rem; margin-top:1rem; }
 .http-fields { display:grid; grid-template-columns:minmax(9rem,1fr) 2fr; gap:.4rem 1rem; }
 .http-fields dd { margin:0; overflow-wrap:anywhere; }
+.http-field-note { display:block; margin-top:.25rem; color:var(--muted); font-size:.95rem; }
 .http-source { max-height:18rem; overflow:auto; }
 .http-page { background:var(--surface); padding:1rem; border:1px solid var(--line); border-radius:.4rem; }
 .http-page h4 { margin-top:0; }

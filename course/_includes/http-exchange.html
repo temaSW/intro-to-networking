@@ -12,17 +12,24 @@
   <p class="http-status" data-http="status" role="status" aria-live="polite"></p>
   <section data-http="request" hidden>
     <h3>Браузер отправляет</h3>
+    <dl class="http-fields">
+      <dt>Действие</dt><dd><code data-http="method"></code> -- получить ресурс</dd>
+      <dt>Сайт</dt><dd><code data-http="host"></code></dd>
+      <dt>Ресурс внутри сайта</dt><dd><code data-http="target"></code></dd>
+    </dl>
+    <p>Тот же запрос в записи HTTP/1.1:</p>
     <pre data-http="request-text"></pre>
-    <p>Здесь показаны действие и адрес запроса. Остальные поля браузер формирует сам.</p>
+    <p>В первой строке -- действие, путь и версия протокола. Поле <code>Host</code> указывает сайт. Показано начало сообщения; остальные поля опущены. Браузер может использовать другую версию HTTP, смысл обращения сохраняется.</p>
     <p><a data-http="open" target="_blank" rel="noopener noreferrer">Открыть адрес в отдельной вкладке</a></p>
   </section>
   <section data-http="response" hidden>
     <h3>Сервер ответил</h3>
     <dl class="http-fields">
-      <dt>Код результата</dt><dd data-http="code"></dd>
-      <dt>Тип содержимого (Content-Type)</dt><dd data-http="type"></dd>
-      <dt>Размер полученного тела, байт</dt><dd data-http="bytes"></dd>
+      <dt>Код результата</dt><dd><code data-http="code"></code><span class="http-field-note" data-http="code-meaning"></span></dd>
+      <dt>Тип содержимого (Content-Type)</dt><dd><code data-http="type"></code><span class="http-field-note">Позволяет определить, как обрабатывать полученные данные.</span></dd>
+      <dt>Размер полученного тела, байт</dt><dd><span data-http="bytes"></span><span class="http-field-note">Объём содержимого, полученного браузером. Служебные поля ответа сюда не входят.</span></dd>
     </dl>
+    <p>Код и поля описывают результат обращения. Тело ответа -- сами переданные данные; его текст доступен ниже.</p>
     <details><summary>Тело ответа в текстовом виде</summary>
       <p data-http="source-note"></p>
       <pre class="http-source" tabindex="0"><code data-http="source"></code></pre>
