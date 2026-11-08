@@ -14,9 +14,8 @@
 .application-link { color:var(--accent); font-size:1.5rem; }
 .http-exchange [hidden] { display:none !important; }
 .http-controls { display:grid; gap:1rem; }
-.http-controls label { display:grid; gap:.4rem; }
-.http-controls input,.http-actions button { min-height:48px; padding:.5rem .75rem; border:1px solid var(--line); border-radius:.35rem; background:var(--surface); color:var(--ink); font:inherit; }
-.http-controls input { width:100%; min-width:0; }
+.http-controls p { overflow-wrap:anywhere; }
+.http-actions button { min-height:48px; padding:.5rem .75rem; border:1px solid var(--line); border-radius:.35rem; background:var(--surface); color:var(--ink); font:inherit; }
 .http-actions { display:flex; flex-wrap:wrap; gap:.6rem; }
 .http-actions button:first-child { background:var(--accent); color:var(--page-bg); font-weight:700; }
 .http-actions button:disabled { opacity:.55; }
@@ -30,9 +29,6 @@
 .http-source { max-height:18rem; overflow:auto; }
 .http-page { background:var(--surface); padding:1rem; border:1px solid var(--line); border-radius:.4rem; }
 .http-page h4 { margin-top:0; }
-.http-download { display:inline-flex; align-items:center; min-height:48px; padding:.7rem 1rem; background:var(--accent); color:var(--page-bg); border-radius:.35rem; font-weight:700; text-decoration:none; }
-.http-download:hover { color:var(--page-bg); text-decoration:underline; }
-.http-download:focus-visible { outline:2px solid var(--focus); outline-offset:3px; }
 @media(max-width:700px) {
   .http-fields { grid-template-columns:1fr; }
   .http-fields dd { margin-bottom:.6rem; }

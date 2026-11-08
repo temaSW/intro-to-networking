@@ -4,7 +4,6 @@
   if (!api) return;
   for (const root of document.querySelectorAll('[data-http-exchange]')) {
     const find = name => root.querySelector(`[data-http="${name}"]`);
-    const address = find('address');
     const send = find('send');
     const read = find('read');
     const render = find('render');
@@ -14,7 +13,6 @@
       controller?.abort();
       controller = undefined;
       result = undefined;
-      address.disabled = false;
       send.disabled = false;
       read.disabled = true;
       render.disabled = true;
@@ -22,68 +20,31 @@
       for (const name of ['request', 'response', 'preview']) find(name).hidden = true;
       find('source').textContent = '';
       find('page').replaceChildren();
-      find('provenance').hidden = true;
-      find('status').textContent = 'Укажите адрес. Запрос ещё не отправлен.';
+      find('status').textContent = 'Запрос главной страницы курса ещё не отправлен.';
     }
-    address.addEventListener('input', reset);
     find('reset').addEventListener('click', reset);
-    find('import')?.addEventListener('change', async event => {
-      const file = event.target.files[0];
-      reset();
-      event.target.value = '';
-      if (!file) return;
-      const current = generation;
-      try {
-        if (file.size > 2000000) throw new Error('Файл слишком большой для результата этого эксперимента.');
-        const data = api.importCapture(JSON.parse(await file.text()));
-        if (generation !== current) return;
-        result = data.result;
-        address.value = data.request.url;
-        address.disabled = true;
-        send.disabled = true;
-        read.disabled = false;
-        find('request').hidden = false;
-        find('request-text').textContent = `Действие: GET\nАдрес: ${data.request.url}\nИсполнитель запроса: машина GitHub Actions`;
-        find('open').href = data.request.url;
-        find('provenance').textContent = `Сохранённый ответ GitHub Actions. Время запроса: ${new Date(result.requestedAt).toLocaleString('ru-RU')}. Выполнение HTTP-запроса: ${result.elapsedSeconds} с; ожидание запуска задания сюда не входит.`;
-        find('provenance').hidden = false;
-        find('status').textContent = 'Сохранённый ответ загружен. Следующий шаг -- прочитать его.';
-      } catch (error) {
-        if (generation === current) find('status').textContent = `Не удалось открыть результат. ${error instanceof SyntaxError ? 'Некорректный JSON.' : error.message}`;
-      }
-    });
     send.addEventListener('click', async () => {
       reset();
       const current = generation;
-      let request;
-      try { request = api.requestFor(address.value); }
-      catch (error) { find('status').textContent = error.message; return; }
+      const request = api.requestFor();
       controller = new AbortController();
-      address.disabled = true;
       send.disabled = true;
       root.setAttribute('aria-busy', 'true');
       find('request').hidden = false;
       find('request-text').textContent = `Действие: ${request.method}\nАдрес: ${request.url}`;
       find('open').href = request.url;
-      find('status').textContent = window.CourseHttpLocal ? 'curl отправляет запрос и ожидает ответ…' : 'Браузер отправляет запрос и ожидает ответ…';
+      find('status').textContent = 'Браузер отправляет запрос и ожидает ответ…';
       try {
         const received = await api.receive(request, controller.signal);
         if (generation !== current) return;
         result = received;
-        if (received.source === 'local-curl') {
-          find('provenance').textContent = `Настоящий ответ curl на этом компьютере. Запрос занял ${received.elapsedSeconds} с. Адрес после перенаправлений: ${received.finalUrl}`;
-          find('provenance').hidden = false;
-        }
         read.disabled = false;
         find('status').textContent = 'Ответ получен. Следующий шаг -- прочитать его.';
       } catch (error) {
         if (generation !== current || error.name === 'AbortError') return;
         result = undefined;
         send.disabled = false;
-        address.disabled = false;
-        find('status').textContent = window.CourseHttpLocal
-          ? `Запрос не выполнен. ${error.message} Код HTTP неизвестен.`
-          : 'Браузер не смог прочитать ответ. Возможны запрет чтения со стороны сайта (CORS), ограничения безопасности браузера или ошибка сети. Код HTTP неизвестен. Адрес можно открыть в отдельной вкладке по ссылке ниже.';
+        find('status').textContent = 'Не удалось получить ответ сайта курса. Проверьте подключение к Интернету и повторите запрос.';
       } finally {
         if (generation === current) root.setAttribute('aria-busy', 'false');
       }
@@ -95,7 +56,7 @@
       find('type').textContent = result.type;
       find('bytes').textContent = result.byteLength.toLocaleString('ru-RU');
       find('source').textContent = result.textual ? result.text.slice(0, 3000) : 'Бинарное содержимое не отображается как текст.';
-      find('source-note').textContent = (!result.textual ? 'Содержимое получено, его тип указан выше.' : result.text.length > 3000 ? 'Первые 3000 символов тела ответа.' : 'Тело ответа целиком.') + (result.truncated ? ' Сохранение было ограничено первыми 256 000 байтами; размер выше относится к сохранённой части.' : '');
+      find('source-note').textContent = result.text.length > 3000 ? 'Первые 3000 символов тела ответа.' : 'Тело ответа целиком.';
       render.disabled = !/\btext\/html\b/i.test(result.type);
       read.disabled = true;
       find('status').textContent = result.status === 404
