@@ -1,0 +1,13 @@
+<div class="transport-scroll" tabindex="0" role="region" aria-label="Завершение двух направлений TCP">
+<svg class="transport-figure" viewBox="0 0 800 390" role="img" aria-labelledby="transport-close-title transport-close-desc">
+<title id="transport-close-title">A заканчивает отправку, B ещё передаёт ответ</title>
+<desc id="transport-close-desc">Время идёт вниз. A передаёт FIN, B подтверждает ACK. Затем B передаёт данные ответа и FIN. A подтверждает данные и FIN. Номера для краткости не показаны; линии данных обозначают обмены, не точное число сегментов.</desc>
+<defs><marker id="transport-close-arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="12" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto"><path d="M1 1 L11 6 L1 11 Z" style="fill:var(--accent);stroke:none"/></marker></defs>
+<text x="100" y="25" text-anchor="middle">Сторона A</text><text x="650" y="25" text-anchor="middle">Сторона B</text><path d="M100 40 V375 M650 40 V375"/>
+<path d="M100 60 L650 90" marker-end="url(#transport-close-arrow)"/><text x="375" y="59" text-anchor="middle">FIN: больше данных от A не будет</text>
+<path d="M650 115 L100 145" marker-end="url(#transport-close-arrow)"/><text x="375" y="114" text-anchor="middle">ACK: окончание A принято</text>
+<path d="M650 175 L100 205" marker-end="url(#transport-close-arrow)"/><text x="375" y="174" text-anchor="middle">Данные ответа B</text>
+<path d="M650 245 L100 275" marker-end="url(#transport-close-arrow)"/><text x="375" y="244" text-anchor="middle">FIN: больше данных от B не будет</text>
+<path d="M100 320 L650 350" marker-end="url(#transport-close-arrow)"/><text x="375" y="319" text-anchor="middle">ACK: данные и окончание B приняты</text>
+<text x="25" y="220" transform="rotate(-90 25 220)" text-anchor="middle">Время</text><path d="M25 250 V300" marker-end="url(#transport-close-arrow)"/>
+</svg></div>
