@@ -1,0 +1,58 @@
+<div class="course-demo arp-demo" data-security-arp>
+<div class="arp-controls" data-arp-controls hidden>
+<div class="arp-buttons" role="group" aria-label="Шаги локального обмена">
+<button type="button" data-arp="previous">← Назад</button>
+<button type="button" data-arp="next">Следующий шаг →</button>
+<button type="button" data-arp="reset">К началу</button>
+</div>
+<label>Действие X с пакетом <select data-arp="action"><option value="forward">Переслать к G</option><option value="drop">Отбросить</option></select></label>
+</div>
+<div class="arp-view-switch" role="group" aria-label="Представление обмена" data-arp="views" hidden>
+<button type="button" data-arp-view="network" aria-pressed="true">Сеть</button>
+<button type="button" data-arp-view="exchange" aria-pressed="false">Обмен</button>
+</div>
+<p class="arp-step-title" data-arp="title">1 / 5 · Обычная передача</p>
+<div class="arp-state-grid">
+<div data-arp="network" class="arp-graph-scroll" tabindex="0" role="region" aria-label="Схема локального обмена; на узком экране прокручивается">
+<svg class="arp-graph" viewBox="0 0 800 290" role="img" aria-label="Локальная передача через шлюз G" aria-describedby="arp-demo-description">
+<desc id="arp-demo-description" data-arp="description">Компьютер S передаёт кадр напрямую шлюзу G. Узел X находится в том же локальном сегменте. Конечный сервер R расположен за шлюзом.</desc>
+<defs><marker data-arp="marker" id="arp-initial-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z"/></marker></defs>
+<path d="M180 70H620 M165 105L343 205 M457 205L635 105" class="arp-idle-path"/>
+<g data-arp="direct"><path d="M180 70H615" class="arp-data-path" data-arp-arrow marker-end="url(#arp-initial-arrow)"/><text x="400" y="52" text-anchor="middle">Кадр S → G</text></g>
+<g data-arp="message" hidden><path d="M330 229Q115 255 115 132" class="arp-message-path" data-arp-arrow/><rect x="25" y="178" width="250" height="60" rx="5" class="arp-message-box"/><text x="150" y="203" text-anchor="middle">«IP G -- это MAC X»</text><text x="150" y="225" text-anchor="middle" class="arp-small">ARP-сообщение от X к S</text></g>
+<g data-arp="toX" hidden><path d="M165 105L343 205" class="arp-data-path" data-arp-arrow/><text x="135" y="157" text-anchor="middle">Кадр S → X</text></g>
+<g data-arp="toG" hidden><path d="M457 205L635 105" class="arp-data-path" data-arp-arrow/><text x="670" y="157" text-anchor="middle">Кадр X → G</text></g>
+<g class="arp-device"><path d="M78 38H162V92H78ZM120 92V104M98 104H142" class="arp-icon"/><text x="120" y="128" text-anchor="middle">Компьютер S</text></g>
+<g class="arp-device"><rect x="640" y="53" width="80" height="35" rx="5" class="arp-router"/><path d="M655 53V35M705 53V35M650 70H658M665 70H673M700 70H710" class="arp-icon"/><text x="680" y="128" text-anchor="middle">Шлюз G</text></g>
+<g class="arp-device arp-x"><rect x="330" y="187" width="140" height="64" rx="6"/><text x="400" y="214" text-anchor="middle">Узел X</text><text x="400" y="237" text-anchor="middle" class="arp-small">Тот же сегмент</text></g>
+<g data-arp="dropped" hidden><path d="M492 205L511 224M511 205L492 224" class="arp-stop"/><text x="590" y="249" text-anchor="middle" class="arp-small">Пакет отброшен</text></g>
+<text x="680" y="21" text-anchor="middle" class="arp-small">Далее -- к R</text>
+</svg>
+</div>
+<div class="arp-exchange" data-arp="exchange" hidden>
+<p class="arp-exchange-hint">Выберите событие на диаграмме. В таблице -- запись на S на этом шаге. Время условное.</p>
+<div class="arp-exchange-scroll" tabindex="0" role="region" aria-label="Последовательность обмена S, X и G; на узком экране прокручивается">
+<div class="arp-sequence">
+<div class="arp-sequence-head"><div><span class="arp-actor" aria-hidden="true">S</span><b>Компьютер</b></div><div><span class="arp-actor arp-actor-x" aria-hidden="true">X</span><b>Другой узел</b></div><div><span class="arp-actor" aria-hidden="true">G</span><b>Шлюз</b></div></div>
+<ol class="arp-sequence-events" aria-label="Сообщения и действия">
+<li><button type="button" data-arp-event="0" class="arp-event arp-event-wide"><span>Кадр к шлюзу</span><small>По записи IP G → MAC G</small></button></li>
+<li><button type="button" data-arp-event="1" class="arp-event arp-event-left arp-event-message"><span>ARP: «IP G -- это MAC X»</span><small>Объявление от X к S</small></button></li>
+<li><button type="button" data-arp-event="2" class="arp-event arp-event-local"><span>S принимает запись</span><small>IP G → MAC G заменено на IP G → MAC X</small></button></li>
+<li><button type="button" data-arp-event="3" class="arp-event arp-event-left"><span>Следующий кадр -- к X</span><small>По новой записи на S</small></button></li>
+<li><button type="button" data-arp-event="4" class="arp-event arp-event-right"><span data-arp="last-event">X передаёт кадр шлюзу</span><small data-arp="last-detail">По корректной записи на X</small></button></li>
+</ol>
+</div>
+</div>
+</div>
+<div class="arp-state-panels">
+<div class="arp-state-card" data-arp="entry"><strong>Таблица ARP на S</strong><table class="arp-entry-table"><thead><tr><th scope="col">IP-адрес</th><th scope="col">MAC-адрес</th></tr></thead><tbody><tr><td>IP G</td><td><b data-arp="mapping">MAC G</b></td></tr></tbody></table><p class="arp-entry-note" data-arp="entry-note">Эта запись определяет получателя кадра S → G.</p></div>
+<div class="arp-state-card"><strong>Назначение IP-пакета</strong><div class="arp-entry-value"><b>R</b><span>Удалённый сервер</span></div></div>
+</div>
+</div>
+<div class="arp-explanation" aria-live="polite" aria-atomic="true">
+<p data-arp="explanation">В таблице S адрес шлюза G связан с MAC-адресом G. Кадр передаётся непосредственно G.</p>
+<p class="arp-path-label" data-arp="path">Путь данных: S → G</p>
+</div>
+<noscript>Для переключения шагов необходим JavaScript. Начальная схема показывает обычный путь S → G.</noscript>
+</div>
+<script type="module" src="../interactives/security-arp-ui.js"></script>

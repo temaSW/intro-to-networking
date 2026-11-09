@@ -1,0 +1,26 @@
+<div class="course-demo security-diagram network-scene" role="region" tabindex="0" aria-label="Точки фильтрации A до канала и Б после него; схема прокручивается на узком экране">
+<svg class="security-figure" viewBox="0 0 850 260" role="img" aria-labelledby="security-ddos-title security-ddos-desc">
+<title id="security-ddos-title">Где фильтр относительно узкого места?</title>
+<desc id="security-ddos-desc">Обычные пользователи предлагают 20 Мбит/с, другие источники 200 Мбит/с. На пути: точка A, канал 100 Мбит/с, точка Б, сервер. A и Б -- возможные места фильтрации, фильтры ещё не включены.</desc>
+<defs><marker id="security-ddos-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z"/></marker></defs>
+<rect x="15" y="25" width="225" height="68" rx="6" class="security-node"/>
+<text x="127" y="52" class="security-node-title" text-anchor="middle">Обычные пользователи</text>
+<text x="127" y="77" class="security-small" text-anchor="middle">20 Мбит/с</text>
+<rect x="15" y="157" width="225" height="68" rx="6" class="security-node"/>
+<text x="127" y="184" class="security-node-title" text-anchor="middle">Другие источники</text>
+<text x="127" y="209" class="security-small" text-anchor="middle">200 Мбит/с</text>
+<path d="M240 60L288 125M240 190L288 125M288 125H392" class="security-flow" marker-end="url(#security-ddos-arrow)"/>
+<path d="M337 90V160" class="security-lifeline"/>
+<text x="337" y="68" class="security-node-title" text-anchor="middle">A</text>
+<text x="337" y="192" class="security-small" text-anchor="middle">До канала</text>
+<rect x="402" y="90" width="180" height="70" rx="6" class="security-node"/>
+<text x="492" y="118" class="security-node-title" text-anchor="middle">Входной канал</text>
+<text x="492" y="145" class="security-small" text-anchor="middle">100 Мбит/с</text>
+<path d="M582 125H712" class="security-flow" marker-end="url(#security-ddos-arrow)"/>
+<path d="M642 90V160" class="security-lifeline"/>
+<text x="642" y="68" class="security-node-title" text-anchor="middle">Б</text>
+<text x="642" y="192" class="security-small" text-anchor="middle">После канала</text>
+<rect x="722" y="90" width="113" height="70" rx="6" class="security-node"/>
+<text x="778" y="130" class="security-node-title" text-anchor="middle">Сервер</text>
+</svg>
+</div>

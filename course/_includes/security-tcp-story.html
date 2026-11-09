@@ -1,0 +1,26 @@
+```{=html}
+<div class="course-demo st-demo tcp-story" data-tcp-story>
+<div class="ts-scenes" data-ts-controls hidden role="group" aria-label="Четыре случая установления TCP-соединения">
+<button type="button" data-ts-scene="0" aria-pressed="true">Клиент отвечает</button><button type="button" data-ts-scene="1" aria-pressed="false">Клиент замолчал</button><button type="button" data-ts-scene="2" aria-pressed="false">Слишком много попыток</button><button type="button" data-ts-scene="3" aria-pressed="false">Защита от заполнения</button>
+</div>
+<div class="st-toolbar" data-ts-controls hidden><div class="st-buttons"><button type="button" data-ts="previous">← Назад</button><button type="button" data-ts="next">Следующий шаг →</button><button type="button" data-ts="reset">К началу случая</button></div><span data-ts="counter">Шаг 1 / 4</span></div>
+<div class="ts-scene">
+<div class="ts-exchange">
+<div class="ts-participants"><strong data-ts="client">Один клиент</strong><strong>Сервер</strong></div>
+<div class="ts-single" data-ts="single">
+<div class="ts-message" data-ts="syn" hidden><span>«Хочу подключиться» · SYN</span><i aria-hidden="true">→</i><small>Запрос клиента дошёл до сервера</small></div>
+<div class="ts-message ts-message-return" data-ts="synAck" hidden><span>«Подтверди, что получил ответ» · SYN + ACK</span><i aria-hidden="true">←</i><small data-ts="replyNote">Ответ сервера</small></div>
+<div class="ts-message" data-ts="ack" hidden><span>«Ответ получил» · ACK</span><i aria-hidden="true">→</i><small data-ts="ackNote">Завершение установления</small></div>
+<div class="ts-missing" data-ts="missing" hidden>ACK не пришёл · запись остаётся до тайм-аута</div>
+</div>
+<div class="ts-burst" data-ts="burst" hidden><span data-ts="burstCount">Два начальных запроса SYN</span><i aria-hidden="true">→ →</i><span data-ts="burstNote">Сервер отвечает; завершающие ACK не приходят</span></div>
+<div class="ts-probe" data-ts="probeBox" hidden><strong>Результат для нового клиента</strong><span data-ts="probe">Ещё не обращался</span></div>
+</div>
+<div class="ts-table"><div class="ts-table-title"><strong>Память сервера для ожидающих клиентов</strong><b data-ts="used">0 / 6</b></div><div class="ts-records" data-ts="records" role="img" aria-label="Шесть свободных записей"></div><p class="ts-table-note" data-ts="tableNote">Все места свободны</p><p class="ts-established"><span>Клиент подключился:</span> <b data-ts="establishedCount">0</b></p></div>
+</div>
+<p class="ts-explanation" data-ts="explanation" aria-live="polite" aria-atomic="true">Клиент ещё не обращался. В таблице ожидания нет записи об этой попытке.</p>
+<p class="st-small">SYN -- просьба начать соединение; SYN + ACK -- ответ сервера; ACK -- подтверждение клиента. Показана только таблица незавершённых соединений. Установленное соединение продолжает требовать ресурсов, но уже не занимает эту таблицу. В примере шесть записей и ожидание 10 с.</p>
+<noscript>Для переключения событий нужен JavaScript.</noscript>
+</div>
+<script type="module" src="../interactives/security-tcp-story-ui.js"></script>
+```

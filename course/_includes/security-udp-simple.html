@@ -1,0 +1,18 @@
+```{=html}
+<div class="course-demo st-demo reflection-simple" data-security-reflection>
+<div class="st-toolbar" data-rf-controls hidden><div class="st-buttons"><button type="button" data-rf="previous">← Назад</button><button type="button" data-rf="next">Отправить запрос →</button><button type="button" data-rf="reset">К началу</button></div><span data-rf="counter">1 / 4</span></div>
+<p class="rf-event" data-rf="event" aria-live="polite">Служба отправляет ответ по адресу источника, указанному в запросе.</p>
+<div class="rf-route">
+<div class="rf-person"><strong>Нарушитель</strong><span>Создаёт запрос</span></div>
+<div class="rf-request" data-rf="request"><span class="rf-packet"><b>Запрос · 80 байт</b><span>Адрес источника:<br><strong>пострадавший</strong></span></span><span class="rf-arrow" aria-hidden="true">→</span></div>
+<div class="rf-service"><strong data-rf="service">Служба</strong><span>Отвечает по указанному адресу</span></div>
+<div class="rf-bystander"><strong>Пострадавший</strong><span>Ничего не запрашивал</span><b data-rf="received">Пока ответов нет</b></div>
+<div class="rf-response" data-rf="response"><span class="rf-arrow" aria-hidden="true">→</span><span class="rf-packet"><b>Ответ · 800 байт</b><span>Получатель:<br><strong>пострадавший</strong></span></span></div>
+<div class="rf-turn" data-rf="turn" aria-hidden="true">↓</div>
+</div>
+<div data-rf="many" hidden><div class="st-parameter"><label>Отвечающих служб: <input type="number" data-rf="count-number" min="1" max="20" value="8" aria-label="Количество отвечающих служб"></label><input type="range" data-rf="count" min="1" max="20" value="8" aria-label="Количество отвечающих служб"></div><p data-rf="load"></p></div>
+<p class="st-small">Чужой адрес источника в этом примере не отфильтрован. Ответ в 10 раз больше запроса; это условие выбранной службы, а не любого UDP-обмена.</p>
+<noscript>Для переключения событий нужен JavaScript.</noscript>
+</div>
+<script type="module" src="../interactives/security-reflection-ui.js"></script>
+```

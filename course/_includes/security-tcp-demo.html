@@ -1,0 +1,18 @@
+```{=html}
+<div class="course-demo st-demo" data-security-tcp>
+<div class="st-controls" data-st-controls hidden>
+<div class="st-parameters"><div class="st-parameter"><label>Новые попытки <input type="number" data-tcp="rate-number" min="0" max="60" value="15" aria-label="Новые попытки, в секунду"> <span>в секунду</span></label><input type="range" data-tcp="rate" min="0" max="60" value="15" aria-label="Новые попытки, в секунду"></div><div class="st-parameter"><label>Завершают обмен <input type="number" data-tcp="complete-number" min="0" max="100" value="100" aria-label="Завершают обмен, %"> <span>%</span></label><input type="range" data-tcp="complete" min="0" max="100" value="100" aria-label="Завершают обмен, %"></div><div class="st-parameter"><label>Хранение записи <input type="number" data-tcp="timeout-number" min="2" max="20" value="10" aria-label="Хранение записи, с"> <span>с</span></label><input type="range" data-tcp="timeout" min="2" max="20" value="10" aria-label="Хранение записи, с"></div></div>
+<div class="st-toolbar"><div class="st-buttons" role="group" aria-label="Ход опыта TCP"><button type="button" data-tcp="step">Шаг +1 с</button><button type="button" data-tcp="play">Запуск</button><button type="button" data-tcp="pause" disabled>Пауза</button><button type="button" data-tcp="reset">Сброс</button></div><label class="st-check"><input type="checkbox" data-tcp="protection"> Не хранить запись до подтверждения</label></div>
+</div>
+<div class="st-metrics"><div><span>Время</span><b data-tcp="time">0 с</b></div><div><span>Ожидают подтверждения</span><b data-tcp="used">0 / 120</b></div><div><span>Отказы за последний шаг</span><b data-tcp="rejected">0</b></div><div><span>Завершено за последний шаг</span><b data-tcp="established">0</b></div></div>
+<div class="st-system">
+<div class="st-side"><div class="st-device">Клиенты</div><p><b data-tcp="rate-label">15</b> новых попыток/с</p><span class="st-small">Обычный клиент дополнительно обращается раз в секунду</span></div>
+<div class="st-handshake" role="group" aria-label="Служебные сообщения последней секунды"><div><span>SYN →</span><b data-tcp="syn">0</b></div><div><span>← SYN + ACK</span><b data-tcp="synAck">0</b></div><div><span>ACK →</span><b data-tcp="ack">0</b></div><div class="st-channel"><span>Служебный обмен</span><b data-tcp="load">0 кбит/с</b><span class="st-small">Ёмкость канала: 1000 кбит/с</span><meter data-tcp="channel" min="0" max="1000" value="0" aria-label="Служебный обмен относительно ёмкости канала"></meter></div></div>
+<div class="st-server"><div class="st-device">Сервер · таблица ожидания</div><div class="st-slots" data-tcp="slots" role="img" aria-label="120 свободных записей"></div><div class="st-legend"><span><i class="st-slot st-slot-completes"></i> ACK придёт</span><span><i class="st-slot st-slot-waits"></i> ACK не придёт</span><span><i class="st-slot"></i> Свободно</span></div><p class="st-small">Освобождено по тайм-ауту за шаг: <b data-tcp="expired">0</b></p></div>
+</div>
+<div class="st-result" aria-live="polite" aria-atomic="true"><strong>Обычный клиент:</strong> <span data-tcp="probe">Ещё не обращался</span><span class="st-small" data-tcp="probe-count">Успешных: 0 · Не принятых: 0</span></div>
+<p class="st-small">Ёмкость таблицы: 120 записей. Завершающий ACK приходит через 1 с; учтены только ожидание подтверждения и служебный обмен. В оценке объёма один служебный пакет занимает 80 байт. Числа -- условия опыта.</p>
+<noscript>Для управления моделью нужен JavaScript.</noscript>
+</div>
+<script type="module" src="../interactives/security-transport-ui.js"></script>
+```

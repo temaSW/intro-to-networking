@@ -1,0 +1,33 @@
+```{=html}
+<div class="course-demo st-demo app-scene" data-security-app>
+<div data-app-controls hidden>
+<div class="st-toolbar"><div class="st-buttons"><button type="button" data-app="step">Показать одну секунду</button><button type="button" data-app="play">Запуск</button><button type="button" data-app="reset">К началу</button></div><strong data-app="time">0 / 20 с</strong></div>
+<label class="st-check"><input type="checkbox" data-app="protect"> Ограничить очередь двумя запросами</label>
+</div>
+<div class="aq-conditions"><span><b>3</b> запроса приходят за секунду</span><span><b>2</b> запроса сервер успевает обработать</span></div>
+<div class="aq-scroll" role="region" tabindex="0" aria-label="Движение запросов к серверу; на узком экране прокручивается">
+<svg class="aq-scene" viewBox="0 0 820 330" role="img" aria-labelledby="aq-title aq-desc">
+<title id="aq-title">Запросы на пути к приложению</title><desc id="aq-desc">Кружок -- один запрос. Запросы движутся слева направо; ожидающие собираются перед сервером. При защите отказанные запросы уходят вниз у входа.</desc>
+<path d="M106 155H727" class="aq-wire"/>
+<path d="M718 149L727 155L718 161" class="aq-arrow"/>
+<g class="aq-browser"><rect x="24" y="120" width="78" height="60" rx="5"/><path d="M24 134H102M34 127H38M43 127H47M52 127H56"/><path d="M50 149L43 155L50 161M75 149L82 155L75 161"/></g>
+<text x="64" y="104" text-anchor="middle" class="aq-heading">Пользователи</text>
+<text x="64" y="208" text-anchor="middle">Шлют запросы</text>
+<g class="aq-server"><rect x="730" y="107" width="68" height="101" rx="5"/><rect x="740" y="118" width="48" height="20" rx="2"/><rect x="740" y="148" width="48" height="20" rx="2"/><rect x="740" y="178" width="48" height="20" rx="2"/><circle cx="779" cy="128" r="2"/><circle cx="779" cy="158" r="2"/><circle cx="779" cy="188" r="2"/></g>
+<text x="764" y="88" text-anchor="middle" class="aq-heading">Сервер</text>
+<text x="764" y="236" text-anchor="middle">Обработано</text><text x="764" y="260" text-anchor="middle" class="aq-number" data-app="completed">0</text>
+<g data-app="gate"><path d="M206 130V180" class="aq-gate"/><text x="209" y="87" text-anchor="middle" data-app="gateLabel">Вход открыт</text></g>
+<path d="M208 180V267" class="aq-reject-path" data-app="rejectPath" hidden/>
+<text x="208" y="295" text-anchor="middle" data-app="rejectedLabel">Отказано: 0</text>
+<text x="458" y="123" text-anchor="middle" class="aq-heading" data-app="queueLabel">Очередь пуста</text>
+<text x="458" y="205" text-anchor="middle" data-app="queueDetail">Никто не ждёт</text>
+<g data-app="waiting"></g><g data-app="motion" aria-hidden="true"></g>
+<g transform="translate(350 290)"><circle r="7" class="aq-dot"/><text x="17" y="5">Один кружок -- один запрос</text></g>
+</svg>
+</div>
+<p class="aq-status" data-app="status" aria-live="polite" aria-atomic="true">Очередь пуста. «Показать одну секунду» отправит три запроса к серверу.</p>
+<p class="st-small">Движение замедлено для наблюдения. Запросы одинаковы по затратам. Включение защиты сохраняет уже принятую очередь; новые запросы могут получить отказ, пока она не сократится до предела.</p>
+<noscript>Для движения запросов нужен JavaScript.</noscript>
+</div>
+<script type="module" src="../interactives/security-app-ui.js"></script>
+```
