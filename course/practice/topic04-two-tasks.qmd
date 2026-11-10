@@ -1,5 +1,5 @@
 ---
-title: "Расчётные задачи по теме 04"
+title: "Практическое занятие № 4. Расчётные задачи по теме 04"
 body-classes: lecture-overview
 format:
   html:
