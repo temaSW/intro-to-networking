@@ -1,0 +1,22 @@
+.frame-sheet .frame-sheet-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+  align-items: stretch;
+}
+.frame-sheet-field {
+  flex: 1 1 7rem;
+  padding: .75rem;
+  border: 1px solid var(--line);
+  border-radius: .3rem;
+  background: var(--surface);
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.frame-sheet-field b, .frame-sheet-field span { display: block; }
+.frame-sheet-field span { margin-top: .35rem; font-size: .9rem; color: var(--muted); }
+.frame-sheet-field.frame-sheet-payload { flex-grow: 2; background: var(--accent-soft); }
+.frame-sheet figcaption { margin-top: .8rem; color: var(--muted); font-size: .9rem; }
+@media (max-width: 575px) {
+  .frame-sheet-field { flex-basis: 8rem; }
+}
