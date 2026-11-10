@@ -1,0 +1,78 @@
+<div class="simple-practice" data-topic04-tasks>
+  <p class="sp-intro">Сначала выполните расчёт самостоятельно: в тетради или в поле под условием. Затем введите своё решение и откройте наглядную проверку. Задачи независимы.</p>
+
+  <section class="sp-task" id="task-1" aria-labelledby="task-1-title">
+    <span class="sp-number">Задача 1</span>
+    <h2 id="task-1-title">Как часто передавать служебное сообщение?</h2>
+    <p>Точка доступа периодически передаёт служебное сообщение длительностью <strong>2 мс</strong>. Новый терминал включается в произвольный момент и должен получить сообщение <strong>целиком не позднее чем через 100 мс</strong> после включения. На служебные сообщения разрешено расходовать <strong>не более 5% времени</strong>.</p>
+    <p><strong>Найдите диапазон допустимых периодов и выберите один из них.</strong> Объясните выбор. Если терминал включился посреди сообщения, принять его с начала он уже не может.</p>
+    <label class="sp-calculation">Мой расчёт <span class="sp-muted">(можно выполнить в тетради)</span><textarea name="beacon-notes" rows="3" placeholder="Какие два ограничения действуют на период? Какой момент включения самый неблагоприятный?"></textarea></label>
+    <div class="sp-answer"><label>Выбранный период T, мс<input name="period" type="text" inputmode="decimal" placeholder="Ваше значение"></label><button data-action="beacon-check">Показать проверку</button></div>
+    <p class="sp-input-message" data-beacon-message role="status" aria-live="polite"></p>
+    <div class="sp-verification" data-beacon-result hidden>
+      <div class="sp-values"><p data-delay></p><p data-share></p></div>
+      <p class="sp-muted">Проверяем предельный случай: терминал включился сразу после начала сообщения. Текущее сообщение уже неполное; целиком можно принять следующее.</p>
+      <div class="sp-legend"><span><i class="sp-old"></i>Уже начавшееся сообщение</span><span><i></i>Следующее полное сообщение</span></div>
+      <div class="sp-chart-scroll" tabindex="0" aria-label="Служебные сообщения на временной линии"><div data-beacon-chart></div></div>
+      <p class="sp-muted" data-beacon-caption></p>
+    </div>
+  </section>
+
+  <section class="sp-task" id="task-2" aria-labelledby="task-2-title">
+    <span class="sp-number">Задача 2</span>
+    <h2 id="task-2-title">Когда отправить первое обращение?</h2>
+    <p>Разрешённые окна обращения повторяются через <strong>20 мс</strong>: <strong>8–12 мс, 28–32 мс, 48–52 мс</strong> и далее аналогично. Обращение занимает <strong>2 мс</strong> и должно целиком помещаться в окно.</p>
+    <p>Терминал готов к отправке в <strong>31 мс</strong>. Обращение должно закончиться <strong>не позднее 51 мс</strong>.</p>
+    <p><strong>Найдите все допустимые моменты начала, выберите один и укажите самый ранний.</strong> Объясните, можно ли начать сразу после готовности.</p>
+    <label class="sp-calculation">Мой расчёт <span class="sp-muted">(можно выполнить в тетради)</span><textarea name="access-notes" rows="3" placeholder="Где целиком поместятся 2 мс? Как учитываются готовность и срок окончания?"></textarea></label>
+    <div class="sp-answer"><label>Выбранное начало, мс<input name="access-start" type="text" inputmode="decimal" placeholder="Ваше значение"></label><button data-action="access-check">Показать проверку</button></div>
+    <p class="sp-input-message" data-access-message role="status" aria-live="polite"></p>
+    <div class="sp-verification" data-access-result hidden><div class="sp-chart-scroll" tabindex="0" aria-label="Окна обращения, готовность, срок и выбранная передача"><div data-access-chart></div></div><div data-access-feedback></div></div>
+  </section>
+
+  <section class="sp-task" id="task-3" aria-labelledby="task-3-title">
+    <span class="sp-number">Задача 3</span>
+    <h2 id="task-3-title">Сколько интервалов выделить для доступа?</h2>
+    <p>Два новых терминала независимо и равновероятно выбирают один из разрешённых интервалов. Если выбрали один и тот же, <strong>оба обращения теряются</strong>; если разные -- оба принимаются.</p>
+    <p>Один интервал занимает <strong>2 мс</strong>, физический кадр -- <strong>40 мс</strong>. На интервалы первоначального доступа можно выделить <strong>не более 15% кадра</strong>. Вероятность совпадения двух обращений должна быть <strong>не выше 1/3</strong>.</p>
+    <p><strong>Выберите число интервалов, выполняющее оба требования.</strong> Вероятность можно найти перебором всех равновероятных пар выбора. Поможет ли после коллизии одинаковое ожидание и повтор в том же интервале?</p>
+    <label class="sp-calculation">Мой расчёт <span class="sp-muted">(можно выполнить в тетради)</span><textarea name="intervals-notes" rows="3" placeholder="Сколько пар выбора возможно? В скольких возникает коллизия? Какая часть кадра резервируется?"></textarea></label>
+    <div class="sp-answer"><label>Число интервалов N<input name="interval-count" type="number" min="1" max="8" step="1" placeholder="Ваше значение"></label><button data-action="intervals-check">Показать проверку</button></div>
+    <p class="sp-input-message" data-intervals-message role="status" aria-live="polite"></p>
+    <div class="sp-verification" data-intervals-result hidden><div class="sp-values"><p data-collision-probability></p><p data-access-resource></p></div><p class="sp-muted">Все клетки таблицы равновероятны. Строка -- выбор терминала А, столбец -- выбор терминала Б.</p><div class="sp-table-scroll" data-pair-grid></div><p class="sp-muted">× -- коллизия, оба обращения потеряны. ✓ -- разные интервалы, оба обращения приняты. Это вероятность одной попытки, а не гарантия успеха.</p><div class="sp-reservation" data-reservation></div><p class="sp-muted" data-reservation-caption></p></div>
+  </section>
+
+  <section class="sp-task" id="task-4" aria-labelledby="task-4-title">
+    <span class="sp-number">Задача 4</span>
+    <h2 id="task-4-title">Как передать файл в выданном ресурсе?</h2>
+    <p>Терминал получил назначение: <strong>физический кадр №12, полоса Б, интервалы 3 и 4</strong>.</p>
+    <p>Кадр №12 начинается в <strong>440 мс</strong>. Интервал 1 начинается через <strong>20 мс</strong> после начала кадра; длительность каждого интервала -- <strong>2 мс</strong>. Передача должна начинаться с границы интервала и занимает его целиком.</p>
+    <p>В одной ячейке помещается канальный кадр размером до <strong>144 байт</strong>, включая <strong>16 служебных байт</strong>. Фрагмент файла объёмом <strong>250 байт</strong> готов к передаче в <strong><span data-ready>463</span> мс</strong>.</p>
+    <p><strong>Предложите разбиение на два канальных кадра и определите время каждой передачи.</strong> Проверьте вместимость ячеек и готовность данных. Введите только байты файла; служебная часть добавляется отдельно.</p>
+    <label class="sp-calculation">Мой расчёт <span class="sp-muted">(можно выполнить в тетради)</span><textarea name="file-notes" rows="3" placeholder="Сколько полезных байтов помещается в ячейке? Когда начинаются интервалы 3 и 4?"></textarea></label>
+    <div class="sp-table-scroll"><table class="sp-plan"><thead><tr><th>Канальный кадр</th><th>Данные файла, байт</th><th>Начало передачи, мс</th></tr></thead><tbody><tr><th scope="row">Д1</th><td><input name="bytes1" type="number" min="1" max="250" step="1" aria-label="Байты файла в Д1" placeholder="Ваш расчёт"></td><td><input name="start1" type="text" inputmode="decimal" aria-label="Начало Д1 в миллисекундах" placeholder="Ваш расчёт"></td></tr><tr><th scope="row">Д2</th><td><input name="bytes2" type="number" min="1" max="250" step="1" aria-label="Байты файла в Д2" placeholder="Ваш расчёт"></td><td><input name="start2" type="text" inputmode="decimal" aria-label="Начало Д2 в миллисекундах" placeholder="Ваш расчёт"></td></tr></tbody></table></div>
+    <div class="sp-answer"><button data-action="file-check">Проверить мой план</button></div>
+    <p class="sp-input-message" data-file-message role="status" aria-live="polite"></p>
+    <div class="sp-verification" data-file-result hidden>
+      <div class="sp-chart-scroll" tabindex="0" aria-label="Выделенные интервалы и ваш план передачи"><div data-file-chart></div></div>
+      <div class="sp-cell-pair" data-cells></div>
+      <div data-file-feedback></div>
+    </div>
+    <div class="sp-variation" data-variation hidden><h3>Измените одно условие</h3><p>Что получится, если данные будут готовы только в 465 мс? Найдите максимальный объём передачи по этому назначению и решите, что потребуется для остатка. Сначала рассчитайте, затем проверьте.</p><button data-action="toggle-ready">Проверить условие «готово в 465 мс»</button></div>
+  </section>
+  <section class="sp-task" id="task-5" aria-labelledby="task-5-title">
+    <span class="sp-number">Задача 5</span>
+    <h2 id="task-5-title">Какой режим и сколько ресурса назначить?</h2>
+    <p>Для этой задачи заданы два режима. В таблице уже указаны <strong>полезные байты</strong> в ячейке; служебные расходы дополнительно вычитать не нужно.</p>
+    <div class="sp-table-scroll"><table class="sp-given"><thead><tr><th>Режим</th><th>Требуемое ОСШ у приёмника</th><th>Полезные данные в ячейке</th></tr></thead><tbody><tr><th scope="row">M1</th><td>Не менее 6 дБ</td><td>100 байт</td></tr><tr><th scope="row">M2</th><td>Не менее 12 дБ</td><td>200 байт</td></tr></tbody></table></div>
+    <p>Точка доступа принимает сигнал терминала с ОСШ <strong>8 дБ</strong>. Терминал принимает сигнал точки доступа с ОСШ <strong>16 дБ</strong>. Передать нужно <strong>250 байт</strong>. Узел рассматривает выделение <strong>двух ячеек</strong>.</p>
+    <p><strong>Определите режим и минимальное число ячеек для передачи от терминала.</strong> Достаточно ли двух? Затем решите ту же задачу для передачи от точки доступа к терминалу. На чьё измерение нужно опираться в каждом случае?</p>
+    <label class="sp-calculation">Мой расчёт <span class="sp-muted">(можно выполнить в тетради)</span><textarea name="quality-notes" rows="3" placeholder="Кто приёмник каждого направления? Какие режимы допустимы? Сколько ячеек потребуется для 250 байт?"></textarea></label>
+    <div class="sp-table-scroll"><table class="sp-plan"><thead><tr><th>Направление</th><th>Режим</th><th>Минимум ячеек</th></tr></thead><tbody><tr><th scope="row">Терминал → точка доступа</th><td><input name="up-mode" type="text" maxlength="2" aria-label="Режим от терминала" placeholder="M1 или M2"></td><td><input name="up-cells" type="number" min="1" max="8" step="1" aria-label="Число ячеек от терминала" placeholder="Ваш расчёт"></td></tr><tr><th scope="row">Точка доступа → терминал</th><td><input name="down-mode" type="text" maxlength="2" aria-label="Режим к терминалу" placeholder="M1 или M2"></td><td><input name="down-cells" type="number" min="1" max="8" step="1" aria-label="Число ячеек к терминалу" placeholder="Ваш расчёт"></td></tr></tbody></table></div>
+    <div class="sp-answer"><button data-action="quality-check">Проверить назначения</button></div><p class="sp-input-message" data-quality-message role="status" aria-live="polite"></p>
+    <div class="sp-verification" data-quality-result hidden><div class="sp-chart-scroll" tabindex="0" aria-label="ОСШ у приёмников и пороги выбранных режимов"><div data-quality-chart></div></div><p class="sp-muted">Точка -- ОСШ у приёмника данного направления; вертикальная линия -- порог выбранного режима.</p><div class="sp-cell-pair" data-direction-results></div></div>
+  </section>
+
+  <p class="sp-footer">Все численные условия учебные. Поля -- для собственного расчёта; автоматическая проверка не оценивает объяснение.</p>
+  <noscript>Для наглядной проверки нужен JavaScript. Условия задач доступны без него.</noscript>
+</div>

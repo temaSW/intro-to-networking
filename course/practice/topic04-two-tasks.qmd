@@ -1,0 +1,14 @@
+---
+title: "Расчётные задачи по теме 04"
+body-classes: lecture-overview
+format:
+  html:
+    css: ../styles/topic04-two-tasks.css
+---
+
+Опора -- [тема 04 «Как устройство получает возможность передавать?»](../lectures/transmission-agreement.qmd).
+
+```{=html}
+{{< include ../_includes/topic04-two-tasks.html >}}
+<script type="module" src="../interactives/topic04-two-tasks-ui.js"></script>
+```
