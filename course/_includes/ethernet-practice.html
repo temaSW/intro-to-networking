@@ -1,0 +1,17 @@
+<div class="ethernet-demo course-demo" data-ethernet-practice>
+  <div class="eth-intro"><span class="eth-eyebrow">Один блок · два способа передачи</span><h4>Сколько времени займёт доставка?</h4><p>Наблюдайте кадры в линии и сборку блока у получателя. Включите ошибку, чтобы сравнить цену повтора.</p></div>
+  <form class="eth-controls" aria-label="Условия передачи Ethernet">
+    <label>Скорость линии<select name="rate"><option value="10">10 Мбит/с</option><option value="100">100 Мбит/с</option><option value="1000">1 Гбит/с</option></select></label>
+    <label>Распространение в одну сторону<select name="propagation"><option value="0">0 мкс · идеальная линия</option><option value="0.005">5 мкс · около 1 км</option><option value="0.2" selected>200 мкс · около 40 км</option><option value="1">1 мс · около 200 км</option></select></label>
+    <label>Пауза протокола перед ответом<select name="recovery"><option value="0">0 мс</option><option value="0.6" selected>0,6 мс</option><option value="2">2 мс</option></select></label>
+    <label class="eth-toggle"><input type="checkbox" name="error">Повредить один кадр</label>
+  </form>
+  <div class="eth-actions"><button type="button" data-play>Запустить</button><button type="button" data-reset>Сначала</button><label>Просмотр<select data-speed><option value="1">Обычный</option><option value="0.5">Медленнее ×2</option></select></label><span class="eth-clock" data-clock>t = 0 мс</span></div>
+  <div class="eth-legend" aria-label="Обозначения"><span class="eth-key-data">Данные</span><span class="eth-key-header">Заголовок + FCS</span><span class="eth-key-error">Повреждение</span><span class="eth-key-feedback">Ответ протокола ←</span></div>
+  <div data-lanes></div>
+  <label class="eth-scrub">Момент опыта<input type="range" data-seek min="0" max="1000" value="0" step="1" aria-label="Перейти к моменту опыта"></label>
+  <p class="eth-live" data-status aria-live="polite">Нажмите «Запустить» или перемещайте указатель времени.</p>
+  <details><summary>Как считается время в этом опыте</summary><p>Передача кадра в линию: <strong>8L/R</strong>. Последний бит приходит через время распространения. В режиме ошибки кадр отбрасывается после полного приёма и проверки FCS. Через выбранную паузу вышестоящий протокол отправляет условный ответ; он идёт обратно с той же задержкой распространения. Повтор начинается после прихода ответа и освобождения передатчика. Остальные маленькие кадры продолжают передаваться.</p><p>Ответ показан маркером: его длительность передачи и объём здесь не учитываются. Это учебный выборочный повтор, а не механизм Ethernet MAC. Пауза не является параметром Ethernet. Без очередей, преамбулы, SFD и межкадровых интервалов; считаются только байты от DA до FCS. Поэтому время — результат этой модели, а не измерение реальной сети. Расстояния оценены при скорости распространения 200 000 км/с. Движение замедлено, масштаб длины линии условный.</p><p>Изображение обозначает исходный блок из 1500 байт. Его части — иллюстрация сборки; реальные границы кадров не обязаны совпадать с областями фотографии.</p></details>
+  <noscript>Для анимации включите JavaScript. Исходные данные и задания выше доступны без него.</noscript>
+</div>
+<script type="module" src="../interactives/ethernet-practice-ui.js"></script>

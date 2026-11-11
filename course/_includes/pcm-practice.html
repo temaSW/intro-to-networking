@@ -1,0 +1,18 @@
+<div class="stream-practice course-demo" data-pcm-practice>
+  <header class="sp-intro"><span class="eth-eyebrow">30 разговоров · одна линия</span><h4>Как отсчёты попадают в общий поток</h4><p>Выберите речевой канал. Его отсчёт занимает один и тот же КИ в каждом цикле; КИ0 и КИ16 передают служебные сведения.</p></header>
+  <div class="sp-controls"><label>Речевой канал<select data-channel aria-label="Речевой канал ИКМ"></select></label><span class="sp-clock" data-clock>t = 0 мкс</span></div>
+  <div class="pcm-route"><div class="pcm-signal"><strong data-source-label>Канал 1 · отправитель</strong><svg data-source role="img" aria-label="Условные отсчёты выбранного речевого канала"></svg></div><div class="pcm-gateway"><span>Отсчёт</span><strong data-code></strong><span>8 бит → свой КИ</span></div><div class="pcm-signal"><strong data-destination-label>Канал 1 · получатель</strong><svg data-destination role="img" aria-label="Полученные отсчёты выбранного речевого канала"></svg></div></div>
+  <div class="sp-section-label"><strong data-cycle>Цикл 1 из 8</strong><span>32 КИ · слева направо, затем следующая строка</span></div>
+  <div class="pcm-slots" data-slots aria-label="Канальные интервалы текущего цикла"></div>
+  <div class="sp-legend"><span class="sp-key-data">Речевые КИ</span><span class="sp-key-service">КИ0 и КИ16</span><span class="sp-key-selected">Выбранный канал</span></div>
+  <div class="pcm-byte"><div><strong data-byte-label></strong><span data-slot-state></span></div><div class="pcm-bits" data-bits aria-label="Восемь бит выбранного отсчёта"></div></div>
+  <div class="sp-section-label"><strong>Тот же канал в соседних циклах</strong><span>Новый отсчёт каждые 125 мкс</span></div>
+  <div class="pcm-history" data-history></div>
+  <div class="sp-actions"><button type="button" data-play>Запустить</button><button type="button" data-next>Следующий цикл</button><button type="button" data-reset>Сначала</button><label>Просмотр<select data-playback-speed aria-label="Скорость просмотра ИКМ"><option value="1">Обычный</option><option value="0.25">Медленнее ×4</option></select></label></div>
+  <label class="sp-scrub">Момент опыта<input data-seek type="range" min="0" max="1000" step="0.1" value="0" aria-label="Момент опыта ИКМ в микросекундах"></label>
+  <div class="sp-metrics"><div><span>Всего передано</span><strong data-total-bits>0 бит</strong></div><div><span>Речевые биты</span><strong data-voice-bits>0 бит</strong></div><div><span>Служебные биты</span><strong data-service-bits>0 бит</strong></div></div>
+  <p class="sp-live" data-live aria-live="polite"></p>
+  <details><summary>Проверить скорости и допущения</summary><p>За цикл передаются 32 × 8 = <strong>256 бит</strong>. За секунду проходят 8000 циклов: полный поток — <strong>2 048 000 бит/с (2048 кбит/с)</strong>. Один речевой канал — <strong>64 кбит/с</strong>, 30 речевых каналов — <strong>1920 кбит/с</strong>. Остальные 128 кбит/с приходятся на КИ0 и КИ16.</p><p>Показаны 8 циклов, то есть 1 мс модельного времени. Анимация замедлена. Значения отсчётов и их 8-битные коды условны; это не модель речевого кодека G.711. Служебные разряды здесь не раскрываются. Для наглядности приём показан без задержки распространения; время дискретизации и доставки в этой схеме не сравниваются.</p></details>
+  <noscript>Для анимации включите JavaScript. Расчётное задание выше доступно без него.</noscript>
+</div>
+<script type="module" src="../interactives/pcm-practice-ui.js"></script>

@@ -1,0 +1,13 @@
+<div class="stream-practice course-demo" data-beacon-practice>
+  <header class="sp-intro"><span class="eth-eyebrow">Один ноутбук · два периода маяков</span><h4>Когда ноутбук увидит сеть?</h4><p>В режиме задания приём включается сразу после окончания предыдущего Beacon. Сеть появляется после полного приёма следующего маяка.</p></header>
+  <div class="sp-controls"><label>Момент включения приёма<select data-mode aria-label="Режим включения приёма Beacon"><option value="task">Как в задании · 0,5 мс</option><option value="custom">Выбрать момент</option></select></label><span class="sp-clock" data-clock>t = 0,5 мс</span></div>
+  <label class="sp-scrub" data-custom hidden>Включить приём: <output data-listen-value>0,5 мс</output><input data-listen type="range" min="0.5" max="499.5" step="0.1" value="0.5" aria-label="Включить приём Beacon в момент, мс"></label>
+  <div class="sp-actions"><button type="button" data-play>Запустить</button><button type="button" data-event>К следующему событию</button><button type="button" data-reset>Сначала</button></div>
+  <div class="sp-legend"><span class="sp-key-data">Передача Beacon</span><span class="sp-key-service">Ожидание приёма</span><span class="sp-key-selected">Включение ноутбука</span></div>
+  <div data-beacon-lanes></div>
+  <label class="sp-scrub">Общая шкала опыта · 1 секунда<input data-seek type="range" min="0" max="1000" step="0.1" value="0.5" aria-label="Момент опыта Beacon в миллисекундах"></label>
+  <p class="sp-live" data-live aria-live="polite"></p>
+  <details><summary>Почему ожидание равно периоду? Проверить расчёт</summary><p>Предыдущий маяк начинается в t = 0 и заканчивается в 0,5 мс. В режиме задания ноутбук начинает слушать в t = 0,5 мс. При периоде 100 мс следующий маяк идёт от 100 до 100,5 мс: ожидание до полного приёма — <strong>100 мс</strong>. При периоде 500 мс — <strong>500 мс</strong>. Ожидание до начала приёма на 0,5 мс меньше.</p><p>На интервале [0; 1000) мс начала передач приходятся на 0, 100, …, 900 мс или на 0 и 500 мс. Это <strong>10 или 2 маяка</strong>; суммарно они занимают <strong>5 или 1 мс эфира</strong>. Предыдущий маяк при t = 0 включён в этот подсчёт.</p><p>Положения маяков на общей шкале соответствуют времени, но тонкие отметки расширены до 2 пикселей для видимости. Волны возле точки доступа — условная индикация передачи. В увеличении последние 0,5 мс показаны отдельно от ожидания. Потерь, задержки распространения и конкуренции за эфир в этом опыте нет. При включении посередине уже идущего Beacon ноутбук ждёт следующий полный маяк.</p></details>
+  <noscript>Для анимации включите JavaScript. Расчётное задание выше доступно без него.</noscript>
+</div>
+<script type="module" src="../interactives/beacon-practice-ui.js"></script>
