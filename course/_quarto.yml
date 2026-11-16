@@ -4,6 +4,7 @@ project:
   render:
     - "**/*.qmd"
     - "!lectures/08-network-performance.qmd"
+    - "!practice/topic04-two-tasks.qmd"
   resources:
     - assets/labs/**
     - labs/pdf/*.pdf
