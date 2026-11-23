@@ -21,11 +21,30 @@ main.content .ipv4-plan {
 .ipv4-plan-router { border-color: var(--accent); }
 .ipv4-plan-link { display: block; justify-self: center; color: var(--accent); font-size: 1.5rem; text-align: center; }
 .ipv4-plan figcaption { grid-column: 1 / -1; }
-.ipv4-plan-table { max-width: 100%; overflow-x: auto; }
-.ipv4-plan-table table { min-width: 34rem; }
-.ipv4-plan-table:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+.ipv4-answer-form { margin: 1.25rem 0; padding: clamp(.85rem, 2vw, 1.25rem); border: 1px solid var(--line); border-radius: .4rem; background: var(--surface); }
+.ipv4-answer-form h3 { margin-top: 0; }
+.ipv4-answer-fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+.ipv4-answer { display: grid; grid-template-rows: auto auto 1fr; align-content: start; gap: .35rem; min-width: 0; color: var(--ink); text-align: left; }
+.ipv4-answer input, .ipv4-answer select { min-width: 0; width: 100%; min-height: 44px; border: 1px solid var(--line); border-radius: .3rem; background: var(--page-bg); color: var(--ink); padding: .5rem; font: inherit; }
+.ipv4-answer input { font-variant-numeric: tabular-nums; }
+.ipv4-answer input:focus-visible, .ipv4-answer select:focus-visible, .ipv4-answer-actions button:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+.ipv4-answer-feedback { min-height: 1.5em; line-height: 1.4; color: var(--muted); }
+.ipv4-answer[data-result="incorrect"] input, .ipv4-answer[data-result="incorrect"] select { border: 2px solid var(--focus); }
+.ipv4-answer[data-result="incorrect"] .ipv4-answer-feedback { color: var(--focus); }
+.ipv4-answer[data-result="correct"] .ipv4-answer-feedback { color: var(--accent); }
+.ipv4-answer-form fieldset { grid-column: 1 / -1; min-width: 0; border: 0; padding: 1rem 0 0; margin: 0; border-top: 1px solid var(--line); }
+.ipv4-answer-form legend { float: none; width: auto; font-size: 1rem; font-weight: 700; }
+.ipv4-answer-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; margin-top: 1rem; }
+.ipv4-answer-actions button { min-height: 48px; border: 1px solid var(--accent); border-radius: .3rem; background: var(--accent); color: var(--page-bg); padding: .5rem 1rem; font: inherit; font-weight: 700; cursor: pointer; }
+.ipv4-answer-actions .ipv4-answer-reset { background: transparent; color: var(--accent); border-color: transparent; text-decoration: underline; font-weight: 400; }
+main.content .ipv4-answer-status { margin: .75rem 0 0; text-align: left; }
 
 @media (max-width: 900px) {
   main.content .ipv4-plan { grid-template-columns: 1fr; }
   .ipv4-plan-link { transform: rotate(90deg); }
+  .ipv4-answer-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 575px) {
+  .ipv4-answer-fields { grid-template-columns: 1fr; }
 }
