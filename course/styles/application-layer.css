@@ -2,6 +2,21 @@
 .application-lecture main table code { white-space:normal; overflow-wrap:anywhere; }
 .application-scroll { max-width:100%; overflow-x:auto; }
 .application-scroll:focus-visible { outline:2px solid var(--focus); outline-offset:3px; }
+.dh-figure .dh-diagram { display:block; width:100%; min-width:56.25rem; max-width:60rem; height:auto; margin-inline:auto; }
+.dh-diagram text { fill:var(--ink); font:16px system-ui,sans-serif; text-anchor:middle; }
+.dh-diagram .dh-heading { font-size:22px; font-weight:700; }
+.dh-diagram .dh-step { font-size:18px; font-weight:600; paint-order:stroke; stroke:var(--surface); stroke-width:10px; stroke-linejoin:round; }
+.dh-diagram .dh-symbol { font-size:25px; }
+.dh-diagram .dh-note { fill:var(--muted); }
+.dh-common { color:#e5c148; }
+.dh-client { color:#3569b7; }
+.dh-server { color:#c95555; }
+.dh-share-a { color:#719966; }
+.dh-share-b { color:#d28b4a; }
+.dh-result { color:#937758; }
+.dh-cup-outline { fill:none; stroke:var(--ink); stroke-width:1.5; }
+.dh-flow { fill:none; stroke:var(--accent); stroke-width:2; }
+.dh-arrowhead { fill:var(--accent); }
 .application-figure { display:block; width:100%; min-width:36rem; height:auto; color:var(--ink); }
 .application-figure text { fill:currentColor; font:16px system-ui,sans-serif; }
 .application-figure rect { fill:var(--surface-alt); stroke:var(--line); }

@@ -1,0 +1,58 @@
+<figure class="course-demo dh-figure">
+<div class="application-scroll" tabindex="0" role="region" aria-label="Схема смешивания красок; на узком экране прокручивается по горизонтали">
+<svg class="dh-diagram" viewBox="0 0 900 790" role="img" aria-labelledby="dh-title dh-desc">
+<title id="dh-title">Обмен Диффи--Хеллмана: аналогия со смешиванием красок</title>
+<desc id="dh-desc">Клиент и сервер начинают с общей жёлтой краски. Клиент добавляет секретную синюю краску и получает зелёную смесь А; сервер добавляет секретную красную и получает оранжевую смесь Б. По открытой линии передаются только смеси А и Б. Клиент добавляет к смеси Б свою синюю краску, сервер к смеси А свою красную. Обе итоговые смеси содержат общую краску и две секретные добавки и имеют одинаковый цвет.</desc>
+<defs>
+  <g id="dh-cup">
+    <path d="M-30-16 L-24 25 Q0 35 24 25 L30-16Z" fill="currentColor"/>
+    <ellipse cy="-16" rx="30" ry="9" fill="currentColor"/>
+    <path d="M-30-16 L-24 25 Q0 35 24 25 L30-16 M-30-16 Q0 3 30-16" class="dh-cup-outline"/>
+  </g>
+  <marker id="dh-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" class="dh-arrowhead"/></marker>
+</defs>
+<text x="225" y="30" class="dh-heading">Клиент</text>
+<text x="675" y="30" class="dh-heading">Сервер</text>
+<text x="450" y="72" class="dh-step">1. Общая краска -- известна всем</text>
+<use href="#dh-cup" x="225" y="112" class="dh-common"/>
+<use href="#dh-cup" x="675" y="112" class="dh-common"/>
+<text x="450" y="186" class="dh-step">2. Каждый добавляет свою секретную краску</text>
+<use href="#dh-cup" x="115" y="235" class="dh-common"/>
+<text x="170" y="244" class="dh-symbol">+</text>
+<use href="#dh-cup" x="225" y="235" class="dh-client"/>
+<text x="280" y="244" class="dh-symbol">=</text>
+<use href="#dh-cup" x="335" y="235" class="dh-share-a"/>
+<use href="#dh-cup" x="565" y="235" class="dh-common"/>
+<text x="620" y="244" class="dh-symbol">+</text>
+<use href="#dh-cup" x="675" y="235" class="dh-server"/>
+<text x="730" y="244" class="dh-symbol">=</text>
+<use href="#dh-cup" x="785" y="235" class="dh-share-b"/>
+<text x="225" y="291">Секрет клиента</text><text x="335" y="291">Смесь А</text>
+<text x="675" y="291">Секрет сервера</text><text x="785" y="291">Смесь Б</text>
+<text x="450" y="342" class="dh-step">3. Обмен по открытой линии</text>
+<path d="M245 390H655" class="dh-flow" marker-end="url(#dh-arrow)"/>
+<use href="#dh-cup" x="225" y="385" class="dh-share-a"/>
+<text x="450" y="378">Смесь А → серверу</text>
+<path d="M655 458H245" class="dh-flow" marker-end="url(#dh-arrow)"/>
+<use href="#dh-cup" x="675" y="453" class="dh-share-b"/>
+<text x="450" y="446">Смесь Б → клиенту</text>
+<text x="450" y="535" class="dh-step">4. К принятой смеси -- своя секретная добавка</text>
+<use href="#dh-cup" x="115" y="584" class="dh-share-b"/>
+<text x="170" y="593" class="dh-symbol">+</text>
+<use href="#dh-cup" x="225" y="584" class="dh-client"/>
+<text x="280" y="593" class="dh-symbol">=</text>
+<use href="#dh-cup" x="335" y="584" class="dh-result"/>
+<use href="#dh-cup" x="565" y="584" class="dh-share-a"/>
+<text x="620" y="593" class="dh-symbol">+</text>
+<use href="#dh-cup" x="675" y="584" class="dh-server"/>
+<text x="730" y="593" class="dh-symbol">=</text>
+<use href="#dh-cup" x="785" y="584" class="dh-result"/>
+<text x="115" y="640">Смесь Б</text><text x="225" y="640">Секрет клиента</text>
+<text x="565" y="640">Смесь А</text><text x="675" y="640">Секрет сервера</text>
+<text x="450" y="702" class="dh-step">Одинаковая итоговая смесь у обеих сторон</text>
+<text x="450" y="735">Общая краска + секрет клиента + секрет сервера</text>
+<text x="450" y="774" class="dh-note">Секретные добавки и итоговая смесь по линии не передаются</text>
+</svg>
+</div>
+<figcaption>Аналогия обмена Диффи--Хеллмана. Цвета условны; подписи показывают, что смешивается и что передаётся. На узком экране схема прокручивается по горизонтали.</figcaption>
+</figure>
