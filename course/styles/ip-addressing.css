@@ -1,0 +1,31 @@
+main.content .ipv4-plan {
+  display: grid;
+  grid-template-columns: 1fr auto 1.4fr auto 1fr;
+  gap: var(--demo-gap, 1rem);
+  align-items: center;
+}
+
+.ipv4-plan-network,
+.ipv4-plan-router {
+  display: grid;
+  gap: .4rem;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: .4rem;
+  background: var(--surface-alt);
+  color: var(--ink);
+  text-align: center;
+  min-width: 0;
+}
+
+.ipv4-plan-router { border-color: var(--accent); }
+.ipv4-plan-link { display: block; justify-self: center; color: var(--accent); font-size: 1.5rem; text-align: center; }
+.ipv4-plan figcaption { grid-column: 1 / -1; }
+.ipv4-plan-table { max-width: 100%; overflow-x: auto; }
+.ipv4-plan-table table { min-width: 34rem; }
+.ipv4-plan-table:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+
+@media (max-width: 900px) {
+  main.content .ipv4-plan { grid-template-columns: 1fr; }
+  .ipv4-plan-link { transform: rotate(90deg); }
+}
