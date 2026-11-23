@@ -1,0 +1,74 @@
+.concept-path { margin:1.2rem 0; padding:clamp(.7rem,1.5vw,1.15rem); border:1px solid var(--line); border-radius:.45rem; background:var(--surface); color:var(--ink); }
+.concept-path [hidden] { display:none!important; }
+.cp-views { display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:.7rem; }
+.concept-path .cp-views button { background:var(--surface-alt); color:var(--ink); font-weight:400; }
+.concept-path .cp-views button[aria-pressed="true"] { background:var(--accent); color:var(--page-bg); font-weight:700; }
+.concept-path .cp-views button[aria-pressed="false"] { background:var(--surface-alt); color:var(--ink); font-weight:400; }
+.concept-path .cp-sequence-note { font-size:.85rem; color:var(--muted); margin:.6rem 0; }
+.cp-sequence-scroll { max-height:34rem; overflow:auto; }
+.concept-path .cp-sequence { display:block; width:100%; min-width:650px; height:auto; }
+.cp-lifeline { fill:none; stroke:var(--line); stroke-dasharray:5 5; stroke-width:1.5; }
+.cp-protocol-message { fill:none; stroke:var(--focus); stroke-width:2; }
+.cp-protocol-media { fill:none; stroke:var(--accent); stroke-width:2.5; }
+.cp-seq-label { font:14px ui-monospace,SFMono-Regular,Consolas,monospace; }
+.concept-path .cp-seq-transport { font-size:14px; fill:var(--muted); }
+.concept-path .cp-stack { margin:.5rem 0; padding:.4rem .65rem; border-left:3px solid var(--accent); background:var(--surface-alt); font-size:.9rem; text-align:left; }
+.cp-seq-local { font-size:15px; }
+.cp-seq-active { fill:var(--accent-soft); }
+.cp-local { fill:var(--accent-soft); stroke:var(--accent); }
+.cp-band { fill:var(--surface-alt); stroke:var(--muted); stroke-dasharray:5 3; }
+.cp-controls { display:flex; gap:.5rem; flex-wrap:wrap; }
+.cp-link-label { font-size:13px; fill:var(--muted); }
+.cp-layer-panel { border-top:1px solid var(--line); margin-top:.8rem; padding-top:.8rem; }
+.cp-layer-controls { display:flex; flex-wrap:wrap; gap:.5rem; }
+.concept-path .cp-layer-status { color:var(--muted); font-size:.85rem; margin:.5rem 0; }
+.concept-path .cp-layer-panel h4 { font-size:1.05rem; margin:.4rem 0; }
+.concept-path .cp-layer-explain { margin:.4rem 0 .8rem; min-height:3em; font-size:.95rem; }
+.cp-layer-columns { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:1rem; }
+.cp-layer-packet { min-height:16rem; }
+.cp-unit { padding:.45rem .6rem; margin-top:.3rem; border:1px solid var(--line); border-radius:.3rem; background:var(--surface-alt); }
+.cp-unit.active { border:2px solid var(--accent); background:var(--accent-soft); }
+.cp-unit strong { display:block; font-size:.9rem; }
+.concept-path .cp-unit p { text-align:left; margin:.2rem 0; font-size:.85rem; line-height:1.35; overflow-wrap:anywhere; }
+.concept-path .cp-layer-link p { margin:.4rem 0; text-align:left; font-size:.9rem; }
+.cp-layer-link details { font-size:.8rem; overflow-wrap:anywhere; }
+@media(max-width:760px) { .cp-layer-columns { grid-template-columns:minmax(0,1fr); } .cp-layer-packet { min-height:13rem; } }
+.concept-path button { padding:.5rem .75rem; min-height:48px; border:1px solid var(--line); border-radius:.35rem; background:var(--surface-alt); color:var(--ink); font:inherit; cursor:pointer; }
+.concept-path button:first-child { min-width:9.5rem; background:var(--accent); color:var(--page-bg); font-weight:700; }
+.concept-path button:disabled { opacity:.45; cursor:default; }
+.concept-path :focus-visible { outline:2px solid var(--focus); outline-offset:3px; }
+.cp-choice { display:flex; gap:.4rem; align-items:center; margin-top:.8rem; }
+.cp-choice input { width:1.1rem; height:1.1rem; accent-color:var(--accent); }
+.concept-path .cp-status { margin:.6rem 0 .2rem; font-size:.85rem; color:var(--muted); }
+.concept-path .cp-step-title { font-size:1.08rem; font-weight:700; margin:.2rem 0 .6rem; text-align:left; }
+.concept-path .cp-caption { font-size:.95rem; margin:.7rem 0 0; min-height:3em; }
+.cp-scroll { max-width:100%; overflow-x:auto; }
+.concept-path .cp-plot,.concept-path .cp-voice-plot { display:block; width:100%; min-width:650px; height:auto; color:var(--ink); }
+.concept-path svg text { fill:currentColor; font-family:system-ui,sans-serif; }
+.cp-label { font-size:17px; }
+.cp-tick { font-size:15px; }
+.cp-link { stroke:var(--line); stroke-width:3; fill:none; }
+.cp-route { stroke:var(--accent); stroke-width:4; fill:none; }
+.cp-route.control { stroke:var(--focus); stroke-dasharray:8 6; }
+.cp-direction-token { fill:var(--accent); stroke:var(--surface); stroke-width:1.5; pointer-events:none; }
+.cp-direction-token.control { fill:var(--focus); }
+.cp-flight-guide { fill:none; stroke:none; pointer-events:none; }
+.cp-node { fill:var(--surface-alt); stroke:var(--line); stroke-width:1.5; }
+.cp-node.active { stroke:var(--accent); stroke-width:3; fill:var(--accent-soft); }
+.cp-icon { fill:none; stroke:var(--ink); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.cp-token rect,.cp-chunk { fill:var(--accent); stroke:var(--surface); stroke-width:1.5; }
+.cp-token.control rect,.cp-chunk.late { fill:var(--focus); }
+.concept-path svg .cp-token text,.concept-path svg .cp-packet-number { fill:var(--page-bg); font-size:17px; font-weight:700; }
+.cp-badge { fill:var(--accent-soft); stroke:var(--line); }
+.cp-axis { fill:none; stroke:var(--muted); stroke-width:1; }
+.cp-grid { fill:none; stroke:var(--line); stroke-dasharray:3 5; }
+.cp-sound { fill:none; stroke:var(--accent); stroke-width:2; }
+.cp-cursor { fill:none; stroke:var(--focus); stroke-width:2; }
+.cp-gap { fill:var(--surface-alt); stroke:var(--focus); stroke-width:2; stroke-dasharray:5 3; }
+.cp-dialog { width:min(96vw,1400px); max-width:96vw; max-height:94dvh; padding:0; color:var(--ink); border:1px solid var(--line); border-radius:.45rem; background:var(--surface); }
+.cp-dialog::backdrop { background:rgb(0 0 0 / .55); }
+.cp-dialog .concept-path { margin:0; border:0; }
+.cp-dialog .cp-controls { position:sticky; top:0; z-index:2; padding-block:.5rem; background:var(--surface); }
+.cp-dialog .cp-plot,.cp-dialog .cp-voice-plot { max-height:60dvh; }
+.cp-dialog .cp-sequence-scroll { max-height:65dvh; }
+@media(max-width:600px) { .concept-path .cp-caption { min-height:0; } .cp-label { font-size:18px; } }
