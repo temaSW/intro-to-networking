@@ -43,3 +43,39 @@ test('Plans reject reserved addresses, duplicates, wrong networks, gateways and 
   for(const [key,value] of [['a','192.168.20.0'],['a','192.168.20.63'],['a','192.168.20.70'],['a','192.168.20.1'],['r1','192.168.20.63'],['r2','192.168.20.127'],['b','192.168.20.65'],['gateway1','192.168.20.65'],['gateway2','192.168.20.1'],['first2','192.168.20.64'],['last1','192.168.20.63'],['hosts','64']])assert.equal(checkPlan({...plan(),[key]:value})[key].ok,false,`${key}=${value}`);
   assert.equal(checkPlan({...plan(),r1:''}).gateway1.ok,null);
 });
+
+test('Eight reproducible variants preserve the task constraints and validate their own answers',()=>{
+  const signatures=new Set();
+  for(let variant=1;variant<=8;variant++){
+    const s=model.variantSettings(variant);assert.deepEqual(s,model.variantSettings(variant));
+    signatures.add(JSON.stringify(s));
+    s.cases.forEach((item,i)=>{
+      const n=subnet(item.address,item.prefix),answers={};
+      for(const key of ['mask','network','first','last','broadcast'])answers[key]=formatIPv4(n[key]);
+      for(const key of ['block','hosts'])answers[key]=String(n[key]);
+      assert.ok(allCorrect(checkSubnet(i,answers,variant)));
+      if(variant>1)assert.equal(checkSubnet(i,answers,1).network.ok,false);
+    });
+    const small=subnet(s.source,26),large=subnet(s.source,24);
+    assert.equal(subnet(s.gateway,26).network,small.network);
+    const delivery={};let changes=0;
+    for(let i=0;i<3;i++){
+      const same=subnet(s.destinations[i],26).network===small.network;
+      assert.equal(subnet(s.destinations[i],24).network,large.network);
+      if(!same)changes++;
+      delivery[`p26_${i}`]=same?'direct':'gateway';delivery[`p24_${i}`]='direct';
+    }
+    assert.equal(changes,1);assert.ok(allCorrect(checkDelivery(delivery,variant)));
+    assert.ok(s.computers+1>30&&s.computers+1<=62);
+    const base=parseIPv4(s.base),a={prefix:'26',hosts:'62'};
+    for(const i of [1,2]){
+      const net=base+(i-1)*64;
+      for(const [key,offset]of [[`network${i}`,0],[`first${i}`,1],[`last${i}`,62],[`r${i}`,1],[`gateway${i}`,1],[i===1?'a':'b',10]])a[key]=formatIPv4(net+offset);
+    }
+    assert.ok(allCorrect(checkPlan(a,variant)));
+    assert.equal(checkPlan({...a,network2:a.network1},variant).network2.ok,false);
+    if(variant>1)assert.equal(checkPlan(plan(),variant).network1.ok,false);
+  }
+  assert.equal(signatures.size,8);
+  for(const value of [0,9,1.5,'2',NaN])assert.throws(()=>model.variantSettings(value),RangeError);
+});

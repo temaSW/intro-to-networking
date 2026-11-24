@@ -1,4 +1,4 @@
-import {CASES,DESTINATIONS,checkSubnet,checkDelivery,checkPlan} from './ip-addressing-model.js';
+import {VARIANT_COUNT,variantSettings,checkSubnet,checkDelivery,checkPlan} from './ip-addressing-model.js';
 let serial=0;
 function element(tag,text,className){const e=document.createElement(tag);if(text)e.textContent=text;if(className)e.className=className;return e;}
 function field(form,name,label,options=null){
@@ -30,22 +30,22 @@ function makeForm(root,title,checker){
     status.textContent=correct===values.length?'Все ответы верны.':`Верно: ${correct} из ${values.length}. ${wrong?'Проверьте отмеченные поля.':''}${values.some(r=>r.ok===null)?' Зависимые поля проверяются после исправления исходных данных.':''}`;
   });root.append(form);return form;
 }
-export function mountAddressing(root){
+export function mountAddressing(root,variant=1){
   if(root.dataset.mounted)return;root.dataset.mounted='true';
-  const kind=root.dataset.ipv4Answers;
-  if(kind==='subnets')CASES.forEach((item,index)=>{
-    const form=makeForm(root,`${item.label} · ${item.address}/${item.prefix}`,a=>checkSubnet(index,a));
+  const kind=root.dataset.ipv4Answers,settings=variantSettings(variant);
+  if(kind==='subnets')settings.cases.forEach((item,index)=>{
+    const form=makeForm(root,`${item.label} · ${item.address}/${item.prefix}`,a=>checkSubnet(index,a,variant));
     for(const[name,label]of [['mask','Маска'],['block','Размер блока, адресов'],['network','Адрес сети'],['first','Первый адрес узла'],['last','Последний адрес узла'],['broadcast','Широковещательный адрес'],['hosts','Число адресов для узлов']])field(form,name,label);
   });
   if(kind==='delivery'){
-    const form=makeForm(root,'Способ отправки при двух масках',checkDelivery);
+    const form=makeForm(root,'Способ отправки при двух масках',a=>checkDelivery(a,variant));
     for(const prefix of [26,24]){
-      const group=element('fieldset'),legend=element('legend',`Адрес A: 192.168.10.70/${prefix}`);group.append(legend);const container=element('div',null,'ipv4-answer-fields');group.append(container);form.fields.append(group);
-      const target={fields:container};DESTINATIONS.forEach((address,i)=>field(target,`p${prefix}_${i}`,`${['B','C','D'][i]} · ${address}`,[['direct','Непосредственно получателю'],['gateway','Через шлюз']]));
+      const group=element('fieldset'),legend=element('legend',`Адрес A: ${settings.source}/${prefix}`);group.append(legend);const container=element('div',null,'ipv4-answer-fields');group.append(container);form.fields.append(group);
+      const target={fields:container};settings.destinations.forEach((address,i)=>field(target,`p${prefix}_${i}`,`${['B','C','D'][i]} · ${address}`,[['direct','Непосредственно получателю'],['gateway','Через шлюз']]));
     }
   }
   if(kind==='plan'){
-    const form=makeForm(root,'Ваш план адресации',checkPlan);
+    const form=makeForm(root,'Ваш план адресации',a=>checkPlan(a,variant));
     field(form,'prefix','Общий префикс, например 24');field(form,'hosts','Доступных адресов для узлов в каждой подсети');
     for(const i of [1,2]){
       const group=element('fieldset'),legend=element('legend',`Сеть ${i}`);group.append(legend);const container=element('div',null,'ipv4-answer-fields');group.append(container);form.fields.append(group);const target={fields:container};
@@ -53,4 +53,30 @@ export function mountAddressing(root){
     }
   }
 }
-document.querySelectorAll('[data-ipv4-answers]').forEach(mountAddressing);
+export function mountPractice(scope=document){
+  const picker=scope.querySelector('[data-ipv4-variant]');
+  if(!picker){scope.querySelectorAll('[data-ipv4-answers]').forEach(root=>mountAddressing(root));return;}
+  const url=new URL(window.location.href),requested=url.searchParams.get('variant');
+  picker.value=/^[1-8]$/.test(requested??'')?requested:'1';
+  function update(){
+    const variant=Number(picker.value),s=variantSettings(variant);
+    const values={source:s.source+'/26',gateway:s.gateway,base:s.base+'/24',computers:s.computers};
+    s.cases.forEach((item,i)=>values['case'+i]=item.address+'/'+item.prefix);
+    s.destinations.forEach((address,i)=>values['destination'+i]=address);
+    scope.querySelectorAll('[data-ipv4-value]').forEach(node=>node.textContent=values[node.dataset.ipv4Value]);
+    scope.querySelectorAll('[data-ipv4-answers]').forEach(root=>{
+      root.replaceChildren();delete root.dataset.mounted;mountAddressing(root,variant);
+    });
+    scope.querySelector('[data-ipv4-variant-status]').textContent=`Вариант ${variant} из ${VARIANT_COUNT}.`;
+  }
+  picker.addEventListener('change',()=>{
+    const next=new URL(window.location.href);next.searchParams.set('variant',picker.value);
+    window.history.replaceState(null,'',next);update();
+  });
+  window.addEventListener('popstate',()=>{
+    const value=new URL(window.location.href).searchParams.get('variant');
+    picker.value=/^[1-8]$/.test(value??'')?value:'1';update();
+  });
+  update();
+}
+mountPractice();

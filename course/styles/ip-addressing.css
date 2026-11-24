@@ -48,3 +48,9 @@ main.content .ipv4-answer-status { margin: .75rem 0 0; text-align: left; }
 @media (max-width: 575px) {
   .ipv4-answer-fields { grid-template-columns: 1fr; }
 }
+
+.ipv4-variant-picker { display: flex; align-items: center; flex-wrap: wrap; gap: 1rem; }
+.ipv4-variant-picker label { font-weight: 700; }
+.ipv4-variant-picker select { min-height: 44px; max-width: 100%; padding: .5rem; border: 1px solid var(--line); border-radius: .3rem; background: var(--page-bg); color: var(--ink); font: inherit; }
+.ipv4-variant-picker select:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+.ipv4-variant-picker [role="status"] { color: var(--muted); }
