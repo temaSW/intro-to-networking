@@ -54,3 +54,11 @@ main.content .ipv4-answer-status { margin: .75rem 0 0; text-align: left; }
 .ipv4-variant-picker select { min-height: 44px; max-width: 100%; padding: .5rem; border: 1px solid var(--line); border-radius: .3rem; background: var(--page-bg); color: var(--ink); font: inherit; }
 .ipv4-variant-picker select:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
 .ipv4-variant-picker [role="status"] { color: var(--muted); }
+
+.ipv4-task-table { max-width: 100%; overflow-x: auto; margin: 1rem 0; }
+.ipv4-task-table table { width: 100%; margin: 0; }
+.ipv4-task-table th, .ipv4-task-table td { padding: .6rem; text-align: left; vertical-align: top; }
+.ipv4-task-table:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+.ipv4-answer > span { overflow-wrap: anywhere; }
+
+.ipv4-task-table :is(th, td) { white-space: nowrap; overflow-wrap: normal; }
