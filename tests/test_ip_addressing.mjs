@@ -15,7 +15,7 @@ test('IPv4 parsing rejects malformed and ambiguous values and handles high addre
 
 test('Eight variants are reproducible and vary masks, directions and planning constraints',()=>{
   assert.equal(model.VARIANT_COUNT,8);
-  const signatures=fixtures.map(({variant})=>{const s=variantSettings(variant);assert.deepEqual(s,variantSettings(variant));return JSON.stringify([s.cases.map(c=>c.prefix),s.delivery.states.map(t=>t.rows.map(r=>[r.sender,r.recipient,r.prefix])),s.plan.computers,s.plan.reserved,s.plan.fixedNetworks,s.plan.fixedRouters,Boolean(s.plan.draft)]);});
+  const signatures=fixtures.map(({variant})=>{const s=variantSettings(variant);assert.deepEqual(s,variantSettings(variant));return JSON.stringify([s.cases.map(c=>c.prefix),s.delivery.states.map(t=>t.rows.map(r=>[r.sender,r.recipient,r.prefix])),s.plan.parentPrefix,s.plan.computers,s.plan.reserved,s.plan.fixedNetworks,s.plan.fixedRouters]);});
   assert.equal(new Set(signatures).size,8);
   for(const v of [0,9,1.5,'2',NaN])assert.throws(()=>variantSettings(v),RangeError);
 });
@@ -64,8 +64,8 @@ test('Minimal sizing counts the router interface and crosses capacity thresholds
 test('Reserved ranges, fixed network addresses and fixed routers are enforced',()=>{
   assert.equal(checkPlan({...fixtures[1].plan,network1:'192.168.40.0'},2).network1.ok,false);
   assert.equal(checkPlan({...fixtures[5].plan,network2:'192.168.120.128'},6).network2.ok,false);
-  assert.equal(checkPlan({...fixtures[4].plan,network1:'192.168.100.128'},5).network1.ok,false);
-  for(const variant of [3,5,7,8]){
+  assert.equal(checkPlan({...fixtures[7].plan,network1:'192.168.160.96'},8).network1.ok,false);
+  for(const variant of [3,7,8]){
     const a=fixtures[variant-1].plan,s=variantSettings(variant);
     for(const i of Object.keys(s.plan.fixedRouters)){
       const other=formatIPv4(parseIPv4(a[`r${i}`])+1);
@@ -90,7 +90,7 @@ test('Every valid pair in the unconstrained equal-size task is accepted',()=>{
   }
 });
 
-test('Draft repairs reject the actual broadcast, wrong gateway and overlapping proposal',()=>{
+test('Plans reject broadcast host addresses, wrong gateways and unequal overlapping blocks',()=>{
   const a={...fixtures[4].plan,a:'192.168.100.63',gateway2:'192.168.100.1'};
   const r=checkPlan(a,5);assert.equal(r.a.ok,false);assert.equal(r.gateway2.ok,false);
   const b={...fixtures[7].plan,network2:'192.168.160.80',first2:'192.168.160.81',last2:'192.168.160.94',r2:'192.168.160.81',b:'192.168.160.82',gateway2:'192.168.160.81'};
@@ -98,7 +98,7 @@ test('Draft repairs reject the actual broadcast, wrong gateway and overlapping p
 });
 
 test('Different valid placements and host choices are accepted in constrained tasks',()=>{
-  for(const [variant,n1,n2]of [[2,128,224],[4,128,0],[6,64,0],[8,64,128]]){
+  for(const [variant,n1,n2]of [[2,128,224],[4,128,0],[6,64,0],[8,64,112]]){
     const a={...fixtures[variant-1].plan},s=variantSettings(variant);
     for(const [i,n]of [[1,n1],[2,n2]]){
       const base=parseIPv4(s.plan.base)+n,size=2**(32-Number(a[`prefix${i}`]));
@@ -112,4 +112,9 @@ test('Different valid placements and host choices are accepted in constrained ta
     a.b=a.last2===a.r2?formatIPv4(parseIPv4(a.last2)-3):a.last2;
     assert.ok(allCorrect(checkPlan(a,variant)),`alternate hosts ${variant}`);
   }
+});
+
+test('New planning tasks enforce the smaller parent and both reserved ranges',()=>{
+  assert.equal(checkPlan({...fixtures[4].plan,network2:'192.168.100.128'},5).network2.ok,false);
+  for(const network2 of ['192.168.160.0','192.168.160.128'])assert.equal(checkPlan({...fixtures[7].plan,network2},8).network2.ok,false);
 });

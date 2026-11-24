@@ -82,7 +82,7 @@ format:
 <div data-ipv4-answers="delivery"><noscript>Для ввода и проверки ответов включите JavaScript.</noscript></div>
 ```
 
-## 3. Составьте или исправьте план адресации {#address-plan}
+## 3. Составьте план адресации {#address-plan}
 
 ```{=html}
 <div data-ipv4-task="plan">

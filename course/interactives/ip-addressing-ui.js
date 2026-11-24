@@ -58,7 +58,6 @@ export function renderConditions(scope,settings){
     if(p.reserved?.length)root.append(table(['Уже занятый блок'],p.reserved.map(r=>[`${r.address}/${r.prefix}`]),'Занятые диапазоны'));
     if(p.fixedNetworks)root.append(table(['Что нужно сохранить','Адрес сети'],Object.entries(p.fixedNetworks).map(([i,address])=>[`Сеть ${i}`,address]),'Закреплённые адреса сетей'));
     if(p.fixedRouters)root.append(table(['Что нужно сохранить','IPv4-адрес'],Object.entries(p.fixedRouters).map(([i,address])=>[`Интерфейс ${i} маршрутизатора R`,address]),'Закреплённые адреса интерфейсов'));
-    if(p.draft){root.append(element('h3','Предложенный план'),table(['Сеть','Сеть / префикс','Интерфейс R','Компьютер','Шлюз компьютера'],p.draft.map((r,i)=>[String(i+1),r.network,r.router,`${i===0?'A':'B'}: ${r.computer}`,r.gateway]),'План для проверки и исправления'),element('p','Заполните ниже исправленный план. В записях укажите, какие исходные значения вы изменили и почему.'));}
     const diagram=element('figure',null,'course-demo ipv4-plan');
     const net=i=>{const n=element('div',null,'ipv4-plan-network');n.append(element('strong',`Сеть ${i}`),element('span',`Компьютеров: ${p.computers[i-1]}`),element('span',`В том числе ${i===1?'A':'B'}`));return n;};
     const link=()=>{const l=element('span','↔','ipv4-plan-link');l.setAttribute('aria-hidden','true');return l;};
@@ -84,7 +83,7 @@ export function mountAddressing(root,variant=1){
     });
   }
   if(kind==='plan'){
-    const form=makeForm(root,settings.plan.draft?'Исправленный план адресации':'Ваш план адресации',a=>checkPlan(a,variant));
+    const form=makeForm(root,'Ваш план адресации',a=>checkPlan(a,variant));
     for(const i of [1,2]){
       const group=element('fieldset');group.append(element('legend',`Сеть ${i}`));const container=element('div',null,'ipv4-answer-fields');group.append(container);form.fields.append(group);const target={fields:container};
       for(const[name,label]of [[`prefix${i}`,'Префикс'],[`hosts${i}`,'Доступных адресов для узлов'],[`network${i}`,'Адрес сети'],[`first${i}`,'Первый адрес узла'],[`last${i}`,'Последний адрес узла'],[i===1?'a':'b',`Адрес компьютера ${i===1?'A':'B'}`],[`r${i}`,`Адрес интерфейса ${i} маршрутизатора R`],[`gateway${i}`,`Шлюз компьютера ${i===1?'A':'B'}`]])field(target,name,label);
