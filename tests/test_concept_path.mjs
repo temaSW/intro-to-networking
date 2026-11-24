@@ -11,6 +11,7 @@ vm.runInNewContext(readFileSync(new URL('../course/interactives/concept-packet-m
 const packet=context.window.CourseConceptPacket;
 const all=id=>Array.from({length:model.stateAt(id,0).count},(_,i)=>model.stateAt(id,i));
 const path=s=>Array.from(s.path||[]);
+const eventIndex=(id,label)=>protocols.forCase(id).rows.findIndex(r=>r.label.startsWith(label))+1;
 test('SMB stays in the local segment and returns data from the file server',()=>{
   const states=all('smb');
   assert.ok(states.every(s=>!path(s).includes(3)));
@@ -78,16 +79,36 @@ test('Protocol events reference valid participants and conceptual states',()=>{
   }
 });
 test('SMB opens before reading and closes after data arrives',()=>{
-  const r=protocols.forCase('smb').rows;
+  const r=protocols.forCase('smb').rows.slice(4).filter(r=>r.tcp?.bytes);
   assert.match(r[0].label,/CREATE/);assert.match(r[1].label,/FileId/);
   assert.match(r[2].label,/READ/);assert.match(r[3].label,/READ Response/);
   assert.match(r[4].label,/CLOSE/);assert.equal(r[3].from,1);
 });
-test('HTTP follows DNS, TCP establishment and an explicitly collapsed TLS exchange',()=>{
+test('SMB byte sequence and cumulative acknowledgements remain consistent in both directions',()=>{
+  const rows=protocols.forCase('smb').rows.filter(r=>r.tcp),next=[1001,5001];
+  assert.equal(rows.length,9);assert.equal(rows.filter(r=>r.tcp.bytes===0).length,3);
+  for(const r of rows){
+    assert.equal(r.tcp.seq,next[r.from],r.label);assert.equal(r.tcp.ack,next[r.to],r.label);
+    assert.equal(r.tcp.flags,'ACK');next[r.from]+=r.tcp.bytes;
+  }
+  assert.deepEqual(next,[1369,5885]);
+  const read=rows.find(r=>r.label.startsWith('SMB2 READ'));
+  assert.equal(read.tcp.ack,5161);assert.equal(read.tcp.bytes,116);
+  assert.equal(rows.find(r=>r.label.startsWith('READ Response')).tcp.ack,1277);
+});
+test('Standalone TCP acknowledgements carry no SMB application payload',()=>{
+  const rows=protocols.forCase('smb').rows;
+  for(let i=0;i<rows.length;i++)if(rows[i].tcp?.bytes===0){
+    const state=protocols.eventState('smb',i+1);assert.equal(state.path[0],rows[i].from===0?0:2);
+    const n=packet.describe('smb',i+1,0).phaseCount;
+    for(let j=0;j<n;j++)assert.ok(!packet.describe('smb',i+1,(j+.5)/n).layers.includes('message'));
+  }
+});
+test('HTTP follows DNS and explicitly collapsed TCP and TLS preparation',()=>{
   const r=protocols.forCase('web').rows;
   assert.match(r[0].label,/DNS Query/);assert.match(r[1].label,/DNS Response/);
-  assert.match(r[2].label,/SYN$/);assert.match(r[3].label,/SYN \+ ACK/);assert.match(r[4].label,/ACK/);
-  assert.equal(r[5].kind,'band');assert.match(r[6].label,/GET/);assert.match(r[7].label,/200 OK/);
+  assert.equal(r[2].label,'TCP-соединение установлено');assert.equal(r[2].kind,'band');
+  assert.equal(r[3].kind,'band');assert.match(r[3].label,/TLS/);assert.match(r[4].label,/GET/);assert.match(r[5].label,/200 OK/);
 });
 test('XMPP receipt originates at the recipient, not at the forwarding server',()=>{
   const r=protocols.forCase('message').rows;
@@ -120,7 +141,7 @@ test('Every network exchange has an explicit transport; local work has none',()=
   assert.ok(protocols.forCase('smb').rows.every(r=>r.transport==='TCP'));
   const web=protocols.forCase('web').rows;
   assert.ok(web.slice(0,2).every(r=>r.transport==='UDP'));
-  assert.ok(web.slice(2,8).every(r=>r.transport==='TCP'));
+  assert.ok(web.slice(2).filter(r=>r.kind!=='local').every(r=>r.transport==='TCP'));
 });
 test('Messenger signalling uses separate TCP connections; chosen media uses UDP',()=>{
   const message=protocols.forCase('message').rows;
@@ -136,7 +157,7 @@ test('Both views share every protocol event and route it between its actual part
     const rows=protocols.forCase(id,relay).rows;
     for(let i=0;i<rows.length;i++){
       const e=rows[i],state=protocols.eventState(id,i+1,relay);
-      assert.equal(state.title,e.label);assert.equal(state.count,rows.length+1);assert.equal(state.eventIndex,i);
+      assert.equal(state.title,e.displayLabel||e.label);assert.equal(state.count,rows.length+1);assert.equal(state.eventIndex,i);
       assert.equal(state.fromNode,mapping[id][e.from]);assert.equal(state.toNode,mapping[id][e.to]);
       if(e.kind==='local'||e.kind==='band')assert.equal(state.path,null);
       else {
@@ -150,7 +171,7 @@ test('Both views share every protocol event and route it between its actual part
 test('Response messages reverse the actual route instead of repeating the request animation',()=>{
   const request=protocols.eventState('smb',1),reply=protocols.eventState('smb',2);
   assert.deepEqual(Array.from(reply.path),Array.from(request.path).reverse());
-  const web=protocols.eventState('web',4);assert.equal(web.fromNode,3);assert.equal(web.toNode,0);
+  const web=protocols.eventState('web',eventIndex('web','HTTP/1.1 200'));assert.equal(web.fromNode,3);assert.equal(web.toNode,0);
   const ring=protocols.eventState('voip',2);assert.deepEqual(Array.from(ring.path),[2,1,0]);
 });
 test('Packet arrow orientation follows right, left and vertical movement',()=>{
@@ -195,7 +216,7 @@ test('Certificate name mismatch terminates the exchange without HTTP or client F
 });
 const packetStages=(id,index,relay=false)=>{const n=packet.describe(id,index,0,relay)?.phaseCount||0;return Array.from({length:n},(_,i)=>packet.describe(id,index,(i+.5)/n,relay));};
 test('Remote packet passes Wi-Fi, bridge, Ethernet fibre and a final Ethernet link',()=>{
-  const steps=packetStages('web',7),links=steps.filter(s=>s.phase.kind==='transfer');
+  const steps=packetStages('web',eventIndex('web','HTTP: GET')),links=steps.filter(s=>s.phase.kind==='transfer');
   assert.deepEqual(links.map(s=>s.frame.format),['Wi-Fi','Ethernet','Ethernet','Ethernet']);
   assert.deepEqual(links.map(s=>s.frame.medium),['radio','copper','optical','copper']);
   assert.deepEqual(links.map(s=>s.ttl),[64,64,63,62]);
@@ -206,23 +227,25 @@ test('Remote packet passes Wi-Fi, bridge, Ethernet fibre and a final Ethernet li
   assert.notEqual(links[0].frame.macDestination,links[0].frame.radioReceiver);
 });
 test('Return packet has reversed IP endpoints and a distinct Wi-Fi transmitter',()=>{
-  const links=packetStages('web',8).filter(s=>s.phase.kind==='transfer'),last=links.at(-1);
+  const links=packetStages('web',eventIndex('web','HTTP/1.1 200')).filter(s=>s.phase.kind==='transfer'),last=links.at(-1);
   assert.equal(last.frame.format,'Wi-Fi');assert.equal(last.ttl,62);
   assert.equal(last.ipSource,'198.51.100.20');assert.equal(last.ipDestination,'192.0.2.10');
   assert.notEqual(last.frame.macSource,last.frame.radioTransmitter);
   assert.equal(last.frame.macDestination,last.frame.radioReceiver);
 });
 test('A local SMB switch preserves IP, MAC data endpoints and TTL',()=>{
-  const stages=packetStages('smb',1),links=stages.filter(s=>s.phase.kind==='transfer');
+  const stages=packetStages('smb',eventIndex('smb','SMB2 CREATE')),links=stages.filter(s=>s.phase.kind==='transfer');
   assert.equal(links.length,2);assert.ok(links.every(s=>s.frame.format==='Ethernet'&&s.ttl===64));
   assert.equal(links[0].frame.macSource,links[1].frame.macSource);assert.equal(links[0].frame.macDestination,links[1].frame.macDestination);
   assert.equal(new Set(stages.map(s=>s.packetId)).size,1);
   assert.equal(stages[0].phase.unit,'message');assert.equal(stages.at(-1).phase.unit,'message');
 });
 test('TCP control segments do not acquire fictitious application data',()=>{
-  const stages=packetStages('web',3);assert.ok(stages.length);
-  assert.ok(stages.every(s=>!s.layers.includes('message')));
-  assert.equal(stages[0].phase.unit,'transport');assert.equal(stages.at(-1).phase.unit,'transport');
+  for(const id of ['smb','cloud'])for(const index of [1,2,3]){
+    const stages=packetStages(id,index);assert.ok(stages.length);
+    assert.ok(stages.every(s=>!s.layers.includes('message')));
+    assert.equal(stages[0].phase.unit,'transport');assert.equal(stages.at(-1).phase.unit,'transport');
+  }
 });
 test('A messenger server begins a new IP exchange when forwarding to the recipient',()=>{
   const a=packet.describe('message',1,0),b=packet.describe('message',3,0);
@@ -253,16 +276,53 @@ test('Changing the animation duration preserves its paused normalized position',
 
 test('Cloud file uses HTTPS across routers and returns bytes to the client',()=>{
   const d=protocols.forCase('cloud');
-  assert.equal(d.rows.length,3);
-  assert.ok(d.rows[0].label.startsWith('HTTP: GET'));
-  assert.ok(d.rows[1].label.includes('200 OK'));
-  assert.equal(d.rows[2].kind,'local');
-  assert.ok(d.rows.slice(0,2).every(r=>r.transport==='TCP'&&r.protection==='application'));
-  assert.deepEqual(path(protocols.eventState('cloud',1)),[0,4,1,2,3]);
-  assert.deepEqual(path(protocols.eventState('cloud',2)),[3,2,1,4,0]);
-  const start=packet.describe('cloud',1,0),end=packet.describe('cloud',1,1);
+  assert.equal(d.rows.length,7);
+  assert.ok(d.rows[4].label.startsWith('HTTP: GET'));
+  assert.ok(d.rows[5].label.includes('200 OK'));
+  assert.equal(d.rows[6].kind,'local');
+  assert.ok(d.rows.slice(4,6).every(r=>r.transport==='TCP'&&r.protection==='application'));
+  assert.deepEqual(path(protocols.eventState('cloud',5)),[0,4,1,2,3]);
+  assert.deepEqual(path(protocols.eventState('cloud',6)),[3,2,1,4,0]);
+  const start=packet.describe('cloud',5,0),end=packet.describe('cloud',5,1);
   assert.equal(start.ipDestination,'198.51.100.20');
   assert.equal(start.payload,'Защищённые данные');
   assert.equal(end.ttl,62);
-  assert.equal(packet.describe('cloud',3,0),null);
+  assert.equal(packet.describe('cloud',7,0),null);
+});
+
+test('HTTPS diagrams expose TLS records while keeping HTTP as protected contents',()=>{
+  for(const id of ['cloud','web','tls']){
+    const d=protocols.forCase(id);assert.ok(d.stack.includes('HTTPS'));
+    const data=d.rows.map((r,i)=>({r,index:i+1})).filter(({r})=>r.protection==='application');
+    assert.equal(data.length,2);
+    for(const{r,index}of data){
+      assert.match(r.displayLabel,/^TLS/);assert.match(protocols.eventState(id,index).title,/^TLS/);
+      assert.equal(protocols.eventState(id,index).payload,r.displayLabel);
+      assert.equal(packet.describe(id,index,.5).payload,'Защищённые данные');
+    }
+  }
+});
+
+test('First two examples establish TCP before application preparation and file operations',()=>{
+  for(const id of ['smb','cloud']){
+    const rows=protocols.forCase(id).rows;
+    assert.deepEqual(Array.from(rows.slice(0,3),r=>[r.label,r.from,r.to]),[['TCP SYN',0,1],['TCP SYN + ACK',1,0],['TCP ACK',0,1]]);
+    assert.equal(rows[3].kind,'band');
+    assert.ok(!rows.slice(0,3).some(r=>r.protection));
+    assert.match(protocols.eventState(id,0).transportStatus,/ещё не установлено/);
+    assert.match(protocols.eventState(id,1).transportStatus,/установление/);
+    assert.match(protocols.eventState(id,2).transportStatus,/установление/);
+    assert.match(protocols.eventState(id,3).transportStatus,/ACK/);
+    assert.equal(protocols.eventState(id,4).transportStatus,'TCP-соединение установлено.');
+  }
+});
+test('Later examples state TCP readiness and distinguish connectionless UDP',()=>{
+  assert.match(protocols.eventState('web',0).transportStatus,/UDP готов/);
+  assert.match(protocols.eventState('web',3).transportStatus,/TCP-соединение.*установлено/);
+  for(const id of ['tls','message','call'])assert.match(protocols.eventState(id,0).transportStatus,/TCP.*установлен/);
+  assert.match(protocols.eventState('voip',0).transportStatus,/UDP готов/);
+  assert.match(protocols.eventState('voip',0).transportStatus,/рукопожатия UDP нет/);
+  const call=protocols.forCase('call');const media=call.rows.findIndex(r=>r.kind==='media')+1;
+  assert.match(protocols.eventState('call',media).transportStatus,/UDP готов к передаче речи/);
+  for(const id of ['web','tls','message','call','voip'])assert.ok(!protocols.forCase(id).rows.some(r=>r.label.startsWith('TCP SYN')));
 });

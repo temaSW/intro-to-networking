@@ -50,7 +50,7 @@
   }
   for(const root of document.querySelectorAll('[data-concept-path]')){
     const id=root.dataset.conceptPath,b=controls(root),motion=p.createMotion();
-    let index=0,view='route',relay=false,tlsFault=false,raf=0,routePath=null,routeToken=null,sequencePath=null,sequenceToken=null,displayState=null,routeBoxes=[],highlightTarget=null,layerKey='';
+    let index=0,view='route',relay=false,tlsFault=false,tcpDetails=false,raf=0,routePath=null,routeToken=null,sequencePath=null,sequenceToken=null,displayState=null,routeBoxes=[],highlightTarget=null,layerKey='';
     b.next.textContent='Сообщение →';b.back.textContent='← Сообщение';
     const viewBar=h('div','cp-views'),messageView=h('button','','Сообщения во времени'),routeView=h('button','','Путь через сеть'),wholeView=h('button','','Вся диаграмма');
     messageView.type=routeView.type=wholeView.type='button';viewBar.setAttribute('role','group');viewBar.setAttribute('aria-label','Представление обмена');viewBar.append(messageView,routeView,wholeView);root.prepend(viewBar);
@@ -61,6 +61,10 @@
     }
     messageView.addEventListener('click',()=>setView('messages'));routeView.addEventListener('click',()=>setView('route'));
     wholeView.addEventListener('click',()=>{stop();view='messages';index=p.forCase(id,relay,tlsFault).rows.length;motion.reset(1);draw();sequenceScroll.scrollTop=0;});
+    if(id==='smb'){
+      const label=h('label','cp-choice'),input=h('input');input.type='checkbox';input.dataset.cp='tcp-details';label.append(input,document.createTextNode(' Показать SEQ, ACK и длины данных'));root.append(label);
+      input.addEventListener('change',()=>{stop();tcpDetails=input.checked;draw();});
+    }
     if(id==='tls'){
       const label=h('label','cp-choice'),input=h('input');input.type='checkbox';input.dataset.cp='tls-fault';label.append(input,document.createTextNode(' Имя в сертификате не совпадает'));root.append(label);
       input.addEventListener('change',()=>{stop();tlsFault=input.checked;index=0;motion.reset();draw();});
@@ -78,7 +82,7 @@
     const plot=s('svg',{viewBox:'0 0 880 270',role:'img',class:'cp-plot'});scroll.append(plot);
     const sequenceNote=h('p','cp-sequence-note'),sequenceScroll=h('div','cp-scroll cp-sequence-scroll');sequenceScroll.tabIndex=0;sequenceScroll.setAttribute('role','region');sequenceScroll.setAttribute('aria-label','Временная диаграмма: время направлено вниз');
     const sequencePlot=s('svg',{viewBox:'0 0 880 400',role:'img',class:'cp-sequence','aria-label':'Последовательность сообщений протокола'});sequenceScroll.append(sequencePlot);
-    const stack=h('p','cp-stack'),caption=h('p','cp-caption');
+    const stack=h('p','cp-stack'),transportState=h('p','cp-transport-state'),caption=h('p','cp-caption');
     const layerPanel=h('section','cp-layer-panel');layerPanel.setAttribute('aria-label','Текущий пакет по уровням');
     const layerControls=h('div','cp-layer-controls'),layerNext=h('button','','Преобразование →'),layerReset=h('button','','Сначала пакет');layerNext.type=layerReset.type='button';layerControls.append(layerNext,layerReset);
     const layerStatus=h('p','cp-layer-status'),layerTitle=h('h4'),layerExplain=h('p','cp-layer-explain'),columns=h('div','cp-layer-columns'),envelope=h('div','cp-layer-packet'),linkInfo=h('div','cp-layer-link');
@@ -86,7 +90,7 @@
     const macDetails=h('details'),macSummary=h('summary','','Адреса текущего кадра'),macText=h('p'),radioText=h('p');macDetails.append(macSummary,macText,radioText);
     linkInfo.append(linkTitle,linkPeer,framePeer,ipDestination,macDetails);columns.append(envelope,linkInfo);
     layerPanel.append(layerControls,layerStatus,layerTitle,layerExplain,columns);
-    root.append(status,title,stack,scroll,sequenceNote,sequenceScroll,layerPanel,caption);
+    root.append(status,title,stack,transportState,scroll,sequenceNote,sequenceScroll,layerPanel,caption);
     layerNext.addEventListener('click',()=>{stop();const d=packet.describe(id,index,motion.snapshot().progress,relay,tlsFault);if(d){motion.reset(d.nextProgress);paint(motion.snapshot().progress);}});
     layerReset.addEventListener('click',()=>{stop();motion.reset();paint(0);});
     function syncButton(){const active=motion.snapshot().running;b.play.textContent=active?'Ⅱ Пауза':'▶ Показать';b.play.setAttribute('aria-pressed',active);}
@@ -111,9 +115,9 @@
       const state=current();displayState=state;layerKey='';const plan=packet.describe(id,index,0,relay,tlsFault);motion.setDuration(plan?plan.duration:1800);
       messageView.setAttribute('aria-pressed',view==='messages');routeView.setAttribute('aria-pressed',view==='route');
       scroll.hidden=view!=='route';sequenceScroll.hidden=view!=='messages';sequenceNote.hidden=view!=='messages';
-      sequenceNote.textContent=state.sequence.note+' Вниз -- позже; вертикальные расстояния не задают длительность.';
+      sequenceNote.textContent=state.sequence.note+(id==='smb'&&tcpDetails?' SEQ, ACK и длины условные, для фрагмента после подготовки SMB.':'')+' Вниз -- позже; вертикальные расстояния не задают длительность.';
       b.back.disabled=index===0;b.next.disabled=index===state.count-1;
-      status.textContent=`${index+1} / ${state.count}`;title.textContent=state.title;caption.textContent=state.text;stack.textContent=state.sequence.stack;
+      status.textContent=`${index+1} / ${state.count}`;title.textContent=state.title;caption.textContent=id==='smb'&&!tcpDetails&&state.event?.brief?state.event.brief:state.text;stack.textContent=state.sequence.stack;transportState.textContent=state.transportStatus;
       drawRoute(state);drawSequence(state);paint(motion.snapshot().progress);syncButton();
     }
     function drawRoute(state){
@@ -138,6 +142,7 @@
         if(unit==='ip')box.append(h('p','',`${d.ipSource} → ${d.ipDestination}`),h('p','',`TTL: ${d.ttl}`));
         if(unit==='message')box.append(h('p','',d.payload));
         if(unit==='transport'&&d.state.event.label.startsWith('TCP '))box.append(h('p','',d.state.event.label));
+        if(unit==='transport'&&d.state.event.tcp){const t=d.state.event.tcp;if(tcpDetails)box.append(h('p','',`SEQ ${t.seq} · ACK ${t.ack} · ${t.bytes} байт данных`));box.append(h('p','',t.bytes?'Полезная нагрузка: сообщение SMB.':'Только подтверждение TCP, без сообщения SMB.'));}
         parent.append(box);parent=box;
       }
       linkTitle.textContent=`${d.frame.format} • ${d.frame.medium==='radio'?'радио':d.frame.medium==='optical'?'волокно':'медь'}`;
@@ -150,26 +155,28 @@
     }
     function drawSequence(state){
       const {actors,rows}=state.sequence;sequencePlot.replaceChildren();sequencePath=null;sequenceToken=null;
-      const height=110+rows.length*52,x=i=>90+i*700/(actors.length-1);
+      const rowGap=id==='smb'?64:52,height=110+rows.length*rowGap,x=i=>90+i*700/(actors.length-1);
       sequencePlot.setAttribute('viewBox',`0 0 880 ${height}`);sequencePlot.setAttribute('aria-label',`${id}: ${state.title}; время направлено вниз`);
       sequencePlot.append(s('path',{d:`M25 55 V${height-15} l-5 -10 m5 10 l5 -10`,class:'cp-axis'}),s('text',{x:10,y:35,class:'cp-tick'},'t'));
       actors.forEach((actor,i)=>sequencePlot.append(s('text',{x:x(i),y:25,'text-anchor':'middle',class:'cp-label'},actor),s('path',{d:`M${x(i)} 40 V${height-10}`,class:'cp-lifeline'})));
       rows.forEach((event,i)=>{
-        if(i>state.eventIndex)return;const y=72+i*52,active=i===state.eventIndex;
+        if(i>state.eventIndex)return;const y=72+i*rowGap,active=i===state.eventIndex;
         if(active)sequencePlot.append(s('rect',{x:38,y:y-23,width:825,height:49,rx:5,class:'cp-seq-active'}));
         if(event.kind==='local'){
           const xx=x(event.from);sequencePlot.append(s('rect',{x:xx-8,y:y-10,width:16,height:27,class:'cp-local'}),s('text',{x:xx+(xx>600?-18:18),y:y+6,'text-anchor':xx>600?'end':'start',class:'cp-seq-local'},event.label));return;
         }
         const a=x(event.from),b=x(event.to),middle=(a+b)/2;
         if(event.kind==='band'){
-          sequencePlot.append(s('rect',{x:Math.min(a,b)+10,y:y-16,width:Math.abs(b-a)-20,height:35,rx:5,class:'cp-band'}),s('text',{x:middle,y:y+6,'text-anchor':'middle',class:'cp-seq-local'},event.label+' · '+event.transport));return;
+          sequencePlot.append(s('rect',{x:Math.min(a,b)+10,y:y-16,width:Math.abs(b-a)-20,height:35,rx:5,class:'cp-band'}),s('text',{x:middle,y:y+6,'text-anchor':'middle',class:'cp-seq-local'},event.label));return;
         }
-        const cls=event.kind==='media'?'cp-protocol-media':'cp-protocol-message',end=b+(a<b?-3:3),sign=a<b?-1:1;
+        const cls=event.tcp?.bytes===0?'cp-protocol-ack':event.kind==='media'?'cp-protocol-media':'cp-protocol-message',end=b+(a<b?-3:3),sign=a<b?-1:1;
         const protection=event.protection==='none'?' · открыто':event.protection==='handshake'?' · шифр (рукопожатие)':event.protection==='application'?' · шифр (приложение)':'';
-        sequencePlot.append(s('text',{x:middle,y:y-6,'text-anchor':'middle',class:'cp-seq-label'},event.label),s('path',{d:`M${a} ${y+8} H${end} m${sign*10} -5 l${-sign*10} 5 l${sign*10} 5`,class:cls}),s('text',{x:middle,y:y+25,'text-anchor':'middle',class:'cp-seq-transport'},event.transport+(event.flow?' · '+event.flow:'')+protection));
+        const label=event.tcp?.bytes?`TCP [${event.label}]`:(event.displayLabel||event.label);
+        const transport=event.tcp?(tcpDetails?`TCP · ${event.tcp.flags} · SEQ ${event.tcp.seq} · ACK ${event.tcp.ack} · ${event.tcp.bytes} байт`:(event.tcp.bytes?'TCP · данные SMB':'TCP · без данных')):event.transport+(event.flow?' · '+event.flow:'')+protection;
+        sequencePlot.append(s('text',{x:middle,y:y-6,'text-anchor':'middle',class:'cp-seq-label'},label),s('path',{d:`M${a} ${y+8} H${end} m${sign*10} -5 l${-sign*10} 5 l${sign*10} 5`,class:cls}),s('text',{x:middle,y:y+25,'text-anchor':'middle',class:'cp-seq-transport'},transport));
         if(active){sequencePath=s('path',{d:`M${a} ${y+8} H${b}`,class:'cp-flight-guide'});sequenceToken=flightToken(event.kind!=='media');sequencePlot.append(sequencePath,sequenceToken);}
       });
-      if(view==='messages')sequenceScroll.scrollTop=Math.max(0,72+state.eventIndex*52-sequenceScroll.clientHeight+85);
+      if(view==='messages')sequenceScroll.scrollTop=Math.max(0,72+state.eventIndex*rowGap-sequenceScroll.clientHeight+85);
     }
     function tick(now){
       const state=motion.sample(now);paint(state.progress);

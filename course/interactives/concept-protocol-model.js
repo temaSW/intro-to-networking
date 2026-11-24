@@ -1,32 +1,46 @@
 (function(scope){
   'use strict';
   const row=(step,from,to,label,explain,kind='message')=>({step,from,to,label,explain,kind});
+  const tcpOpen=(step,client,server)=>[
+    row(step,client,server,'TCP SYN','Клиент начинает установление TCP-соединения с сервером.'),
+    row(step,server,client,'TCP SYN + ACK','Сервер подтверждает SYN клиента и передаёт свой SYN.'),
+    row(step,client,server,'TCP ACK','Клиент подтверждает SYN сервера. После приёма ACK сервером TCP-соединение установлено.')
+  ];
+  const tcpSegment=(step,from,to,label,explain,seq,ack,bytes)=>({
+    ...row(step,from,to,label,explain),tcp:{seq,ack,bytes,flags:'ACK'},
+    brief:bytes?'Сообщение SMB передаётся внутри TCP. В том же сегменте подтверждаются байты, принятые от другой стороны.':'TCP подтверждает приём байтов. Данных SMB в этом сегменте нет.'
+  });
   const diagrams={
-    cloud:{actors:['Клиент WebDAV','Облачное хранилище'],note:'Яндекс Диск: выбран доступ по WebDAV/HTTPS с HTTP/1.1. DNS, TCP, TLS и авторизация уже подготовлены; файл не сохранён локально. Внутренние серверы облака объединены в одну службу.',rows:[
-      {...row(1,0,1,'HTTP: GET /отчёт.pdf','Клиент WebDAV запрашивает содержимое выбранного файла. GET -- метод HTTP; запрос передаётся внутри TLS.'),protection:'application'},
-      {...row(2,1,0,'HTTP/1.1 200 OK + байты файла','Служба возвращает содержимое файла в теле HTTP-ответа. Большой файл передаётся множеством пакетов; на диаграмме это одна стрелка.'),protection:'application'},
+    cloud:{actors:['Клиент WebDAV','Облачное хранилище'],note:'Яндекс Диск: WebDAV/HTTPS с HTTP/1.1. Адрес известен; сначала устанавливается TCP, затем свёрнуто показана подготовка TLS и доступа. Внутренние серверы облака объединены в одну службу.',rows:[
+      ...tcpOpen(0,0,1),
+      row(1,0,1,'TLS и доступ к облаку подготовлены','После установления TCP стороны подготавливают защиту TLS и авторизованный доступ. Эти обмены свёрнуты; далее HTTP передаётся внутри TLS.','band'),
+      {...row(1,0,1,'HTTP: GET /отчёт.pdf','Клиент WebDAV запрашивает содержимое выбранного файла. GET -- метод HTTP; запрос зашифрован внутри записи TLS. Это HTTPS.'),protection:'application',displayLabel:'TLS: зашифрованный HTTP-запрос'},
+      {...row(2,1,0,'HTTP/1.1 200 OK + байты файла','Внутри зашифрованного ответа TLS находятся HTTP 200 OK и байты файла. Наблюдателю по пути они не видны. Большой файл передаётся множеством пакетов; здесь это одна стрелка.'),protection:'application',displayLabel:'TLS: зашифрованный HTTP-ответ с файлом'},
       row(3,0,0,'Файл передан программе','Клиент собирает полученные данные и передаёт их программе. Это локальная обработка.','local')
     ]},
-    smb:{actors:['Клиент SMB','Файловый сервер'],note:'SMB2/3: соединение, сеанс и подключение общей папки уже подготовлены.',rows:[
-      row(1,0,1,'SMB2 CREATE: отчёт.pdf','CREATE открывает существующий файл; название команды не означает обязательного создания нового файла.'),
-      row(1,1,0,'CREATE Response: SUCCESS, FileId','Сервер открыл файл и вернул идентификатор для дальнейших операций.'),
-      row(1,0,1,'SMB2 READ: FileId, Offset, Length','Клиент запрашивает порцию данных открытого файла.'),
-      row(2,1,0,'READ Response: данные','Сервер возвращает запрошенные байты. Для большого файла чтение повторяется.'),
-      row(2,0,1,'SMB2 CLOSE: FileId','После чтения клиент закрывает открытый файл.'),
-      row(3,1,0,'CLOSE Response: SUCCESS','Закрытие подтверждено. Данные доступны программе клиента.')
+    smb:{actors:['Клиент SMB','Файловый сервер'],note:'Сплошные стрелки -- TCP с сообщением SMB; пунктир -- отдельный TCP ACK без данных.',rows:[
+      ...tcpOpen(0,0,1),
+      row(1,0,1,'Подготовка SMB: сеанс и доступ к папке','Это отдельный служебный обмен SMB после установления TCP: согласование протокола, подготовка сеанса и подключения общей папки. Сообщения этого обмена свёрнуты в одну полосу; далее открывается файл.','band'),
+      tcpSegment(1,0,1,'SMB2 CREATE: отчёт.pdf','Запрос открытия файла находится в полезной нагрузке TCP: 160 байт с SEQ 1001. Следующий ожидаемый от сервера байт -- 5001.',1001,5001,160),
+      tcpSegment(1,1,0,'TCP ACK: байты запроса приняты','ACK 1161 подтверждает приём байтов 1001–1160. Прикладных данных в сегменте нет. Это ещё не ответ SMB об открытии файла.',5001,1161,0),
+      tcpSegment(1,1,0,'CREATE Response: SUCCESS, FileId','Теперь сервер SMB сообщает об успешном открытии файла и возвращает FileId. Эти 160 байт идут в TCP; ACK 1161 также подтверждает запрос клиента.',5001,1161,160),
+      tcpSegment(1,0,1,'SMB2 READ: FileId, Offset, Length','Клиент запрашивает данные файла. Сегмент TCP несёт 116 байт запроса и одновременно подтверждает приём ответа CREATE: ACK 5161. Отдельный ACK для него здесь не нужен.',1161,5161,116),
+      tcpSegment(2,1,0,'READ Response: данные','Сервер возвращает ответ SMB с данными файла внутри 596 байт полезной нагрузки TCP. ACK 1277 одновременно подтверждает запрос READ. Длина включает оформление SMB, а не только байты файла.',5161,1277,596),
+      tcpSegment(2,0,1,'TCP ACK: байты ответа приняты','ACK 5757 подтверждает приём байтов сервера до 5756 включительно. Сегмент не содержит запроса SMB и не доказывает, что программа уже использовала данные файла.',1277,5757,0),
+      tcpSegment(2,0,1,'SMB2 CLOSE: FileId','Клиент отправляет закрытие файла внутри 92 байт полезной нагрузки TCP. Отдельный ACK перед этим не израсходовал номер SEQ: данные продолжаются с 1277.',1277,5757,92),
+      tcpSegment(3,1,0,'CLOSE Response: SUCCESS','Ответ SMB подтверждает закрытие файла, а ACK 1369 в том же сегменте TCP подтверждает байты запроса CLOSE. TCP-соединение остаётся открытым.',5757,1369,128),
+      tcpSegment(3,0,1,'TCP ACK: ответ CLOSE принят','Клиент подтверждает байты ответа: ACK 5885. Это подтверждение TCP, а не ещё одна операция SMB. Файл закрыт; TCP-соединение сохраняется для следующих операций.',1369,5885,0)
     ]},
     web:{actors:['Компьютер','DNS-резолвер','Веб-сервер'],note:'Пример HTTPS с HTTP/1.1 поверх TCP. Имя и адрес условные; DNS-кэша и готового соединения с сайтом нет.',rows:[
       row(1,0,1,'DNS Query: A course.example','Компьютер запрашивает адрес IPv4 для имени сайта.'),
       row(2,1,0,'DNS Response: A 198.51.100.20','Успешный ответ содержит адрес для следующего обмена. Это ещё не содержимое сайта.'),
-      row(3,0,2,'TCP SYN','Компьютер начинает транспортное соединение с веб-сервером.'),
-      row(3,2,0,'TCP SYN + ACK','Веб-сервер отвечает на начало соединения.'),
-      row(3,0,2,'TCP ACK','Завершается показанное трёхэтапное установление TCP-соединения.'),
-      row(3,0,2,'TLS: подготовка защиты','Полоса объединяет несколько служебных сообщений TLS. Они подробно показаны в следующем эпизоде этой страницы.','band'),
-      row(3,0,2,'HTTP: GET / HTTP/1.1','Браузер запрашивает ресурс. HTTP-сообщение передаётся внутри подготовленного защищённого соединения.'),
-      row(4,2,0,'HTTP/1.1 200 OK + HTML','Сервер возвращает успешный результат и документ. Заголовки и тело здесь объединены в одну стрелку.'),
+      row(3,0,2,'TCP-соединение установлено','После получения адреса устанавливается TCP-соединение с веб-сервером. Три сообщения рукопожатия уже разобраны в первых двух примерах и здесь свёрнуты.','band'),
+      row(3,0,2,'TLS: подготовка защиты','Полоса объединяет несколько служебных сообщений TLS. Обмен ключами, сертификат и проверка сервера уже рассмотрены в предшествующем разборе TLS.','band'),
+      {...row(3,0,2,'HTTP: GET / HTTP/1.1','Браузер запрашивает ресурс по HTTPS. HTTP GET зашифрован внутри TLS; промежуточным узлам его содержимое недоступно.'),protection:'application',displayLabel:'TLS: зашифрованный HTTP-запрос'},
+      {...row(4,2,0,'HTTP/1.1 200 OK + HTML','Сервер возвращает HTTP 200 OK и HTML внутри зашифрованных записей TLS. Заголовки и тело здесь объединены в одну стрелку.'),protection:'application',displayLabel:'TLS: зашифрованный HTTP-ответ с HTML'},
       row(5,0,0,'Разбор HTML','Это локальная обработка, а не новое сетевое сообщение. Дополнительные ресурсы могут потребовать новых запросов.','local')
     ]},
-    message:{actors:['Приложение А','XMPP-сервер','Приложение Б'],note:'Оба клиента одного XMPP-сервера уже вошли в службу. В примере используется расширение подтверждений XEP-0184.',rows:[
+    message:{actors:['Приложение А','XMPP-сервер','Приложение Б'],note:'TCP-соединения А ↔ сервер и Б ↔ сервер уже установлены, TLS и вход в службу подготовлены. В примере используется расширение подтверждений XEP-0184.',rows:[
       row(1,0,1,'message type="chat", id="m1"','А отправляет XMPP-сообщение с текстом и запросом подтверждения получения.'),
       row(2,1,1,'Приём и обработка сервером','Это действие сервера. Базовое сообщение XMPP само по себе не требует отдельного ответа «сервер принял».','local'),
       row(3,1,2,'message type="chat", id="m1"','Сервер передаёт сообщение клиенту Б. Между клиентами нет непосредственного сетевого соединения для этой передачи.'),
@@ -81,9 +95,9 @@
         r(0,1,'Application Data: запрос HTTP','Браузер передаёт GET внутри защищённых записей TLS. Назначение данных подписано для обучения; наблюдателю по пути открытый HTTP-текст не виден.','application'),
         r(1,0,'Application Data: ответ HTTP','Сервер возвращает защищённый ответ. Клиент проверяет целостность, расшифровывает данные и передаёт их браузеру.','application'));
     }
-    return {actors:['Клиент TLS','Сервер TLS'],note:'Полное рукопожатие TLS 1.3 с сертификатом сервера. TCP готов; нет возобновления, ранних данных и сертификата клиента. Метка «шифр» относится к содержимому сообщения.',rows};
+    return {actors:['Клиент TLS','Сервер TLS'],note:'Полное рукопожатие TLS 1.3 с сертификатом сервера. TCP готов; нет возобновления, ранних данных и сертификата клиента. Метка «шифр» относится к содержимому сообщения.',rows:rows.map(r=>r.protection==='application'?{...r,displayLabel:r.from===0?'TLS Application Data: HTTP-запрос':'TLS Application Data: HTTP-ответ'}:r)};
   }
-  const stacks={cloud:'WebDAV/HTTP → TLS → TCP → IP',smb:'SMB2/3 → TCP → IP',web:'DNS → UDP → IP; HTTP → TLS → TCP → IP',tls:'HTTP → TLS 1.3 → TCP → IP',message:'XMPP → TLS → TCP → IP',call:'Jingle/XMPP → TLS → TCP → IP; SRTP → UDP → IP',voip:'SIP → UDP → IP; RTP → UDP → IP'};
+  const stacks={cloud:'WebDAV по HTTPS: HTTP → TLS → TCP → IP',smb:'SMB2/3 → TCP → IP',web:'DNS → UDP → IP; HTTPS: HTTP → TLS → TCP → IP',tls:'HTTPS: HTTP → TLS 1.3 → TCP → IP',message:'XMPP → TLS → TCP → IP',call:'Jingle/XMPP → TLS → TCP → IP; SRTP → UDP → IP',voip:'SIP → UDP → IP; RTP → UDP → IP'};
   function forCase(id,relay=false,tlsFault=false){
     const data=id==='tls'?tls(tlsFault):id==='call'?call(relay):diagrams[id];if(!data)throw new RangeError('Нет диаграммы');
     const rows=data.rows.map(r=>{
@@ -98,6 +112,14 @@
     return {...data,rows,stack:stacks[id],note:data.note+transportNote};
   }
   const actorNodes={cloud:[0,3],smb:[0,2],web:[0,4,3],tls:[0,3],message:[0,2,4],call:[0,2,5,4],voip:[0,2]};
+  function transportStatus(id,index,event){
+    if(id==='smb'||id==='cloud')return index===0?'TCP-соединение ещё не установлено.':index<3?'TCP: установление соединения.':index===3?'TCP: ACK завершает установление соединения.':'TCP-соединение установлено.';
+    if(id==='web')return index<3?'DNS: UDP готов к обмену; рукопожатия нет. TCP будет установлен после получения адреса.':'TCP-соединение с веб-сервером установлено.';
+    if(id==='tls')return 'TCP-соединение уже установлено.';
+    if(id==='message')return 'Два TCP-соединения уже установлены: А ↔ сервер и Б ↔ сервер.';
+    if(id==='call')return 'TCP-соединения с XMPP-сервером уже установлены. '+(event?.kind==='media'?'UDP готов к передаче речи; рукопожатия UDP нет.':'UDP для речи будет готов после согласования медиасеанса; рукопожатия UDP нет.');
+    return 'UDP готов к обмену SIP и RTP; установления соединения и рукопожатия UDP нет.';
+  }
   function routeBetween(edges,from,to){
     const queue=[[from]],seen=new Set([from]);
     while(queue.length){
@@ -112,8 +134,8 @@
     const event=index?sequence.rows[index-1]:null;
     const from=event?actorNodes[id][event.from]:base.at,to=event?actorNodes[id][event.to]:base.at;
     const moving=event&&event.kind!=='local'&&event.kind!=='band';
-    return {...base,index,count:sequence.rows.length+1,event,eventIndex:index-1,sequence,
-      title:event?event.label:base.title,text:event?event.explain:base.text,payload:event?event.label:base.payload,
+    return {...base,index,count:sequence.rows.length+1,event,eventIndex:index-1,sequence,transportStatus:transportStatus(id,index,event),
+      title:event?(event.displayLabel||event.label):base.title,text:event?event.explain:base.text,payload:event?(event.displayLabel||event.label):base.payload,
       path:moving?routeBetween(base.edges,from,to):null,at:from===to?from:undefined,
       focusNodes:event?.kind==='band'?[from,to]:[from],fromNode:from,toNode:to,
       train:false,duplex:false,media:event?.kind==='media',control:!!moving&&event.kind!=='media'};

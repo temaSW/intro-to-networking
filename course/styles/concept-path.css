@@ -9,6 +9,7 @@
 .concept-path .cp-sequence { display:block; width:100%; min-width:650px; height:auto; }
 .cp-lifeline { fill:none; stroke:var(--line); stroke-dasharray:5 5; stroke-width:1.5; }
 .cp-protocol-message { fill:none; stroke:var(--focus); stroke-width:2; }
+.cp-protocol-ack { fill:none; stroke:var(--accent); stroke-width:2; stroke-dasharray:7 5; }
 .cp-protocol-media { fill:none; stroke:var(--accent); stroke-width:2.5; }
 .cp-seq-label { font:14px ui-monospace,SFMono-Regular,Consolas,monospace; }
 .concept-path .cp-seq-transport { font-size:14px; fill:var(--muted); }
@@ -47,6 +48,7 @@
 .concept-path svg text { fill:currentColor; font-family:system-ui,sans-serif; }
 .cp-label { font-size:17px; }
 .cp-tick { font-size:15px; }
+.cp-transport-state { padding:.6rem .8rem; border-left:3px solid var(--accent); background:var(--accent-soft); color:var(--ink); }
 .cp-link { stroke:var(--line); stroke-width:3; fill:none; }
 .cp-route { stroke:var(--accent); stroke-width:4; fill:none; }
 .cp-route.control { stroke:var(--focus); stroke-dasharray:8 6; }
