@@ -296,7 +296,7 @@ test('HTTPS diagrams expose TLS records while keeping HTTP as protected contents
     const data=d.rows.map((r,i)=>({r,index:i+1})).filter(({r})=>r.protection==='application');
     assert.equal(data.length,2);
     for(const{r,index}of data){
-      assert.match(r.displayLabel,/^TLS/);assert.match(protocols.eventState(id,index).title,/^TLS/);
+      assert.match(r.displayLabel,/^HTTPS/);assert.match(protocols.eventState(id,index).title,/^HTTPS/);
       assert.equal(protocols.eventState(id,index).payload,r.displayLabel);
       assert.equal(packet.describe(id,index,.5).payload,'Защищённые данные');
     }

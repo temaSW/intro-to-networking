@@ -236,7 +236,7 @@ format:
 [Следующая тема: Основы сетевой безопасности →](09-network-security.qmd)
 :::
 
-<script src="../interactives/concept-path-model.js?v=tcp-20261124-5" defer></script>
-<script src="../interactives/concept-protocol-model.js?v=tcp-20261124-5" defer></script>
-<script src="../interactives/concept-packet-model.js?v=tcp-20261124-5" defer></script>
-<script src="../interactives/concept-path-ui.js?v=tcp-20261124-5" defer></script>
+<script src="../interactives/concept-path-model.js?v=tcp-20261124-6" defer></script>
+<script src="../interactives/concept-protocol-model.js?v=tcp-20261124-6" defer></script>
+<script src="../interactives/concept-packet-model.js?v=tcp-20261124-6" defer></script>
+<script src="../interactives/concept-path-ui.js?v=tcp-20261124-6" defer></script>
