@@ -24,7 +24,7 @@ main.content .ipv4-plan {
 .ipv4-answer-form { margin: 1.25rem 0; padding: clamp(.85rem, 2vw, 1.25rem); border: 1px solid var(--line); border-radius: .4rem; background: var(--surface); }
 .ipv4-answer-form h3 { margin-top: 0; }
 .ipv4-answer-fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
-.ipv4-answer { display: grid; grid-template-rows: auto auto 1fr; align-content: start; gap: .35rem; min-width: 0; color: var(--ink); text-align: left; }
+.ipv4-answer { display: grid; grid-row: span 3; grid-template-rows: subgrid; align-content: start; gap: .35rem; min-width: 0; color: var(--ink); text-align: left; }
 .ipv4-answer input, .ipv4-answer select { min-width: 0; width: 100%; min-height: 44px; border: 1px solid var(--line); border-radius: .3rem; background: var(--page-bg); color: var(--ink); padding: .5rem; font: inherit; }
 .ipv4-answer input { font-variant-numeric: tabular-nums; }
 .ipv4-answer input:focus-visible, .ipv4-answer select:focus-visible, .ipv4-answer-actions button:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
